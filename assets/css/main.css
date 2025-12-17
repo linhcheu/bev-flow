@@ -1,0 +1,21 @@
+@import "https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap";
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-luxury-gold: #D4AF37;
+    --color-luxury-dark: hsl(0, 0%, 10%);
+    --color-luxury-light: #fafafa;
+    --color-luxury-gray: #4a4a4a;
+  }
+  
+  body {
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  * {
+    font-family: 'Lato', sans-serif;
+  }
+}
