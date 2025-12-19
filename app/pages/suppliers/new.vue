@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container">
+  <div class="p-8">
     <SupplierForm @submit="handleSubmit" />
   </div>
 </template>
@@ -17,9 +17,3 @@ const handleSubmit = async (supplier: Supplier) => {
   }
 };
 </script>
-
-<style scoped>
-.page-container {
-  padding: 2rem;
-}
-</style>

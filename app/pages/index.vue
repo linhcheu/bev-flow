@@ -1,66 +1,111 @@
 <template>
-  <div class="px-12 py-10">
+  <div class="p-8">
     <!-- Header -->
-    <div class="mb-12">
-      <h1 class="text-4xl font-light text-neutral-800 tracking-wide mb-2">Dashboard</h1>
-      <p class="text-sm text-neutral-500 tracking-wider uppercase">Overview & Insights</p>
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">Dashboard</h1>
+      <p class="mt-1 text-zinc-500">Welcome back! Here's your business overview.</p>
     </div>
     
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-16">
-      <div class="bg-white border border-neutral-200 p-8 rounded-sm hover:shadow-lg transition-shadow duration-300">
-        <h3 class="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] mb-3">Total Products</h3>
-        <p class="text-4xl font-light text-neutral-900">{{ stats.totalProducts }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 hover:shadow-lg hover:shadow-zinc-200/50 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-package" class="w-5 h-5 text-blue-600" />
+          </div>
+          <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12%</span>
+        </div>
+        <p class="text-2xl font-bold text-zinc-900">{{ stats.totalProducts }}</p>
+        <p class="text-sm text-zinc-500 mt-1">Total Products</p>
       </div>
       
-      <div class="bg-white border border-neutral-200 p-8 rounded-sm hover:shadow-lg transition-shadow duration-300">
-        <h3 class="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] mb-3">Total Suppliers</h3>
-        <p class="text-4xl font-light text-neutral-900">{{ stats.totalSuppliers }}</p>
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 hover:shadow-lg hover:shadow-zinc-200/50 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-building-2" class="w-5 h-5 text-purple-600" />
+          </div>
+          <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+3</span>
+        </div>
+        <p class="text-2xl font-bold text-zinc-900">{{ stats.totalSuppliers }}</p>
+        <p class="text-sm text-zinc-500 mt-1">Total Suppliers</p>
       </div>
       
-      <div class="bg-white border border-neutral-200 p-8 rounded-sm hover:shadow-lg transition-shadow duration-300">
-        <h3 class="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] mb-3">Active POs</h3>
-        <p class="text-4xl font-light text-neutral-900">{{ stats.activePOs }}</p>
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 hover:shadow-lg hover:shadow-zinc-200/50 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-clipboard-list" class="w-5 h-5 text-amber-600" />
+          </div>
+          <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>
+        </div>
+        <p class="text-2xl font-bold text-zinc-900">{{ stats.activePOs }}</p>
+        <p class="text-sm text-zinc-500 mt-1">Active POs</p>
       </div>
       
-      <div class="bg-white border border-neutral-200 p-8 rounded-sm hover:shadow-lg transition-shadow duration-300">
-        <h3 class="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] mb-3">Monthly Sales</h3>
-        <p class="text-4xl font-light text-[#D4AF37]">${{ stats.monthlySales.toFixed(2) }}</p>
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 hover:shadow-lg hover:shadow-zinc-200/50 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-emerald-600" />
+          </div>
+          <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+8.2%</span>
+        </div>
+        <p class="text-2xl font-bold text-zinc-900">${{ stats.monthlySales.toFixed(2) }}</p>
+        <p class="text-sm text-zinc-500 mt-1">Monthly Sales</p>
       </div>
       
-      <div class="bg-white border border-neutral-200 p-8 rounded-sm hover:shadow-lg transition-shadow duration-300">
-        <h3 class="text-[10px] font-medium text-neutral-500 uppercase tracking-[0.15em] mb-3">Monthly Profit</h3>
-        <p class="text-4xl font-light text-[#D4AF37]">${{ stats.monthlyProfit.toFixed(2) }}</p>
+      <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-6 hover:shadow-lg hover:shadow-amber-200/50 transition-all duration-300">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-wallet" class="w-5 h-5 text-white" />
+          </div>
+          <span class="text-xs font-medium text-white/90 bg-white/20 px-2 py-1 rounded-full">+15%</span>
+        </div>
+        <p class="text-2xl font-bold text-white">${{ stats.monthlyProfit.toFixed(2) }}</p>
+        <p class="text-sm text-white/80 mt-1">Monthly Profit</p>
       </div>
     </div>
 
     <!-- Quick Actions -->
-    <div>
-      <h2 class="text-2xl font-light text-neutral-800 mb-6 tracking-wide">Quick Actions</h2>
-      <div class="flex flex-wrap gap-4">
+    <div class="bg-white border border-zinc-200 rounded-xl p-6">
+      <h2 class="text-lg font-semibold text-zinc-900 mb-5">Quick Actions</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <NuxtLink 
           to="/products/new" 
-          class="px-8 py-4 bg-[#1a1a1a] text-white text-sm font-light tracking-wider uppercase rounded-sm hover:bg-[#D4AF37] hover:text-[#1a1a1a] transition-all duration-300 no-underline"
+          class="flex flex-col items-center gap-3 p-5 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-all duration-200 no-underline group"
         >
-          Add Product
+          <div class="w-12 h-12 bg-white border border-zinc-200 rounded-xl flex items-center justify-center group-hover:border-amber-300 group-hover:bg-amber-50 transition-all">
+            <UIcon name="i-lucide-package-plus" class="w-6 h-6 text-zinc-600 group-hover:text-amber-600" />
+          </div>
+          <span class="text-sm font-medium text-zinc-700">Add Product</span>
         </NuxtLink>
+        
         <NuxtLink 
           to="/suppliers/new" 
-          class="px-8 py-4 bg-[#1a1a1a] text-white text-sm font-light tracking-wider uppercase rounded-sm hover:bg-[#D4AF37] hover:text-[#1a1a1a] transition-all duration-300 no-underline"
+          class="flex flex-col items-center gap-3 p-5 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-all duration-200 no-underline group"
         >
-          Add Supplier
+          <div class="w-12 h-12 bg-white border border-zinc-200 rounded-xl flex items-center justify-center group-hover:border-amber-300 group-hover:bg-amber-50 transition-all">
+            <UIcon name="i-lucide-building-2" class="w-6 h-6 text-zinc-600 group-hover:text-amber-600" />
+          </div>
+          <span class="text-sm font-medium text-zinc-700">Add Supplier</span>
         </NuxtLink>
+        
         <NuxtLink 
           to="/purchase-orders/new" 
-          class="px-8 py-4 bg-[#1a1a1a] text-white text-sm font-light tracking-wider uppercase rounded-sm hover:bg-[#D4AF37] hover:text-[#1a1a1a] transition-all duration-300 no-underline"
+          class="flex flex-col items-center gap-3 p-5 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-all duration-200 no-underline group"
         >
-          Create PO
+          <div class="w-12 h-12 bg-white border border-zinc-200 rounded-xl flex items-center justify-center group-hover:border-amber-300 group-hover:bg-amber-50 transition-all">
+            <UIcon name="i-lucide-file-plus" class="w-6 h-6 text-zinc-600 group-hover:text-amber-600" />
+          </div>
+          <span class="text-sm font-medium text-zinc-700">Create PO</span>
         </NuxtLink>
+        
         <NuxtLink 
           to="/sales/new" 
-          class="px-8 py-4 bg-[#1a1a1a] text-white text-sm font-light tracking-wider uppercase rounded-sm hover:bg-[#D4AF37] hover:text-[#1a1a1a] transition-all duration-300 no-underline"
+          class="flex flex-col items-center gap-3 p-5 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-all duration-200 no-underline group"
         >
-          Record Sale
+          <div class="w-12 h-12 bg-white border border-zinc-200 rounded-xl flex items-center justify-center group-hover:border-amber-300 group-hover:bg-amber-50 transition-all">
+            <UIcon name="i-lucide-receipt" class="w-6 h-6 text-zinc-600 group-hover:text-amber-600" />
+          </div>
+          <span class="text-sm font-medium text-zinc-700">Record Sale</span>
         </NuxtLink>
       </div>
     </div>

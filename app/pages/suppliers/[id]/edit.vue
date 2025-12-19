@@ -1,7 +1,9 @@
 <template>
-  <div class="page-container">
-    <div v-if="loading" class="loading">Loading...</div>
-    <SupplierForm v-else :supplier="supplier" :is-edit="true" @submit="handleSubmit" />
+  <div class="p-8">
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-zinc-400 animate-spin" />
+    </div>
+    <SupplierForm v-else-if="supplier" :supplier="supplier" :is-edit="true" @submit="handleSubmit" />
   </div>
 </template>
 
@@ -26,14 +28,3 @@ const handleSubmit = async (updatedSupplier: Supplier) => {
   }
 };
 </script>
-
-<style scoped>
-.page-container {
-  padding: 2rem;
-}
-
-.loading {
-  text-align: center;
-  padding: 2rem;
-}
-</style>

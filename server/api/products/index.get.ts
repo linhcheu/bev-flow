@@ -1,49 +1,28 @@
-// Sample API endpoint for products
-// This demonstrates the structure - you'll need to connect to your actual MySQL database
+// API endpoint for getting all products
+import { queryAll } from '~/server/utils/db';
+import type { Product, Supplier } from '~/types';
 
-export default defineEventHandler(async (event) => {
-  // TODO: Replace with actual database connection
-  
-  /*
-  const db = await connectToDatabase();
-  
-  const [rows] = await db.query(`
-    SELECT p.*, s.company_name as supplier_name,
-           (p.selling_price - p.cost_price) as profit
+interface ProductRow extends Product {
+  supplier_name: string;
+}
+
+export default defineEventHandler(async () => {
+  const products = queryAll<ProductRow>(`
+    SELECT 
+      p.*,
+      s.company_name as supplier_name
     FROM Products p
     LEFT JOIN Suppliers s ON p.supplier_id = s.supplier_id
+    ORDER BY p.created_at DESC
   `);
   
-  return rows;
-  */
-  
-  // Mock data for development
-  return [
-    {
-      product_id: 1,
-      sku: 'A005',
-      product_name: 'Sample Product 1',
-      description: 'Product description here',
-      cost_price: 10.00,
-      selling_price: 15.00,
-      supplier_id: 1,
-      supplier: {
-        supplier_id: 1,
-        company_name: 'ABC Suppliers Inc.'
-      }
-    },
-    {
-      product_id: 2,
-      sku: 'A002',
-      product_name: 'Sample Product 2',
-      description: 'Another product',
-      cost_price: 20.00,
-      selling_price: 30.00,
-      supplier_id: 2,
-      supplier: {
-        supplier_id: 2,
-        company_name: 'XYZ Wholesale'
-      }
-    }
-  ];
+  // Transform to include supplier object
+  return products.map(p => ({
+    ...p,
+    profit: Number(p.selling_price) - Number(p.cost_price),
+    supplier: p.supplier_id ? {
+      supplier_id: p.supplier_id,
+      company_name: p.supplier_name
+    } : null
+  }));
 });

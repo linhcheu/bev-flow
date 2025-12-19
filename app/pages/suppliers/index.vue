@@ -1,59 +1,103 @@
 <template>
-  <div class="px-12 py-10">
-    <div class="flex justify-between items-center mb-12">
+  <div class="p-8">
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-8">
       <div>
-        <h1 class="text-4xl font-light text-neutral-800 tracking-wide mb-2">Suppliers</h1>
-        <p class="text-sm text-neutral-500 tracking-wider uppercase">Supplier Management</p>
+        <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">Suppliers</h1>
+        <p class="mt-1 text-zinc-500">Manage your supplier relationships</p>
       </div>
       <NuxtLink 
         to="/suppliers/new" 
-        class="px-8 py-4 bg-[#1a1a1a] text-white text-sm font-light tracking-wider uppercase rounded-sm hover:bg-[#D4AF37] hover:text-[#1a1a1a] transition-all duration-300 no-underline"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors no-underline"
       >
+        <UIcon name="i-lucide-plus" class="w-4 h-4" />
         Add Supplier
       </NuxtLink>
     </div>
 
-    <div v-if="loading" class="text-center py-16 text-neutral-500">Loading suppliers...</div>
-    <div v-else-if="error" class="text-center py-16 text-red-600">{{ error }}</div>
+    <!-- Loading State -->
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-zinc-400 animate-spin" />
+    </div>
     
-    <div v-else class="bg-white border border-neutral-200 rounded-sm overflow-hidden">
-      <table class="w-full">
-        <thead>
-          <tr class="bg-neutral-50 border-b border-neutral-200">
-            <th class="px-8 py-5 text-left text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">ID</th>
-            <th class="px-8 py-5 text-left text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Company Name</th>
-            <th class="px-8 py-5 text-left text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Contact Person</th>
-            <th class="px-8 py-5 text-left text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Phone</th>
-            <th class="px-8 py-5 text-left text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Email</th>
-            <th class="px-8 py-5 text-left text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Lead Time</th>
-            <th class="px-8 py-5 text-left text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-neutral-100">
-          <tr v-for="supplier in suppliers" :key="supplier.supplier_id" class="hover:bg-neutral-50 transition-colors duration-200">
-            <td class="px-8 py-5 text-sm text-neutral-700 font-light">{{ supplier.supplier_id }}</td>
-            <td class="px-8 py-5 text-sm text-neutral-900">{{ supplier.company_name }}</td>
-            <td class="px-8 py-5 text-sm text-neutral-700 font-light">{{ supplier.contact_person || '-' }}</td>
-            <td class="px-8 py-5 text-sm text-neutral-700 font-light">{{ supplier.phone || '-' }}</td>
-            <td class="px-8 py-5 text-sm text-neutral-700 font-light">{{ supplier.email || '-' }}</td>
-            <td class="px-8 py-5 text-sm text-neutral-700 font-light">{{ supplier.lead_time_days || 7 }} days</td>
-            <td class="px-8 py-5 flex gap-3">
-              <NuxtLink 
-                :to="`/suppliers/${supplier.supplier_id}/edit`" 
-                class="px-4 py-2 text-xs bg-neutral-100 text-neutral-700 rounded-sm hover:bg-neutral-200 transition-colors uppercase tracking-wider no-underline"
-              >
-                Edit
-              </NuxtLink>
-              <button 
-                @click="handleDelete(supplier.supplier_id!)" 
-                class="px-4 py-2 text-xs bg-red-50 text-red-700 rounded-sm hover:bg-red-100 transition-colors uppercase tracking-wider"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Error State -->
+    <div v-else-if="error" class="text-center py-20">
+      <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <UIcon name="i-lucide-alert-circle" class="w-8 h-8 text-red-500" />
+      </div>
+      <p class="text-zinc-600">{{ error }}</p>
+    </div>
+    
+    <!-- Suppliers Table -->
+    <div v-else class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-zinc-50 border-b border-zinc-200">
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Company</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Contact Person</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Phone</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Email</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Lead Time</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold text-zinc-600 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            <tr v-for="supplier in suppliers" :key="supplier.supplier_id" class="hover:bg-zinc-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
+                    <UIcon name="i-lucide-building-2" class="w-4 h-4 text-purple-600" />
+                  </div>
+                  <span class="text-sm font-medium text-zinc-900">{{ supplier.company_name }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-zinc-600">{{ supplier.contact_person || '-' }}</td>
+              <td class="px-6 py-4 text-sm text-zinc-600">{{ supplier.phone || '-' }}</td>
+              <td class="px-6 py-4 text-sm text-zinc-600">{{ supplier.email || '-' }}</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+                  {{ supplier.lead_time_days || 7 }} days
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-end gap-2">
+                  <NuxtLink 
+                    :to="`/suppliers/${supplier.supplier_id}/edit`" 
+                    class="p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors no-underline"
+                    title="Edit"
+                  >
+                    <UIcon name="i-lucide-pencil" class="w-4 h-4" />
+                  </NuxtLink>
+                  <button 
+                    @click="handleDelete(supplier.supplier_id!)" 
+                    class="p-2 text-zinc-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Empty State -->
+      <div v-if="suppliers.length === 0" class="text-center py-16">
+        <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <UIcon name="i-lucide-building-2" class="w-8 h-8 text-zinc-400" />
+        </div>
+        <h3 class="text-lg font-medium text-zinc-900 mb-1">No suppliers yet</h3>
+        <p class="text-sm text-zinc-500 mb-4">Get started by adding your first supplier.</p>
+        <NuxtLink 
+          to="/suppliers/new" 
+          class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors no-underline"
+        >
+          <UIcon name="i-lucide-plus" class="w-4 h-4" />
+          Add Supplier
+        </NuxtLink>
+      </div>
     </div>
   </div>
 </template>

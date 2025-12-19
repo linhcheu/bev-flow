@@ -1,106 +1,162 @@
 <template>
-  <div class="max-w-3xl mx-auto px-12 py-10">
-    <div class="mb-12">
-      <h2 class="text-4xl font-light text-neutral-800 tracking-wide mb-2">{{ isEdit ? 'Edit Product' : 'Add Product' }}</h2>
-      <p class="text-sm text-neutral-500 tracking-wider uppercase">Product Information</p>
+  <div class="max-w-2xl">
+    <!-- Header -->
+    <div class="mb-8">
+      <NuxtLink to="/products" class="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors no-underline mb-4">
+        <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
+        Back to Products
+      </NuxtLink>
+      <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">{{ isEdit ? 'Edit Product' : 'Add Product' }}</h1>
+      <p class="mt-1 text-zinc-500">{{ isEdit ? 'Update product information' : 'Add a new product to your inventory' }}</p>
     </div>
     
-    <form @submit.prevent="handleSubmit" class="space-y-8">
-      <div>
-        <label for="sku" class="block mb-2 text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">SKU</label>
-        <input 
-          id="sku"
-          v-model="form.sku" 
-          type="text"
-          class="w-full px-6 py-4 border border-neutral-300 rounded-sm focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 text-neutral-800"
-        />
-      </div>
-      
-      <div>
-        <label for="product_name" class="block mb-2 text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Product Name *</label>
-        <input 
-          id="product_name"
-          v-model="form.product_name" 
-          type="text" 
-          required
-          class="w-full px-6 py-4 border border-neutral-300 rounded-sm focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 text-neutral-800"
-        />
-      </div>
-      
-      <div>
-        <label for="description" class="block mb-2 text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Description</label>
-        <textarea 
-          id="description"
-          v-model="form.description" 
-          rows="4"
-          class="w-full px-6 py-4 border border-neutral-300 rounded-sm focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 text-neutral-800 resize-vertical"
-        ></textarea>
-      </div>
-      
-      <div class="grid grid-cols-2 gap-6">
-        <div>
-          <label for="cost_price" class="block mb-2 text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Cost Price *</label>
-          <input 
-            id="cost_price"
-            v-model.number="form.cost_price" 
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            class="w-full px-6 py-4 border border-neutral-300 rounded-sm focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 text-neutral-800"
-          />
+    <form @submit.prevent="handleSubmit" class="space-y-6">
+      <!-- SKU & Product Name -->
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
+          <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-500" />
+          Basic Information
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="sku" class="block text-sm font-medium text-zinc-700 mb-2">SKU</label>
+            <input 
+              id="sku"
+              v-model="form.sku" 
+              type="text"
+              placeholder="e.g. BEV001"
+              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+            />
+          </div>
+          
+          <div>
+            <label for="product_name" class="block text-sm font-medium text-zinc-700 mb-2">
+              Product Name <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="product_name"
+              v-model="form.product_name" 
+              type="text" 
+              required
+              placeholder="Enter product name"
+              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+            />
+          </div>
         </div>
         
         <div>
-          <label for="selling_price" class="block mb-2 text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Selling Price *</label>
-          <input 
-            id="selling_price"
-            v-model.number="form.selling_price" 
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            class="w-full px-6 py-4 border border-neutral-300 rounded-sm focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 text-neutral-800"
-          />
+          <label for="description" class="block text-sm font-medium text-zinc-700 mb-2">Description</label>
+          <textarea 
+            id="description"
+            v-model="form.description" 
+            rows="3"
+            placeholder="Enter product description"
+            class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
+          ></textarea>
         </div>
       </div>
       
-      <div>
-        <label for="supplier_id" class="block mb-2 text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em]">Supplier</label>
-        <select 
-          id="supplier_id"
-          v-model="form.supplier_id"
-          class="w-full px-6 py-4 border border-neutral-300 rounded-sm focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 text-neutral-800 bg-white"
-        >
-          <option :value="undefined">-- Select Supplier --</option>
-          <option v-for="supplier in suppliers" :key="supplier.supplier_id" :value="supplier.supplier_id">
-            {{ supplier.company_name }}
-          </option>
-        </select>
+      <!-- Pricing -->
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
+          <UIcon name="i-lucide-banknote" class="w-4 h-4 text-zinc-500" />
+          Pricing
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="cost_price" class="block text-sm font-medium text-zinc-700 mb-2">
+              Cost Price <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+              <input 
+                id="cost_price"
+                v-model.number="form.cost_price" 
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                placeholder="0.00"
+                class="w-full pl-8 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label for="selling_price" class="block text-sm font-medium text-zinc-700 mb-2">
+              Selling Price <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+              <input 
+                id="selling_price"
+                v-model.number="form.selling_price" 
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                placeholder="0.00"
+                class="w-full pl-8 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Profit Preview -->
+        <div v-if="form.cost_price && form.selling_price" class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <span class="text-sm font-medium text-emerald-700">Profit Margin</span>
+          <span class="text-xl font-bold text-emerald-600">${{ (form.selling_price - form.cost_price).toFixed(2) }}</span>
+        </div>
       </div>
       
-      <div v-if="form.cost_price && form.selling_price" class="px-6 py-4 bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-sm">
-        <span class="text-[10px] font-medium text-neutral-600 uppercase tracking-[0.15em] mr-3">Profit:</span>
-        <span class="text-2xl font-light text-[#D4AF37]">${{ (form.selling_price - form.cost_price).toFixed(2) }}</span>
+      <!-- Supplier -->
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
+          <UIcon name="i-lucide-building-2" class="w-4 h-4 text-zinc-500" />
+          Supplier
+        </h3>
+        
+        <div>
+          <label for="supplier_id" class="block text-sm font-medium text-zinc-700 mb-2">Select Supplier</label>
+          <select 
+            id="supplier_id"
+            v-model="form.supplier_id"
+            class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
+          >
+            <option :value="undefined">-- Select Supplier --</option>
+            <option v-for="supplier in suppliers" :key="supplier.supplier_id" :value="supplier.supplier_id">
+              {{ supplier.company_name }}
+            </option>
+          </select>
+        </div>
       </div>
       
-      <div class="flex gap-4 pt-6">
+      <!-- Error Message -->
+      <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
+        <p class="text-sm text-red-700">{{ error }}</p>
+      </div>
+      
+      <!-- Actions -->
+      <div class="flex items-center gap-3 pt-4">
         <button 
           type="submit" 
-          class="px-8 py-4 bg-[#1a1a1a] text-white text-sm font-light tracking-wider uppercase rounded-sm hover:bg-[#D4AF37] hover:text-[#1a1a1a] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" 
+          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
           :disabled="loading"
         >
+          <UIcon v-if="loading" name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
+          <UIcon v-else name="i-lucide-check" class="w-4 h-4" />
           {{ loading ? 'Saving...' : 'Save Product' }}
         </button>
         <NuxtLink 
           to="/products" 
-          class="px-8 py-4 bg-neutral-200 text-neutral-700 text-sm font-light tracking-wider uppercase rounded-sm hover:bg-neutral-300 transition-colors no-underline"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-xl hover:bg-zinc-200 transition-colors no-underline"
         >
           Cancel
         </NuxtLink>
       </div>
-      
-      <div v-if="error" class="px-6 py-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm">{{ error }}</div>
     </form>
   </div>
 </template>

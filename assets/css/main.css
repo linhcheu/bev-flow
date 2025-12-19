@@ -1,21 +1,114 @@
-@import "https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap";
+@import "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap";
 @import "tailwindcss";
 
 @layer base {
   :root {
-    --color-luxury-gold: #D4AF37;
-    --color-luxury-dark: hsl(0, 0%, 10%);
-    --color-luxury-light: #fafafa;
-    --color-luxury-gray: #4a4a4a;
+    --color-primary: #f59e0b;
+    --color-primary-dark: #d97706;
+    --color-dark: #09090b;
+    --color-light: #fafafa;
   }
   
   body {
-    font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #fafafa;
   }
   
   * {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #d4d4d8;
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
+  }
+  
+  /* Remove default focus outline and add custom */
+  *:focus {
+    outline: none;
+  }
+  
+  /* Form elements base styling */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="tel"],
+  select,
+  textarea {
+    @apply transition-all duration-200;
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  a, button {
+    @apply transition-all duration-200;
+  }
+}
+
+@layer components {
+  /* Page header styles */
+  .page-header {
+    @apply mb-8;
+  }
+  
+  .page-title {
+    @apply text-3xl font-bold text-zinc-900 tracking-tight;
+  }
+  
+  .page-subtitle {
+    @apply mt-1 text-zinc-500;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-white border border-zinc-200 rounded-xl;
+  }
+  
+  /* Button variants */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-lg hover:bg-zinc-200 transition-colors;
+  }
+  
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100 transition-colors;
+  }
+  
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all;
+  }
+  
+  .input-label {
+    @apply block text-sm font-medium text-zinc-700 mb-2;
+  }
+  
+  /* Table styles */
+  .table-header {
+    @apply px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider;
+  }
+  
+  .table-cell {
+    @apply px-6 py-4 text-sm;
   }
 }

@@ -1,55 +1,58 @@
-// Sample API endpoint for dashboard stats
-// This demonstrates the structure - you'll need to connect to your actual MySQL database
+// API endpoint for dashboard statistics
+import { queryOne, queryAll } from '~/server/utils/db';
 
-export default defineEventHandler(async (event) => {
-  // TODO: Replace with actual database queries
+export default defineEventHandler(async () => {
+  // Get total products count
+  const productCount = queryOne<{ count: number }>('SELECT COUNT(*) as count FROM Products WHERE is_active = 1');
   
-  /*
-  const db = await connectToDatabase();
+  // Get total suppliers count
+  const supplierCount = queryOne<{ count: number }>('SELECT COUNT(*) as count FROM Suppliers WHERE is_active = 1');
   
-  // Get total products
-  const [productCount] = await db.query('SELECT COUNT(*) as count FROM Products');
-  
-  // Get total suppliers
-  const [supplierCount] = await db.query('SELECT COUNT(*) as count FROM Suppliers');
-  
-  // Get active POs
-  const [activePoCount] = await db.query(
-    "SELECT COUNT(*) as count FROM PurchaseOrders WHERE status != 'Received' AND status != 'Cancelled'"
+  // Get active POs count
+  const activePoCount = queryOne<{ count: number }>(
+    "SELECT COUNT(*) as count FROM PurchaseOrders WHERE status NOT IN ('received', 'cancelled')"
   );
   
-  // Get monthly sales
-  const [monthlySales] = await db.query(`
-    SELECT SUM(total_amount) as total 
+  // Get monthly sales (current month)
+  const monthlySales = queryOne<{ total: number }>(`
+    SELECT COALESCE(SUM(total_amount), 0) as total 
     FROM Sales 
-    WHERE MONTH(sale_date) = MONTH(CURRENT_DATE()) 
-    AND YEAR(sale_date) = YEAR(CURRENT_DATE())
+    WHERE strftime('%Y-%m', sale_date) = strftime('%Y-%m', 'now')
   `);
   
-  // Get monthly profit
-  const [monthlyProfit] = await db.query(`
-    SELECT SUM((p.selling_price - p.cost_price) * s.quantity_sold) as profit
+  // Get monthly profit (current month)
+  const monthlyProfit = queryOne<{ profit: number }>(`
+    SELECT COALESCE(SUM((p.selling_price - p.cost_price) * s.quantity), 0) as profit
     FROM Sales s
     JOIN Products p ON s.product_id = p.product_id
-    WHERE MONTH(s.sale_date) = MONTH(CURRENT_DATE()) 
-    AND YEAR(s.sale_date) = YEAR(CURRENT_DATE())
+    WHERE strftime('%Y-%m', s.sale_date) = strftime('%Y-%m', 'now')
+  `);
+  
+  // Get low stock products
+  const lowStockProducts = queryAll<{ product_id: number; product_name: string; current_stock: number; min_stock_level: number }>(`
+    SELECT product_id, product_name, current_stock, min_stock_level
+    FROM Products
+    WHERE current_stock <= min_stock_level AND is_active = 1
+    ORDER BY (current_stock - min_stock_level) ASC
+    LIMIT 5
+  `);
+  
+  // Get recent sales
+  const recentSales = queryAll<{ sale_id: number; product_name: string; quantity: number; total_amount: number; sale_date: string }>(`
+    SELECT s.sale_id, p.product_name, s.quantity, s.total_amount, s.sale_date
+    FROM Sales s
+    JOIN Products p ON s.product_id = p.product_id
+    ORDER BY s.sale_date DESC
+    LIMIT 5
   `);
   
   return {
-    totalProducts: productCount[0].count,
-    totalSuppliers: supplierCount[0].count,
-    activePOs: activePoCount[0].count,
-    monthlySales: monthlySales[0].total || 0,
-    monthlyProfit: monthlyProfit[0].profit || 0
-  };
-  */
-  
-  // Mock data for development
-  return {
-    totalProducts: 24,
-    totalSuppliers: 8,
-    activePOs: 5,
-    monthlySales: 15420.50,
-    monthlyProfit: 4326.75
+    totalProducts: productCount?.count || 0,
+    totalSuppliers: supplierCount?.count || 0,
+    activePOs: activePoCount?.count || 0,
+    monthlySales: monthlySales?.total || 0,
+    monthlyProfit: monthlyProfit?.profit || 0,
+    lowStockProducts,
+    recentSales
   };
 });

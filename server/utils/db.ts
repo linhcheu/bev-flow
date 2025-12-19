@@ -1,39 +1,110 @@
-// Database connection utility
-// Uncomment and configure this file when you're ready to connect to your MySQL database
+// Database connection utility using better-sqlite3
+import Database from 'better-sqlite3';
+import { join } from 'path';
+import { existsSync, readFileSync, mkdirSync } from 'fs';
 
-/*
-import mysql from 'mysql2/promise';
+let db: Database.Database | null = null;
 
-let connection: any = null;
-
-export const connectToDatabase = async () => {
-  if (connection) {
-    return connection;
+// Get the database instance (singleton pattern)
+export const useDatabase = () => {
+  if (db) {
+    return db;
   }
 
-  connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'bev_flow',
-    waitForConnections: true,
-  });
+  // Ensure .data directory exists
+  const dataDir = join(process.cwd(), '.data');
+  if (!existsSync(dataDir)) {
+    mkdirSync(dataDir, { recursive: true });
+  }
 
-  return connection;
+  // Database file location
+  const dbPath = join(dataDir, 'bev-flow.db');
+  
+  // Create database connection
+  db = new Database(dbPath);
+  
+  // Enable foreign keys
+  db.pragma('foreign_keys = ON');
+  db.pragma('journal_mode = WAL');
+  
+  // Initialize schema if database is new
+  initializeSchema();
+  
+  return db;
 };
 
-export const query = async (sql: string, values?: any[]) => {
-  const conn = await connectToDatabase();
-  const [rows] = await conn.execute(sql, values);
-  return rows;
+// Initialize the database schema
+const initializeSchema = () => {
+  if (!db) return;
+  
+  // Check if tables exist
+  const tableCheck = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='Users'").get();
+  
+  if (!tableCheck) {
+    console.log('🗄️ Initializing database schema...');
+    
+    // Read schema file
+    const schemaPath = join(process.cwd(), 'database', 'schema.sql');
+    if (existsSync(schemaPath)) {
+      const schema = readFileSync(schemaPath, 'utf-8');
+      
+      // Execute the entire schema
+      try {
+        db.exec(schema);
+        console.log('✅ Database schema initialized successfully!');
+      } catch (e) {
+        console.error('❌ Error initializing schema:', (e as Error).message);
+        // Try to execute statement by statement
+        const lines = schema.split('\n');
+        let currentStatement = '';
+        
+        for (const line of lines) {
+          const trimmed = line.trim();
+          // Skip empty lines and comments
+          if (!trimmed || trimmed.startsWith('--')) continue;
+          
+          currentStatement += line + '\n';
+          
+          // If line ends with semicolon, execute it
+          if (trimmed.endsWith(';')) {
+            try {
+              db.exec(currentStatement);
+            } catch (err) {
+              console.warn('⚠️ Statement failed:', (err as Error).message.substring(0, 100));
+            }
+            currentStatement = '';
+          }
+        }
+        
+        console.log('✅ Database schema initialized (with some warnings)');
+      }
+    } else {
+      console.warn('⚠️ Schema file not found at:', schemaPath);
+    }
+  }
 };
-*/
 
-// Export placeholder functions for now
-export const connectToDatabase = async () => {
-  throw new Error('Database connection not configured. See server/utils/db.ts');
+// Helper function for SELECT queries
+export const queryAll = <T = any>(sql: string, params: any[] = []): T[] => {
+  const database = useDatabase();
+  return database.prepare(sql).all(...params) as T[];
 };
 
-export const query = async (sql: string, values?: any[]) => {
-  throw new Error('Database connection not configured. See server/utils/db.ts');
+// Helper function for SELECT single row
+export const queryOne = <T = any>(sql: string, params: any[] = []): T | undefined => {
+  const database = useDatabase();
+  return database.prepare(sql).get(...params) as T | undefined;
+};
+
+// Helper function for INSERT/UPDATE/DELETE
+export const execute = (sql: string, params: any[] = []) => {
+  const database = useDatabase();
+  return database.prepare(sql).run(...params);
+};
+
+// Helper to get last inserted ID
+export const getLastInsertId = () => {
+  const database = useDatabase();
+  const result = database.prepare('SELECT last_insert_rowid() as id').get() as { id: number };
+  return result.id;
 };
