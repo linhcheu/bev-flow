@@ -20,6 +20,7 @@ export interface Product {
   supplier_id?: number;
   supplier?: Supplier;
   profit?: number; // Calculated field
+  image?: string; // Product image URL
 }
 
 export type POStatus = 'Pending' | 'Shipped' | 'Received' | 'Cancelled';

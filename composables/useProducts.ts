@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import type { Product } from '~/types';
 
 export const useProducts = () => {
