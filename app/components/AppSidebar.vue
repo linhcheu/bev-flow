@@ -7,7 +7,7 @@
           <UIcon name="i-lucide-wine" class="w-5 h-5 text-zinc-900" />
         </div>
         <div>
-          <h2 class="text-lg font-semibold text-white tracking-wide">BEV Flow</h2>
+          <h2 class="text-lg font-semibold text-white tracking-wide">BEV Flow Hello</h2>
           <p class="text-[10px] text-zinc-500 tracking-wider uppercase">Inventory System</p>
         </div>
       </NuxtLink>
