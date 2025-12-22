@@ -16,6 +16,18 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      script: [
+        {
+          children: `
+            (function() {
+              // Force light mode - remove dark class
+              document.documentElement.classList.remove('dark');
+              localStorage.removeItem('theme');
+            })();
+          `,
+          type: 'text/javascript',
+        }
+      ],
       link: [
         {
           rel: 'preconnect',

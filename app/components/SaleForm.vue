@@ -2,24 +2,24 @@
   <div class="max-w-2xl">
     <!-- Header -->
     <div class="mb-8">
-      <NuxtLink to="/sales" class="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors no-underline mb-4">
+      <NuxtLink to="/sales" class="inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors no-underline mb-4">
         <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
         Back to Sales
       </NuxtLink>
-      <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">Record Sale</h1>
-      <p class="mt-1 text-zinc-500">Record a new sales transaction</p>
+      <h1 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Record Sale</h1>
+      <p class="mt-1 text-zinc-600 dark:text-zinc-500">Record a new sales transaction</p>
     </div>
     
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Sale Details -->
-      <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-          <UIcon name="i-lucide-receipt" class="w-4 h-4 text-zinc-500" />
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-amber-500/30 rounded-xl p-6 space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+          <UIcon name="i-lucide-receipt" class="w-4 h-4 text-zinc-600 dark:text-zinc-500" />
           Sale Details
         </h3>
         
         <div>
-          <label for="sale_date" class="block text-sm font-medium text-zinc-700 mb-2">
+          <label for="sale_date" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             Sale Date <span class="text-red-500">*</span>
           </label>
           <div class="relative">
@@ -29,20 +29,20 @@
               v-model="form.sale_date" 
               type="date" 
               required
-              class="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              class="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:bg-white dark:focus:bg-zinc-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
             />
           </div>
         </div>
         
         <div>
-          <label for="product_id" class="block text-sm font-medium text-zinc-700 mb-2">
+          <label for="product_id" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             Product <span class="text-red-500">*</span>
           </label>
           <select 
             id="product_id"
             v-model="form.product_id"
             required
-            class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
+            class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:bg-white dark:focus:bg-zinc-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
             @change="updateTotalAmount"
           >
             <option :value="undefined">-- Select Product --</option>
@@ -117,16 +117,16 @@
       </div>
       
       <!-- Error Message -->
-      <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
-        <p class="text-sm text-red-700">{{ error }}</p>
+      <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl">
+        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
+        <p class="text-sm text-red-700 dark:text-red-300">{{ error }}</p>
       </div>
       
       <!-- Actions -->
       <div class="flex items-center gap-3 pt-4">
         <button 
           type="submit" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+          class="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white text-sm font-medium rounded-xl hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
           :disabled="loading"
         >
           <UIcon v-if="loading" name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
@@ -135,7 +135,7 @@
         </button>
         <NuxtLink 
           to="/sales" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-xl hover:bg-zinc-200 transition-colors no-underline"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-medium rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors no-underline"
         >
           Cancel
         </NuxtLink>

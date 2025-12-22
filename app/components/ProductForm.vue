@@ -2,36 +2,36 @@
   <div class="max-w-2xl">
     <!-- Header -->
     <div class="mb-8">
-      <NuxtLink to="/products" class="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors no-underline mb-4">
+      <NuxtLink to="/products" class="inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors no-underline mb-4">
         <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
         Back to Products
       </NuxtLink>
-      <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">{{ isEdit ? 'Edit Product' : 'Add Product' }}</h1>
-      <p class="mt-1 text-zinc-500">{{ isEdit ? 'Update product information' : 'Add a new product to your inventory' }}</p>
+      <h1 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">{{ isEdit ? 'Edit Product' : 'Add Product' }}</h1>
+      <p class="mt-1 text-zinc-600 dark:text-zinc-500">{{ isEdit ? 'Update product information' : 'Add a new product to your inventory' }}</p>
     </div>
     
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- SKU & Product Name -->
-      <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-amber-500/30 rounded-xl p-6 space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-500" />
           Basic Information
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="sku" class="block text-sm font-medium text-zinc-700 mb-2">SKU</label>
+            <label for="sku" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">SKU</label>
             <input 
               id="sku"
               v-model="form.sku" 
               type="text"
               placeholder="e.g. BEV001"
-              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:bg-white dark:focus:bg-zinc-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
             />
           </div>
           
           <div>
-            <label for="product_name" class="block text-sm font-medium text-zinc-700 mb-2">
+            <label for="product_name" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
               Product Name <span class="text-red-500">*</span>
             </label>
             <input 
@@ -40,13 +40,13 @@
               type="text" 
               required
               placeholder="Enter product name"
-              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:bg-white dark:focus:bg-zinc-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
             />
           </div>
         </div>
         
         <div>
-          <label for="description" class="block text-sm font-medium text-zinc-700 mb-2">Description</label>
+          <label for="description" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Description</label>
           <textarea 
             id="description"
             v-model="form.description" 
@@ -58,15 +58,15 @@
       </div>
       
       <!-- Pricing -->
-      <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-amber-500/30 rounded-xl p-6 space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-lucide-banknote" class="w-4 h-4 text-zinc-500" />
           Pricing
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="cost_price" class="block text-sm font-medium text-zinc-700 mb-2">
+            <label for="cost_price" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
               Cost Price <span class="text-red-500">*</span>
             </label>
             <div class="relative">
@@ -85,7 +85,7 @@
           </div>
           
           <div>
-            <label for="selling_price" class="block text-sm font-medium text-zinc-700 mb-2">
+            <label for="selling_price" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
               Selling Price <span class="text-red-500">*</span>
             </label>
             <div class="relative">
@@ -112,14 +112,14 @@
       </div>
       
       <!-- Supplier -->
-      <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-amber-500/30 rounded-xl p-6 space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
           <UIcon name="i-lucide-building-2" class="w-4 h-4 text-zinc-500" />
           Supplier
         </h3>
         
         <div>
-          <label for="supplier_id" class="block text-sm font-medium text-zinc-700 mb-2">Select Supplier</label>
+          <label for="supplier_id" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Select Supplier</label>
           <select 
             id="supplier_id"
             v-model="form.supplier_id"
@@ -134,16 +134,16 @@
       </div>
       
       <!-- Error Message -->
-      <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
-        <p class="text-sm text-red-700">{{ error }}</p>
+      <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl">
+        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
+        <p class="text-sm text-red-700 dark:text-red-300">{{ error }}</p>
       </div>
       
       <!-- Actions -->
       <div class="flex items-center gap-3 pt-4">
         <button 
           type="submit" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+          class="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white text-sm font-medium rounded-xl hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
           :disabled="loading"
         >
           <UIcon v-if="loading" name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
@@ -152,7 +152,7 @@
         </button>
         <NuxtLink 
           to="/products" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-xl hover:bg-zinc-200 transition-colors no-underline"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-medium rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors no-underline"
         >
           Cancel
         </NuxtLink>

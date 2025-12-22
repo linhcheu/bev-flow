@@ -1,14 +1,14 @@
 <template>
-  <div class="p-8">
+  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950 animate-fade-in transition-colors duration-200">
     <!-- Header -->
     <div class="flex justify-between items-start mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">Suppliers</h1>
-        <p class="mt-1 text-zinc-500">Manage your supplier relationships</p>
+        <h1 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Suppliers</h1>
+        <p class="mt-1 text-zinc-600 dark:text-zinc-400">Manage your supplier relationships</p>
       </div>
       <NuxtLink 
         to="/suppliers/new" 
-        class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors no-underline"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors no-underline shadow-lg shadow-amber-500/30"
       >
         <UIcon name="i-lucide-plus" class="w-4 h-4" />
         Add Supplier
@@ -17,46 +17,46 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-20">
-      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-zinc-400 animate-spin" />
+      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
     </div>
     
     <!-- Error State -->
     <div v-else-if="error" class="text-center py-20">
-      <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <UIcon name="i-lucide-alert-circle" class="w-8 h-8 text-red-500" />
+      <div class="w-16 h-16 bg-red-500/20 border border-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+        <UIcon name="i-lucide-alert-circle" class="w-8 h-8 text-red-400" />
       </div>
-      <p class="text-zinc-600">{{ error }}</p>
+      <p class="text-zinc-600 dark:text-zinc-400">{{ error }}</p>
     </div>
     
     <!-- Suppliers Table -->
-    <div v-else class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
+    <div v-else class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl overflow-hidden shadow-2xl">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
-            <tr class="bg-zinc-50 border-b border-zinc-200">
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Company</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Contact Person</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Phone</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Email</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">Lead Time</th>
-              <th class="px-6 py-4 text-right text-xs font-semibold text-zinc-600 uppercase tracking-wider">Actions</th>
+            <tr class="bg-zinc-200 dark:bg-zinc-800 border-b border-amber-500/50">
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Company</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Contact Person</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Phone</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Email</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Lead Time</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-zinc-100">
-            <tr v-for="supplier in suppliers" :key="supplier.supplier_id" class="hover:bg-zinc-50/50 transition-colors">
+          <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tr v-for="supplier in suppliers" :key="supplier.supplier_id" class="hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
-                    <UIcon name="i-lucide-building-2" class="w-4 h-4 text-purple-600" />
+                  <div class="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center">
+                    <UIcon name="i-lucide-building-2" class="w-4 h-4 text-zinc-900" />
                   </div>
-                  <span class="text-sm font-medium text-zinc-900">{{ supplier.company_name }}</span>
+                  <span class="text-sm font-semibold text-zinc-900 dark:text-white">{{ supplier.company_name }}</span>
                 </div>
               </td>
-              <td class="px-6 py-4 text-sm text-zinc-600">{{ supplier.contact_person || '-' }}</td>
-              <td class="px-6 py-4 text-sm text-zinc-600">{{ supplier.phone || '-' }}</td>
-              <td class="px-6 py-4 text-sm text-zinc-600">{{ supplier.email || '-' }}</td>
+              <td class="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">{{ supplier.contact_person || '-' }}</td>
+              <td class="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">{{ supplier.phone || '-' }}</td>
+              <td class="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">{{ supplier.email || '-' }}</td>
               <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+                <span class="inline-flex items-center px-2.5 py-1 bg-amber-500/20 border border-amber-500 text-amber-600 dark:text-amber-400 text-xs font-semibold rounded-full">
                   {{ supplier.lead_time_days || 7 }} days
                 </span>
               </td>
@@ -64,14 +64,14 @@
                 <div class="flex items-center justify-end gap-2">
                   <NuxtLink 
                     :to="`/suppliers/${supplier.supplier_id}/edit`" 
-                    class="p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors no-underline"
+                    class="p-2 text-amber-600 dark:text-amber-500 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-lg transition-colors no-underline"
                     title="Edit"
                   >
                     <UIcon name="i-lucide-pencil" class="w-4 h-4" />
                   </NuxtLink>
                   <button 
                     @click="handleDelete(supplier.supplier_id!)" 
-                    class="p-2 text-zinc-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    class="p-2 text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                     title="Delete"
                   >
                     <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
@@ -85,14 +85,14 @@
       
       <!-- Empty State -->
       <div v-if="suppliers.length === 0" class="text-center py-16">
-        <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <UIcon name="i-lucide-building-2" class="w-8 h-8 text-zinc-400" />
+        <div class="w-16 h-16 bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+          <UIcon name="i-lucide-building-2" class="w-8 h-8 text-zinc-500 dark:text-zinc-600" />
         </div>
-        <h3 class="text-lg font-medium text-zinc-900 mb-1">No suppliers yet</h3>
-        <p class="text-sm text-zinc-500 mb-4">Get started by adding your first supplier.</p>
+        <h3 class="text-lg font-medium text-zinc-900 dark:text-white mb-1">No suppliers yet</h3>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Get started by adding your first supplier.</p>
         <NuxtLink 
           to="/suppliers/new" 
-          class="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors no-underline"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors no-underline"
         >
           <UIcon name="i-lucide-plus" class="w-4 h-4" />
           Add Supplier

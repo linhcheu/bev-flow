@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-zinc-950 flex">
+  <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex transition-colors duration-200">
     <!-- Left Side - Branding -->
-    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black relative overflow-hidden">
+    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-zinc-200 via-zinc-100 to-zinc-50 dark:from-zinc-900 dark:via-zinc-950 dark:to-black relative overflow-hidden">
       <!-- Background Pattern -->
       <div class="absolute inset-0 opacity-5">
         <div class="absolute top-0 left-0 w-full h-full" 
@@ -15,38 +15,38 @@
           <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-amber-500/20">
             <UIcon name="i-lucide-wine" class="w-8 h-8 text-zinc-900" />
           </div>
-          <h1 class="text-5xl font-bold text-white mb-4 tracking-tight">BEV Flow</h1>
-          <p class="text-xl text-zinc-400 font-light">Streamline your beverage inventory management</p>
+          <h1 class="text-5xl font-bold text-zinc-900 dark:text-white mb-4 tracking-tight">BEV Flow</h1>
+          <p class="text-xl text-zinc-600 dark:text-zinc-400 font-light">Streamline your beverage inventory management</p>
         </div>
                                     
         <div class="space-y-6">
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-zinc-800/50 flex items-center justify-center">
-              <UIcon name="i-lucide-package" class="w-5 h-5 text-amber-400" />
+            <div class="w-10 h-10 rounded-lg bg-zinc-300 dark:bg-zinc-800/50 flex items-center justify-center">
+              <UIcon name="i-lucide-package" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p class="text-white font-medium">Product Management</p>
-              <p class="text-sm text-zinc-500">Track inventory in real-time</p>
+              <p class="text-zinc-900 dark:text-white font-medium">Product Management</p>
+              <p class="text-sm text-zinc-600 dark:text-zinc-500">Track inventory in real-time</p>
             </div>
           </div>
           
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-zinc-800/50 flex items-center justify-center">
-              <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-amber-400" />
+            <div class="w-10 h-10 rounded-lg bg-zinc-300 dark:bg-zinc-800/50 flex items-center justify-center">
+              <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p class="text-white font-medium">Sales Analytics</p>
-              <p class="text-sm text-zinc-500">Gain insights from your data</p>
+              <p class="text-zinc-900 dark:text-white font-medium">Sales Analytics</p>
+              <p class="text-sm text-zinc-600 dark:text-zinc-500">Gain insights from your data</p>
             </div>
           </div>
           
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-zinc-800/50 flex items-center justify-center">
-              <UIcon name="i-lucide-bar-chart-3" class="w-5 h-5 text-amber-400" />
+            <div class="w-10 h-10 rounded-lg bg-zinc-300 dark:bg-zinc-800/50 flex items-center justify-center">
+              <UIcon name="i-lucide-bar-chart-3" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p class="text-white font-medium">Smart Forecasting</p>
-              <p class="text-sm text-zinc-500">AI-powered demand prediction</p>
+              <p class="text-zinc-900 dark:text-white font-medium">Smart Forecasting</p>
+              <p class="text-sm text-zinc-600 dark:text-zinc-500">AI-powered demand prediction</p>
             </div>
           </div>
         </div>
@@ -65,19 +65,19 @@
           <div class="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center mx-auto mb-4">
             <UIcon name="i-lucide-wine" class="w-7 h-7 text-zinc-900" />
           </div>
-          <h1 class="text-2xl font-bold text-white">BEV Flow</h1>
+          <h1 class="text-2xl font-bold text-zinc-900 dark:text-white">BEV Flow</h1>
         </div>
         
         <!-- Form Header -->
         <div class="mb-10">
-          <h2 class="text-3xl font-bold text-white tracking-tight">Welcome back</h2>
-          <p class="mt-2 text-zinc-500">Sign in to your account to continue</p>
+          <h2 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Welcome back</h2>
+          <p class="mt-2 text-zinc-600 dark:text-zinc-500">Sign in to your account to continue</p>
         </div>
         
         <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div>
-            <label for="email" class="block text-sm font-medium text-zinc-300 mb-2">
+            <label for="email" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
               Email address
             </label>
             <div class="relative">
@@ -91,13 +91,13 @@
                 autocomplete="email"
                 required
                 placeholder="Enter your email"
-                class="w-full pl-12 pr-4 py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-200"
+                class="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-200"
               />
             </div>
           </div>
           
           <div>
-            <label for="password" class="block text-sm font-medium text-zinc-300 mb-2">
+            <label for="password" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
               Password
             </label>
             <div class="relative">
@@ -111,12 +111,12 @@
                 autocomplete="current-password"
                 required
                 placeholder="Enter your password"
-                class="w-full pl-12 pr-12 py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-200"
+                class="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-200"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
+                class="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
               >
                 <UIcon :name="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'" class="w-5 h-5" />
               </button>
@@ -128,11 +128,11 @@
               <input 
                 v-model="form.remember" 
                 type="checkbox" 
-                class="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-amber-500 focus:ring-amber-500/50 focus:ring-offset-0"
+                class="w-4 h-4 rounded bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-amber-500 focus:ring-amber-500/50 focus:ring-offset-0"
               />
-              <span class="text-sm text-zinc-400">Remember me</span>
+              <span class="text-sm text-zinc-600 dark:text-zinc-400">Remember me</span>
             </label>
-            <a href="#" class="text-sm text-amber-400 hover:text-amber-300 transition-colors">
+            <a href="#" class="text-sm text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors">
               Forgot password?
             </a>
           </div>
@@ -148,7 +148,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-900 font-semibold rounded-xl hover:from-amber-400 hover:to-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-900 font-semibold rounded-xl hover:from-amber-400 hover:to-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-zinc-950 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <UIcon v-if="loading" name="i-lucide-loader-2" class="w-5 h-5 animate-spin" />
             <span>{{ loading ? 'Signing in...' : 'Sign in' }}</span>
@@ -156,18 +156,18 @@
         </form>
         
         <!-- Demo Credentials -->
-        <div class="mt-8 p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
-          <p class="text-xs text-zinc-500 mb-2">Demo credentials:</p>
-          <p class="text-sm text-zinc-400">
-            <span class="text-zinc-500">Email:</span> admin@bevflow.com
+        <div class="mt-8 p-4 bg-zinc-200 dark:bg-zinc-900/50 border border-zinc-300 dark:border-zinc-800 rounded-xl">
+          <p class="text-xs text-zinc-600 dark:text-zinc-500 mb-2">Demo credentials:</p>
+          <p class="text-sm text-zinc-700 dark:text-zinc-400">
+            <span class="text-zinc-600 dark:text-zinc-500">Email:</span> admin@bevflow.com
           </p>
-          <p class="text-sm text-zinc-400">
-            <span class="text-zinc-500">Password:</span> admin123
+          <p class="text-sm text-zinc-700 dark:text-zinc-400">
+            <span class="text-zinc-600 dark:text-zinc-500">Password:</span> admin123
           </p>
         </div>
         
         <!-- Footer -->
-        <p class="mt-8 text-center text-sm text-zinc-600">
+        <p class="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-600">
           2024 BEV Flow. All rights reserved.
         </p>
       </div>
