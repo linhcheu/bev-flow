@@ -4,7 +4,19 @@ import type { Supplier } from '~/types';
 
 export default defineEventHandler(async () => {
   const suppliers = queryAll<Supplier>(`
-    SELECT * FROM Suppliers 
+    SELECT 
+      supplier_id,
+      company_name,
+      contact_person,
+      sale_agent,
+      phone,
+      email,
+      address,
+      lead_time_days,
+      is_active,
+      created_at,
+      updated_at
+    FROM Suppliers 
     WHERE is_active = 1
     ORDER BY company_name ASC
   `);

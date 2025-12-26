@@ -1,104 +1,142 @@
 <template>
-  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950 animate-fade-in transition-colors duration-200">
+  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-200">
     <!-- Header -->
-    <div class="flex justify-between items-start mb-8">
+    <div 
+      v-motion
+      :initial="{ opacity: 0, y: -20 }"
+      :enter="{ opacity: 1, y: 0, transition: { duration: 400 } }"
+      class="flex justify-between items-start mb-8"
+    >
       <div>
         <h1 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Sales</h1>
         <p class="mt-1 text-zinc-600 dark:text-zinc-400">Track and manage your sales transactions</p>
       </div>
       <NuxtLink 
         to="/sales/new" 
-        class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors no-underline shadow-lg shadow-amber-500/30"
+        class="btn-primary no-underline"
       >
         <UIcon name="i-lucide-plus" class="w-4 h-4" />
         Record Sale
       </NuxtLink>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-5 mb-6">
-      <div class="flex flex-wrap items-center gap-4">
-        <div class="flex items-center gap-2">
-          <UIcon name="i-lucide-calendar" class="w-4 h-4 text-amber-600 dark:text-amber-500" />
-          <span class="text-sm text-zinc-700 dark:text-zinc-300">Filter by date:</span>
+    <!-- Summary Cards -->
+    <div 
+      v-motion
+      :initial="{ opacity: 0, y: 20 }"
+      :enter="{ opacity: 1, y: 0, transition: { delay: 50 } }"
+      class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6"
+    >
+      <div class="stat-card">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-receipt" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Sales</div>
         </div>
-        <input 
-          v-model="startDate" 
-          type="date" 
-          class="px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-amber-500/50 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
-          @change="handleFilterChange"
-        />
-        <span class="text-zinc-500">to</span>
-        <input 
-          v-model="endDate" 
-          type="date" 
-          class="px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-amber-500/50 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
-          @change="handleFilterChange"
-        />
-        <button 
-          @click="handleFilterChange" 
-          class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors"
-        >
-          <UIcon name="i-lucide-filter" class="w-4 h-4" />
-          Apply
-        </button>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">${{ totalSales.toFixed(2) }}</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-file-text" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Transactions</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ sales.length }}</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-package" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Items Sold</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ totalQuantity }}</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Avg. Sale</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">${{ avgSale.toFixed(2) }}</div>
       </div>
     </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-20">
-      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
+      <div class="flex flex-col items-center gap-3">
+        <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
+        <p class="text-sm text-zinc-500">Loading sales...</p>
+      </div>
     </div>
 
-    <!-- Sales List -->
-    <div v-else class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl overflow-hidden shadow-2xl">
+    <!-- Sales Table -->
+    <div 
+      v-else
+      v-motion
+      :initial="{ opacity: 0, y: 20 }"
+      :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }"
+      class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl overflow-hidden shadow-2xl"
+    >
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-zinc-200 dark:bg-zinc-800 border-b border-amber-500/50">
-            <tr>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Date</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Product</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Quantity</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Unit Price</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Total</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Payment</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Actions</th>
+          <thead>
+            <tr class="bg-zinc-200 dark:bg-zinc-800 border-b border-amber-500/50">
+              <th class="table-header">Invoice No.</th>
+              <th class="table-header">Customer</th>
+              <th class="table-header">Date</th>
+              <th class="table-header">Product</th>
+              <th class="table-header text-right">Qty</th>
+              <th class="table-header text-right">Unit Price</th>
+              <th class="table-header text-right">Total</th>
+              <th class="table-header text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
-            <tr v-for="sale in sales" :key="sale.id" class="hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors">
-              <td class="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">
-                {{ new Date(sale.saleDate).toLocaleDateString() }}
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm font-medium text-zinc-900 dark:text-white">{{ sale.productName }}</div>
-                <div class="text-xs text-zinc-600 dark:text-zinc-500">{{ sale.productSku }}</div>
-              </td>
-              <td class="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">{{ sale.quantity }}</td>
-              <td class="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">${{ sale.unitPrice.toFixed(2) }}</td>
-              <td class="px-6 py-4 text-sm font-semibold text-amber-600 dark:text-amber-500">${{ sale.totalAmount.toFixed(2) }}</td>
-              <td class="px-6 py-4">
-                <span :class="[
-                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                  sale.paymentStatus === 'paid' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500' : 
-                  sale.paymentStatus === 'pending' ? 'bg-amber-500/20 text-amber-400 border border-amber-500' : 
-                  'bg-red-500/20 text-red-400 border border-red-500'
-                ]">
-                  {{ sale.paymentStatus }}
+            <tr 
+              v-for="(sale, index) in sales" 
+              :key="sale.sale_id" 
+              v-motion
+              :initial="{ opacity: 0, x: -20 }"
+              :enter="{ opacity: 1, x: 0, transition: { delay: index * 50 } }"
+              class="hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-colors"
+            >
+              <td class="table-cell">
+                <span class="badge badge-warning font-semibold">
+                  {{ sale.invoice_number }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm">
+              <td class="table-cell">
                 <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <UIcon name="i-lucide-user" class="w-4 h-4 text-zinc-900" />
+                  </div>
+                  <span class="font-medium text-zinc-900 dark:text-white">{{ sale.customer_name || '-' }}</span>
+                </div>
+              </td>
+              <td class="table-cell">{{ formatDate(sale.sale_date) }}</td>
+              <td class="table-cell">
+                <div>
+                  <span class="font-medium text-zinc-900 dark:text-white">{{ sale.product?.product_name }}</span>
+                  <span class="block text-xs text-zinc-500">{{ sale.product?.sku }}</span>
+                </div>
+              </td>
+              <td class="table-cell text-right">{{ sale.quantity }}</td>
+              <td class="table-cell text-right">${{ Number(sale.unit_price).toFixed(2) }}</td>
+              <td class="table-cell text-right">
+                <span class="font-semibold text-emerald-600 dark:text-emerald-400">${{ Number(sale.total_amount).toFixed(2) }}</span>
+              </td>
+              <td class="table-cell">
+                <div class="flex items-center justify-end gap-1">
                   <button 
-                    @click="viewSale(sale.id)" 
-                    class="text-amber-600 dark:text-amber-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
-                    title="View"
-                  >
-                    <UIcon name="i-lucide-eye" class="w-4 h-4" />
-                  </button>
-                  <button 
-                    @click="deleteSale(sale.id)" 
-                    class="text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300 transition-colors"
+                    @click="handleDelete(sale.sale_id!)" 
+                    class="icon-btn icon-btn-danger"
                     title="Delete"
                   >
                     <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
@@ -111,108 +149,61 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="!sales.length && !loading" class="text-center py-16">
-        <UIcon name="i-lucide-receipt" class="w-16 h-16 text-zinc-500 dark:text-zinc-700 mx-auto mb-4" />
-        <h3 class="text-lg font-semibold text-zinc-700 dark:text-zinc-400 mb-2">No sales found</h3>
-        <p class="text-sm text-zinc-600 dark:text-zinc-500 mb-6">Start recording your first sale transaction</p>
+      <div v-if="sales.length === 0" class="text-center py-16">
+        <div 
+          v-motion
+          :initial="{ scale: 0.8, opacity: 0 }"
+          :enter="{ scale: 1, opacity: 1, transition: { type: 'spring', stiffness: 200 } }"
+          class="w-16 h-16 bg-zinc-200 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <UIcon name="i-lucide-receipt" class="w-8 h-8 text-zinc-500 dark:text-zinc-600" />
+        </div>
+        <h3 class="text-lg font-medium text-zinc-900 dark:text-white mb-1">No sales recorded</h3>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Start by recording your first sale transaction.</p>
         <NuxtLink 
           to="/sales/new" 
-          class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 transition-colors no-underline"
+          class="btn-primary no-underline"
         >
           <UIcon name="i-lucide-plus" class="w-4 h-4" />
           Record Sale
         </NuxtLink>
       </div>
     </div>
-
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
-      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 shadow-lg">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-zinc-900" />
-          </div>
-          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Sales</div>
-        </div>
-        <div class="text-2xl font-bold text-zinc-900 dark:text-white">${{ totalSales.toFixed(2) }}</div>
-      </div>
-      
-      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 shadow-lg">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-package" class="w-5 h-5 text-zinc-900" />
-          </div>
-          <div class="text-sm text-zinc-600 dark:text-zinc-400">Items Sold</div>
-        </div>
-        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ totalQuantity }}</div>
-      </div>
-      
-      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 shadow-lg">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-receipt" class="w-5 h-5 text-zinc-900" />
-          </div>
-          <div class="text-sm text-zinc-600 dark:text-zinc-400">Transactions</div>
-        </div>
-        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ sales.length }}</div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+const { sales, loading, fetchSales, deleteSale } = useSales();
 
-interface Sale {
-  id: number;
-  saleDate: string;
-  productName: string;
-  productSku: string;
-  quantity: number;
-  unitPrice: number;
-  totalAmount: number;
-  paymentStatus: 'paid' | 'pending' | 'overdue';
-}
-
-const sales = ref<Sale[]>([]);
-const loading = ref(false);
-const startDate = ref('');
-const endDate = ref('');
+onMounted(() => {
+  fetchSales();
+});
 
 const totalSales = computed(() => {
-  return sales.value.reduce((sum, sale) => sum + sale.totalAmount, 0);
+  return sales.value.reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0);
 });
 
 const totalQuantity = computed(() => {
   return sales.value.reduce((sum, sale) => sum + sale.quantity, 0);
 });
 
-const handleFilterChange = () => {
-  console.log('Filtering sales from', startDate.value, 'to', endDate.value);
-  // TODO: Implement filtering logic
-};
-
-const viewSale = (id: number) => {
-  console.log('Viewing sale:', id);
-  // TODO: Implement view logic
-};
-
-const deleteSale = (id: number) => {
-  if (confirm('Are you sure you want to delete this sale?')) {
-    sales.value = sales.value.filter(s => s.id !== id);
-  }
-};
-
-onMounted(async () => {
-  loading.value = true;
-  try {
-    // TODO: Replace with actual API call
-    // const response = await $fetch('/api/sales');
-    // sales.value = response;
-  } catch (error) {
-    console.error('Failed to fetch sales:', error);
-  } finally {
-    loading.value = false;
-  }
+const avgSale = computed(() => {
+  if (sales.value.length === 0) return 0;
+  return totalSales.value / sales.value.length;
 });
+
+const formatDate = (date?: string) => {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
+};
+
+const handleDelete = async (id: number) => {
+  if (confirm('Are you sure you want to delete this sale?')) {
+    await deleteSale(id);
+  }
+};
 </script>

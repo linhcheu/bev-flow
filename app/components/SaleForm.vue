@@ -1,132 +1,170 @@
 <template>
-  <div class="max-w-2xl">
+  <div class="max-w-3xl mx-auto">
     <!-- Header -->
-    <div class="mb-8">
-      <NuxtLink to="/sales" class="inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors no-underline mb-4">
+    <div 
+      v-motion
+      :initial="{ opacity: 0, y: -20 }"
+      :enter="{ opacity: 1, y: 0, transition: { duration: 400 } }"
+      class="mb-8"
+    >
+      <NuxtLink to="/sales" class="btn-ghost no-underline mb-4 -ml-3">
         <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
         Back to Sales
       </NuxtLink>
       <h1 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Record Sale</h1>
-      <p class="mt-1 text-zinc-600 dark:text-zinc-500">Record a new sales transaction</p>
+      <p class="mt-1 text-zinc-600 dark:text-zinc-400">Record a new sales transaction</p>
     </div>
     
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Sale Details -->
-      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-amber-500/30 rounded-xl p-6 space-y-5">
+      <div 
+        v-motion
+        :initial="{ opacity: 0, y: 20 }"
+        :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }"
+        class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
+      >
         <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-          <UIcon name="i-lucide-receipt" class="w-4 h-4 text-zinc-600 dark:text-zinc-500" />
+          <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-receipt" class="w-4 h-4 text-zinc-900" />
+          </div>
           Sale Details
         </h3>
         
-        <div>
-          <label for="sale_date" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-            Sale Date <span class="text-red-500">*</span>
-          </label>
-          <div class="relative">
-            <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="form-group">
+            <label class="input-label">
+              Invoice No. <span class="text-red-500">*</span>
+            </label>
             <input 
-              id="sale_date"
-              v-model="form.sale_date" 
-              type="date" 
+              v-model="form.invoice_number" 
+              type="text" 
               required
-              class="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:bg-white dark:focus:bg-zinc-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              placeholder="e.g. 1001"
+              class="input"
             />
+          </div>
+          
+          <div class="form-group">
+            <label class="input-label">
+              Sale Date <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <input 
+                v-model="form.sale_date" 
+                type="date" 
+                required
+                class="input pl-11"
+              />
+            </div>
           </div>
         </div>
         
-        <div>
-          <label for="product_id" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+        <div class="form-group">
+          <label class="input-label">
+            Customer Name
+          </label>
+          <input 
+            v-model="form.customer_name" 
+            type="text"
+            placeholder="Enter customer name"
+            class="input"
+          />
+        </div>
+        
+        <div class="form-group">
+          <label class="input-label">
             Product <span class="text-red-500">*</span>
           </label>
           <select 
-            id="product_id"
             v-model="form.product_id"
             required
-            class="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:bg-white dark:focus:bg-zinc-700 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
+            class="select"
             @change="updateTotalAmount"
           >
-            <option :value="undefined">-- Select Product --</option>
+            <option :value="0">-- Select Product --</option>
             <option v-for="product in products" :key="product.product_id" :value="product.product_id">
               {{ product.product_name }} - ${{ product.selling_price.toFixed(2) }}
             </option>
           </select>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="quantity_sold" class="block text-sm font-medium text-zinc-700 mb-2">
-              Quantity <span class="text-red-500">*</span>
-            </label>
-            <input 
-              id="quantity_sold"
-              v-model.number="form.quantity_sold" 
-              type="number"
-              min="1"
-              required
-              placeholder="1"
-              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
-              @input="updateTotalAmount"
-            />
-          </div>
-          
-          <div>
-            <label for="total_amount" class="block text-sm font-medium text-zinc-700 mb-2">
-              Total Amount <span class="text-red-500">*</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="form-group">
+            <label class="input-label">
+              Unit Price <span class="text-red-500">*</span>
             </label>
             <div class="relative">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
               <input 
-                id="total_amount"
-                v-model.number="form.total_amount" 
+                v-model.number="form.unit_price" 
                 type="number"
                 step="0.01"
                 min="0"
                 required
-                placeholder="0.00"
-                class="w-full pl-8 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                class="input pl-8"
               />
             </div>
           </div>
+          
+          <div class="form-group">
+            <label class="input-label">
+              Quantity <span class="text-red-500">*</span>
+            </label>
+            <input 
+              v-model.number="form.quantity" 
+              type="number"
+              min="1"
+              required
+              placeholder="1"
+              class="input"
+              @input="updateTotalAmount"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label class="input-label">Total Amount</label>
+            <div class="flex items-center h-12 px-4 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl">
+              <span class="text-xl font-bold text-amber-600 dark:text-amber-500">
+                ${{ totalAmount.toFixed(2) }}
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <!-- Summary -->
-      <div v-if="selectedProduct" class="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
-        <h3 class="text-sm font-semibold text-emerald-800 flex items-center gap-2 mb-4">
-          <UIcon name="i-lucide-check-circle" class="w-4 h-4" />
-          Sale Summary
-        </h3>
-        <div class="space-y-2">
-          <div class="flex justify-between text-sm">
-            <span class="text-emerald-700">Product:</span>
-            <span class="font-medium text-emerald-900">{{ selectedProduct.product_name }}</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-emerald-700">Unit Price:</span>
-            <span class="font-medium text-emerald-900">${{ selectedProduct.selling_price.toFixed(2) }}</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-emerald-700">Quantity:</span>
-            <span class="font-medium text-emerald-900">{{ form.quantity_sold }}</span>
-          </div>
-          <div class="pt-2 mt-2 border-t border-emerald-200 flex justify-between">
-            <span class="font-semibold text-emerald-800">Total:</span>
-            <span class="text-xl font-bold text-emerald-600">${{ form.total_amount.toFixed(2) }}</span>
-          </div>
+        
+        <div class="form-group">
+          <label class="input-label">Notes</label>
+          <textarea 
+            v-model="form.notes" 
+            rows="3"
+            placeholder="Any additional notes..."
+            class="input resize-none"
+          ></textarea>
         </div>
       </div>
       
       <!-- Error Message -->
-      <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl">
-        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
-        <p class="text-sm text-red-700 dark:text-red-300">{{ error }}</p>
+      <div 
+        v-if="error" 
+        v-motion
+        :initial="{ opacity: 0, scale: 0.95 }"
+        :enter="{ opacity: 1, scale: 1 }"
+        class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl"
+      >
+        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
+        <p class="text-sm text-red-700 dark:text-red-400">{{ error }}</p>
       </div>
       
       <!-- Actions -->
-      <div class="flex items-center gap-3 pt-4">
+      <div 
+        v-motion
+        :initial="{ opacity: 0, y: 20 }"
+        :enter="{ opacity: 1, y: 0, transition: { delay: 200 } }"
+        class="flex items-center gap-3 pt-4"
+      >
         <button 
           type="submit" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white text-sm font-medium rounded-xl hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+          class="btn-primary" 
           :disabled="loading"
         >
           <UIcon v-if="loading" name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
@@ -135,7 +173,7 @@
         </button>
         <NuxtLink 
           to="/sales" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-medium rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors no-underline"
+          class="btn-secondary no-underline"
         >
           Cancel
         </NuxtLink>
@@ -145,25 +183,27 @@
 </template>
 
 <script setup lang="ts">
-import type { Sale, Product } from '~/types';
+import type { SaleFormData, Product } from '~/types';
 
 const emit = defineEmits<{
-  submit: [sale: Sale];
+  submit: [sale: SaleFormData];
 }>();
 
 const { loading, error } = useSales();
 const { products, fetchProducts } = useProducts();
 
-const form = ref<Sale>({
+const form = ref<SaleFormData>({
+  invoice_number: '',
+  customer_name: '',
   sale_date: new Date().toISOString().split('T')[0] || '',
-  product_id: undefined,
-  quantity_sold: 1,
-  total_amount: 0,
+  product_id: 0,
+  unit_price: 0,
+  quantity: 1,
+  notes: '',
 });
 
-const selectedProduct = computed(() => {
-  if (!form.value.product_id) return null;
-  return products.value.find((p: Product) => p.product_id === form.value.product_id);
+const totalAmount = computed(() => {
+  return form.value.unit_price * form.value.quantity;
 });
 
 onMounted(() => {
@@ -171,10 +211,10 @@ onMounted(() => {
 });
 
 const updateTotalAmount = () => {
-  if (form.value.product_id && form.value.quantity_sold) {
+  if (form.value.product_id > 0) {
     const product = products.value.find((p: Product) => p.product_id === form.value.product_id);
     if (product) {
-      form.value.total_amount = product.selling_price * form.value.quantity_sold;
+      form.value.unit_price = product.selling_price;
     }
   }
 };

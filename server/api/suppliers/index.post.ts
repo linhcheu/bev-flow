@@ -13,15 +13,16 @@ export default defineEventHandler(async (event) => {
   }
   
   execute(`
-    INSERT INTO Suppliers (company_name, contact_person, phone, email, address, lead_time_days, is_active)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO Suppliers (company_name, contact_person, sale_agent, phone, email, address, lead_time_days, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     body.company_name,
     body.contact_person || null,
+    body.sale_agent || null,
     body.phone || null,
     body.email || null,
     body.address || null,
-    body.lead_time_days || 0,
+    body.lead_time_days || 7,
     body.is_active !== false ? 1 : 0
   ]);
   

@@ -1,4 +1,4 @@
-import type { Sale } from '~/types';
+import type { Sale, SaleFormData } from '~/types';
 
 export const useSales = () => {
   const sales = ref<Sale[]>([]);
@@ -9,7 +9,6 @@ export const useSales = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       const params = new URLSearchParams();
       if (startDate) params.append('start_date', startDate);
       if (endDate) params.append('end_date', endDate);
@@ -28,7 +27,6 @@ export const useSales = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       return await $fetch<Sale>(`/api/sales/${id}`);
     } catch (e) {
       error.value = 'Failed to fetch sale';
@@ -39,11 +37,10 @@ export const useSales = () => {
     }
   };
 
-  const createSale = async (sale: Sale) => {
+  const createSale = async (sale: SaleFormData) => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       const response = await $fetch<Sale>('/api/sales', {
         method: 'POST',
         body: sale,
@@ -63,7 +60,6 @@ export const useSales = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       await $fetch(`/api/sales/${id}`, {
         method: 'DELETE',
       });
@@ -78,6 +74,12 @@ export const useSales = () => {
     }
   };
 
+  // Generate next invoice number
+  const generateInvoiceNumber = () => {
+    const existingCount = sales.value.length + 1;
+    return String(1000 + existingCount);
+  };
+
   return {
     sales,
     loading,
@@ -86,5 +88,6 @@ export const useSales = () => {
     getSale,
     createSale,
     deleteSale,
+    generateInvoiceNumber,
   };
 };

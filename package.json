@@ -21,6 +21,7 @@
     "@tailwindcss/postcss": "^4.1.17",
     "@tailwindcss/vite": "^4.1.17",
     "@unhead/vue": "^2.0.19",
+    "@vueuse/motion": "^3.0.3",
     "better-sqlite3": "^12.4.6",
     "eslint": "^9.39.1",
     "mysql2": "^3.16.0",
