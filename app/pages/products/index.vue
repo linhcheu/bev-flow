@@ -15,6 +15,49 @@
       </NuxtLink>
     </div>
 
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-package" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Products</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ products.length }}</div>
+      </div>
+      
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-dollar-sign" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Cost Value</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">${{ totalCostValue.toFixed(2) }}</div>
+      </div>
+      
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-tag" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Sell Value</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">${{ totalSellValue.toFixed(2) }}</div>
+      </div>
+      
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Profit Margin</div>
+        </div>
+        <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${{ totalProfit.toFixed(2) }}</div>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-20">
       <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
@@ -104,6 +147,18 @@ const { products, loading, error, fetchProducts, deleteProduct } = useProducts()
 
 onMounted(() => {
   fetchProducts();
+});
+
+const totalCostValue = computed(() => {
+  return products.value.reduce((sum, p) => sum + Number(p.cost_price || 0), 0);
+});
+
+const totalSellValue = computed(() => {
+  return products.value.reduce((sum, p) => sum + Number(p.selling_price || 0), 0);
+});
+
+const totalProfit = computed(() => {
+  return products.value.reduce((sum, p) => sum + Number(p.profit || 0), 0);
 });
 
 const handleDelete = async (id: number) => {

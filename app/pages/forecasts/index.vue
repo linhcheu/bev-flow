@@ -8,6 +8,49 @@
       </div>
     </div>
 
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-bar-chart-3" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Forecasts</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ forecasts.length }}</div>
+      </div>
+      
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-package" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Total Predicted Units</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ totalPredictedQuantity }}</div>
+      </div>
+      
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-target" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Avg. Confidence</div>
+        </div>
+        <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ avgConfidence.toFixed(0) }}%</div>
+      </div>
+      
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500 rounded-xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-calendar" class="w-5 h-5 text-zinc-900" />
+          </div>
+          <div class="text-sm text-zinc-600 dark:text-zinc-400">Products Forecasted</div>
+        </div>
+        <div class="text-2xl font-bold text-zinc-900 dark:text-white">{{ uniqueProducts }}</div>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-20">
       <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
@@ -58,13 +101,13 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <div class="flex-1 bg-zinc-300 dark:bg-zinc-800 rounded-full h-2 overflow-hidden">
+                  <div class="flex-1 bg-zinc-300 dark:bg-zinc-800 rounded-full h-2 overflow-hidden max-w-24">
                     <div 
                       class="h-full bg-amber-500 rounded-full transition-all"
                       :style="{width: `${((forecast.confidence_level || 0.8) * 100)}%`}"
-                    ></div>
+                    />
                   </div>
-                  <span class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 min-w-[3rem] text-right">
+                  <span class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 min-w-12 text-right">
                     {{ ((forecast.confidence_level || 0.8) * 100).toFixed(0) }}%
                   </span>
                 </div>
@@ -72,9 +115,9 @@
               <td class="px-6 py-4">
                 <div class="flex items-center justify-end">
                   <button 
-                    @click="handleDelete(forecast.forecast_id!)" 
                     class="p-2 text-red-500 dark:text-red-400 hover:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                     title="Delete"
+                    @click="handleDelete(forecast.forecast_id!)" 
                   >
                     <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
                   </button>
@@ -102,6 +145,21 @@ const { forecasts, loading, error, fetchForecasts, deleteForecast } = useForecas
 
 onMounted(() => {
   fetchForecasts();
+});
+
+const totalPredictedQuantity = computed(() => {
+  return forecasts.value.reduce((sum, f) => sum + (f.predicted_quantity || 0), 0);
+});
+
+const avgConfidence = computed(() => {
+  if (forecasts.value.length === 0) return 0;
+  const total = forecasts.value.reduce((sum, f) => sum + ((f.confidence_level || 0.8) * 100), 0);
+  return total / forecasts.value.length;
+});
+
+const uniqueProducts = computed(() => {
+  const productIds = new Set(forecasts.value.map(f => f.product_id));
+  return productIds.size;
 });
 
 const formatDate = (date: string) => {
