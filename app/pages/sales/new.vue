@@ -211,7 +211,7 @@
           :enter="{ opacity: 1, scale: 1 }"
           class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl"
         >
-          <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
+          <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 shrink-0" />
           <p class="text-sm text-red-700 dark:text-red-400">{{ error }}</p>
         </div>
         
