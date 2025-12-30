@@ -54,12 +54,12 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="quantity_sold" class="block text-sm font-medium text-zinc-700 mb-2">
+            <label for="quantity" class="block text-sm font-medium text-zinc-700 mb-2">
               Quantity <span class="text-red-500">*</span>
             </label>
             <input 
-              id="quantity_sold"
-              v-model.number="form.quantity_sold" 
+              id="quantity"
+              v-model.number="form.quantity" 
               type="number"
               min="1"
               required
@@ -107,11 +107,11 @@
           </div>
           <div class="flex justify-between text-sm">
             <span class="text-emerald-700">Quantity:</span>
-            <span class="font-medium text-emerald-900">{{ form.quantity_sold }}</span>
+            <span class="font-medium text-emerald-900">{{ form.quantity }}</span>
           </div>
           <div class="pt-2 mt-2 border-t border-emerald-200 flex justify-between">
             <span class="font-semibold text-emerald-800">Total:</span>
-            <span class="text-xl font-bold text-emerald-600">${{ form.total_amount.toFixed(2) }}</span>
+            <span class="text-xl font-bold text-emerald-600">${{ (form.total_amount ?? 0).toFixed(2) }}</span>
           </div>
         </div>
       </div>
@@ -157,7 +157,8 @@ const { products, fetchProducts } = useProducts();
 const form = ref<Sale>({
   sale_date: new Date().toISOString().split('T')[0] || '',
   product_id: undefined,
-  quantity_sold: 1,
+  quantity: 1,
+  unit_price: 0,
   total_amount: 0,
 });
 
@@ -171,10 +172,11 @@ onMounted(() => {
 });
 
 const updateTotalAmount = () => {
-  if (form.value.product_id && form.value.quantity_sold) {
+  if (form.value.product_id && form.value.quantity) {
     const product = products.value.find((p: Product) => p.product_id === form.value.product_id);
     if (product) {
-      form.value.total_amount = product.selling_price * form.value.quantity_sold;
+      form.value.unit_price = product.selling_price;
+      form.value.total_amount = product.selling_price * form.value.quantity;
     }
   }
 };
