@@ -1,13 +1,8 @@
 <template>
-  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-200">
+  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
-      <div 
-        v-motion
-        :initial="{ opacity: 0, y: -20 }"
-        :enter="{ opacity: 1, y: 0, transition: { duration: 400 } }"
-        class="mb-8"
-      >
+      <div class="mb-8">
         <NuxtLink to="/purchase-orders" class="btn-ghost no-underline mb-4 -ml-3">
           <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
           Back to Purchase Orders
@@ -18,12 +13,7 @@
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- PO Details Card -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }"
-          class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-        >
+        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
           <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-zinc-900" />
@@ -69,7 +59,7 @@
                 Order Date <span class="text-red-500">*</span>
               </label>
               <div class="relative">
-                <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                 <input 
                   v-model="form.order_date" 
                   type="date"
@@ -82,7 +72,7 @@
             <div class="form-group">
               <label class="input-label">ETA (Expected Arrival)</label>
               <div class="relative">
-                <UIcon name="i-lucide-truck" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <UIcon name="i-lucide-truck" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                 <input 
                   v-model="form.eta_date" 
                   type="date"
@@ -94,12 +84,7 @@
         </div>
         
         <!-- Items Card -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 200 } }"
-          class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-        >
+        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
               <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
@@ -164,7 +149,7 @@
                   </td>
                   <td class="py-3">
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">$</span>
                       <input 
                         v-model.number="item.unit_cost"
                         type="number"
@@ -208,7 +193,7 @@
             <div class="flex justify-end items-center gap-4">
               <span class="text-sm text-zinc-600 dark:text-zinc-400">Promotion:</span>
               <div class="relative w-28">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">-$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">-$</span>
                 <input 
                   v-model.number="form.promotion_amount"
                   type="number"
@@ -226,12 +211,7 @@
         </div>
         
         <!-- Remarks Card -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 300 } }"
-          class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-        >
+        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
           <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-message-square" class="w-4 h-4 text-zinc-900" />
@@ -265,9 +245,6 @@
         <!-- Error Message -->
         <div 
           v-if="error" 
-          v-motion
-          :initial="{ opacity: 0, scale: 0.95 }"
-          :enter="{ opacity: 1, scale: 1 }"
           class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl"
         >
           <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
@@ -275,12 +252,7 @@
         </div>
         
         <!-- Actions -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 400 } }"
-          class="flex items-center gap-3 pt-4"
-        >
+        <div class="flex items-center gap-3 pt-4">
           <button 
             type="submit" 
             class="btn-primary" 
@@ -303,7 +275,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PurchaseOrderFormData, PurchaseOrderItemFormData } from '~/types';
+import type { PurchaseOrderFormData } from '~/types';
 
 const { createPurchaseOrder, loading, error, generatePONumber, fetchPurchaseOrders } = usePurchaseOrders();
 const { suppliers, fetchSuppliers } = useSuppliers();

@@ -1,13 +1,8 @@
 <template>
-  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-200">
+  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950">
     <div class="max-w-3xl mx-auto">
       <!-- Header -->
-      <div 
-        v-motion
-        :initial="{ opacity: 0, y: -20 }"
-        :enter="{ opacity: 1, y: 0, transition: { duration: 400 } }"
-        class="mb-8"
-      >
+      <div class="mb-8">
         <NuxtLink to="/sales" class="btn-ghost no-underline mb-4 -ml-3">
           <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
           Back to Sales
@@ -18,12 +13,7 @@
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Sale Details Card -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }"
-          class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-        >
+        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
           <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-receipt" class="w-4 h-4 text-zinc-900" />
@@ -50,7 +40,7 @@
                 Sale Date <span class="text-red-500">*</span>
               </label>
               <div class="relative">
-                <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                 <input 
                   v-model="form.sale_date" 
                   type="date"
@@ -63,12 +53,7 @@
         </div>
         
         <!-- Customer Card -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 150 } }"
-          class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-        >
+        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
           <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-user" class="w-4 h-4 text-zinc-900" />
@@ -104,12 +89,7 @@
         </div>
         
         <!-- Product Card -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 200 } }"
-          class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-        >
+        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
           <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-900" />
@@ -142,7 +122,7 @@
                 Unit Price <span class="text-red-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">$</span>
                 <input 
                   v-model.number="form.unit_price" 
                   type="number"
@@ -179,12 +159,7 @@
         </div>
         
         <!-- Notes Card -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 250 } }"
-          class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-        >
+        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
           <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-file-text" class="w-4 h-4 text-zinc-900" />
@@ -206,9 +181,6 @@
         <!-- Error Message -->
         <div 
           v-if="error" 
-          v-motion
-          :initial="{ opacity: 0, scale: 0.95 }"
-          :enter="{ opacity: 1, scale: 1 }"
           class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl"
         >
           <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 shrink-0" />
@@ -216,12 +188,7 @@
         </div>
         
         <!-- Actions -->
-        <div 
-          v-motion
-          :initial="{ opacity: 0, y: 20 }"
-          :enter="{ opacity: 1, y: 0, transition: { delay: 300 } }"
-          class="flex items-center gap-3 pt-4"
-        >
+        <div class="flex items-center gap-3 pt-4">
           <button 
             type="submit" 
             class="btn-primary" 

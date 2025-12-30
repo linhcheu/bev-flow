@@ -1,12 +1,7 @@
 <template>
   <div class="max-w-3xl mx-auto">
     <!-- Header -->
-    <div 
-      v-motion
-      :initial="{ opacity: 0, y: -20 }"
-      :enter="{ opacity: 1, y: 0, transition: { duration: 400 } }"
-      class="mb-8"
-    >
+    <div class="mb-8">
       <NuxtLink to="/suppliers" class="btn-ghost no-underline mb-4 -ml-3">
         <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
         Back to Suppliers
@@ -17,12 +12,7 @@
     
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Company Info -->
-      <div 
-        v-motion
-        :initial="{ opacity: 0, y: 20 }"
-        :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }"
-        class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-      >
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
         <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
           <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
             <UIcon name="i-lucide-building-2" class="w-4 h-4 text-zinc-900" />
@@ -66,12 +56,7 @@
       </div>
       
       <!-- Contact Info -->
-      <div 
-        v-motion
-        :initial="{ opacity: 0, y: 20 }"
-        :enter="{ opacity: 1, y: 0, transition: { delay: 150 } }"
-        class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-      >
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
         <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
           <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
             <UIcon name="i-lucide-user" class="w-4 h-4 text-zinc-900" />
@@ -83,7 +68,7 @@
           <div class="form-group">
             <label class="input-label">Sale Agent</label>
             <div class="relative">
-              <UIcon name="i-lucide-user-check" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <UIcon name="i-lucide-user-check" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
               <input 
                 v-model="form.sale_agent" 
                 type="text"
@@ -108,7 +93,7 @@
           <div class="form-group">
             <label class="input-label">Phone</label>
             <div class="relative">
-              <UIcon name="i-lucide-phone" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <UIcon name="i-lucide-phone" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
               <input 
                 v-model="form.phone" 
                 type="tel"
@@ -121,7 +106,7 @@
           <div class="form-group">
             <label class="input-label">Email</label>
             <div class="relative">
-              <UIcon name="i-lucide-mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <UIcon name="i-lucide-mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
               <input 
                 v-model="form.email" 
                 type="email"
@@ -134,12 +119,7 @@
       </div>
       
       <!-- Delivery Info -->
-      <div 
-        v-motion
-        :initial="{ opacity: 0, y: 20 }"
-        :enter="{ opacity: 1, y: 0, transition: { delay: 200 } }"
-        class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5"
-      >
+      <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
         <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
           <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
             <UIcon name="i-lucide-truck" class="w-4 h-4 text-zinc-900" />
@@ -163,9 +143,6 @@
       <!-- Error Message -->
       <div 
         v-if="error" 
-        v-motion
-        :initial="{ opacity: 0, scale: 0.95 }"
-        :enter="{ opacity: 1, scale: 1 }"
         class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl"
       >
         <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
@@ -173,12 +150,7 @@
       </div>
       
       <!-- Actions -->
-      <div 
-        v-motion
-        :initial="{ opacity: 0, y: 20 }"
-        :enter="{ opacity: 1, y: 0, transition: { delay: 250 } }"
-        class="flex items-center gap-3 pt-4"
-      >
+      <div class="flex items-center gap-3 pt-4">
         <button 
           type="submit" 
           class="btn-primary" 
