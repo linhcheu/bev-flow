@@ -1,8 +1,8 @@
 <template>
-  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-zinc-50">
+  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="mb-4 sm:mb-6 lg:mb-8">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-8">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
             <UIcon name="i-lucide-layout-dashboard" class="w-5 h-5 text-zinc-600" />
@@ -11,6 +11,22 @@
             <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Dashboard</h1>
             <p class="text-xs sm:text-sm text-zinc-500">{{ todayFormatted }}</p>
           </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button 
+            @click="handleExportExcel"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-emerald-100"
+          >
+            <UIcon name="i-lucide-file-spreadsheet" class="w-3.5 h-3.5" />
+            Excel
+          </button>
+          <button 
+            @click="handleExportPDF"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-red-100"
+          >
+            <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5" />
+            PDF
+          </button>
         </div>
       </div>
       
@@ -545,5 +561,47 @@ const getProfitBadgeClass = (profit: number) => {
 const getSalesColorClass = (sales: number) => {
   if (sales > 0) return 'text-emerald-600';
   return 'text-zinc-900';
+};
+
+// Export functions
+const handleExportExcel = () => {
+  const { exportToExcel } = useExport();
+  
+  // Summary data
+  const summaryData = [
+    { metric: 'Total Products', value: stats.value.totalProducts },
+    { metric: 'Total Suppliers', value: stats.value.totalSuppliers },
+    { metric: 'Active POs', value: stats.value.activePOs },
+    { metric: 'Today\'s Orders', value: stats.value.todayOrders || 0 },
+    { metric: 'Today\'s Sales', value: stats.value.todaySales || 0 },
+    { metric: 'Today\'s Profit', value: stats.value.todayProfit || 0 },
+  ];
+  
+  const columns = [
+    { header: 'Metric', key: 'metric', width: 20 },
+    { header: 'Value', key: 'value', width: 15 },
+  ];
+  
+  exportToExcel(summaryData, columns, 'dashboard_summary');
+};
+
+const handleExportPDF = () => {
+  const { exportDashboardPDF } = useExport();
+  
+  const dashboardStats = {
+    productCount: stats.value.totalProducts,
+    supplierCount: stats.value.totalSuppliers,
+    activePoCount: stats.value.activePOs,
+    todaySales: stats.value.todaySales || 0,
+    todayProfit: stats.value.todayProfit || 0,
+    todayOrders: stats.value.todayOrders || 0,
+    lowStockProducts: stats.value.lowStockProducts || [],
+    topProducts: analytics.value.topProducts.map(p => ({
+      product_name: p.name,
+      total_sold: p.sold,
+    })),
+  };
+  
+  exportDashboardPDF(dashboardStats);
 };
 </script>

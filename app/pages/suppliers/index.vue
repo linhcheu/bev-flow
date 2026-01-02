@@ -7,13 +7,29 @@
           <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Suppliers</h1>
           <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500">Manage your supplier relationships</p>
         </div>
-        <NuxtLink 
-          to="/suppliers/new" 
-          class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 no-underline w-full sm:w-auto"
-        >
-          <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          Add Supplier
-        </NuxtLink>
+        <div class="flex flex-wrap items-center gap-2">
+          <button 
+            @click="handleExportExcel"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-emerald-100"
+          >
+            <UIcon name="i-lucide-file-spreadsheet" class="w-3.5 h-3.5" />
+            Excel
+          </button>
+          <button 
+            @click="handleExportPDF"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-red-100"
+          >
+            <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5" />
+            PDF
+          </button>
+          <NuxtLink 
+            to="/suppliers/new" 
+            class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+          >
+            <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            Add Supplier
+          </NuxtLink>
+        </div>
       </div>
 
       <!-- Summary Stats -->
@@ -109,9 +125,16 @@
                   <p class="text-xs text-zinc-500 mt-0.5">{{ supplier.contact_person || 'No contact person' }}</p>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
+                  <button 
+                    @click="openViewModal(supplier)" 
+                    class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                    title="View"
+                  >
+                    <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                  </button>
                   <NuxtLink 
                     :to="`/suppliers/${supplier.supplier_id}/edit`" 
-                    class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors no-underline"
+                    class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors no-underline"
                     title="Edit"
                   >
                     <UIcon name="i-lucide-pencil" class="w-4 h-4" />
@@ -209,9 +232,16 @@
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 max-w-[200px] truncate">{{ supplier.address || '-' }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <div class="flex items-center justify-end gap-1">
+                    <button 
+                      @click="openViewModal(supplier)" 
+                      class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                      title="View"
+                    >
+                      <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                    </button>
                     <NuxtLink 
                       :to="`/suppliers/${supplier.supplier_id}/edit`" 
-                      class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors no-underline"
+                      class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors no-underline"
                       title="Edit"
                     >
                       <UIcon name="i-lucide-pencil" class="w-4 h-4" />
@@ -263,9 +293,113 @@
           @next="nextPage"
           @last="lastPage"
           @goto="goToPage"
-        />
+                />
       </div>
     </div>
+    
+    <!-- View Supplier Modal -->
+    <Teleport to="body">
+      <div v-if="viewModalOpen" class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="fixed inset-0 bg-black/50" @click="closeViewModal"></div>
+          <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-5 sm:p-6">
+            <!-- Header -->
+            <div class="flex items-start gap-4 mb-5">
+              <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-building-2" class="w-6 h-6 text-amber-600" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h2 class="text-lg font-semibold text-zinc-900">{{ selectedSupplier?.company_name }}</h2>
+                <p class="text-sm text-zinc-500">Supplier Profile</p>
+              </div>
+              <button 
+                @click="closeViewModal" 
+                class="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg"
+              >
+                <UIcon name="i-lucide-x" class="w-5 h-5" />
+              </button>
+            </div>
+            
+            <!-- Details -->
+            <div class="space-y-3 mb-5">
+              <div v-if="selectedSupplier?.contact_person" class="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                <UIcon name="i-lucide-user" class="w-4 h-4 text-zinc-400" />
+                <div>
+                  <p class="text-xs text-zinc-500">Contact Person</p>
+                  <p class="text-sm font-medium text-zinc-900">{{ selectedSupplier.contact_person }}</p>
+                </div>
+              </div>
+              
+              <div v-if="selectedSupplier?.sale_agent" class="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                <UIcon name="i-lucide-user-check" class="w-4 h-4 text-zinc-400" />
+                <div>
+                  <p class="text-xs text-zinc-500">Sales Agent</p>
+                  <p class="text-sm font-medium text-zinc-900">{{ selectedSupplier.sale_agent }}</p>
+                </div>
+              </div>
+              
+              <div v-if="selectedSupplier?.email" class="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                <UIcon name="i-lucide-mail" class="w-4 h-4 text-zinc-400" />
+                <div>
+                  <p class="text-xs text-zinc-500">Email</p>
+                  <p class="text-sm font-medium text-zinc-900">{{ selectedSupplier.email }}</p>
+                </div>
+              </div>
+              
+              <div v-if="selectedSupplier?.phone" class="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                <UIcon name="i-lucide-phone" class="w-4 h-4 text-zinc-400" />
+                <div>
+                  <p class="text-xs text-zinc-500">Phone</p>
+                  <p class="text-sm font-medium text-zinc-900">{{ selectedSupplier.phone }}</p>
+                </div>
+              </div>
+              
+              <div v-if="selectedSupplier?.address" class="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                <UIcon name="i-lucide-map-pin" class="w-4 h-4 text-zinc-400" />
+                <div>
+                  <p class="text-xs text-zinc-500">Address</p>
+                  <p class="text-sm font-medium text-zinc-900">{{ selectedSupplier.address }}</p>
+                </div>
+              </div>
+              
+              <div v-if="selectedSupplier?.lead_time_days" class="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                <UIcon name="i-lucide-clock" class="w-4 h-4 text-zinc-400" />
+                <div>
+                  <p class="text-xs text-zinc-500">Lead Time</p>
+                  <p class="text-sm font-medium text-zinc-900">{{ selectedSupplier.lead_time_days }} days</p>
+                </div>
+              </div>
+              
+              <div v-if="selectedSupplier?.products" class="flex items-start gap-3 p-3 bg-zinc-50 rounded-lg">
+                <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-400 mt-0.5" />
+                <div>
+                  <p class="text-xs text-zinc-500">Products Supplied</p>
+                  <p class="text-sm font-medium text-zinc-900">{{ selectedSupplier.products }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+              <button 
+                @click="exportSupplierPDF(selectedSupplier!)"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100"
+              >
+                <UIcon name="i-lucide-file-text" class="w-4 h-4" />
+                Export PDF
+              </button>
+              <NuxtLink 
+                :to="`/suppliers/${selectedSupplier?.supplier_id}/edit`"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+              >
+                <UIcon name="i-lucide-pencil" class="w-4 h-4" />
+                Edit
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -335,5 +469,51 @@ const handleDelete = async (id: number) => {
   if (confirm('Are you sure you want to delete this supplier?')) {
     await deleteSupplier(id);
   }
+};
+
+// View modal
+const viewModalOpen = ref(false);
+const selectedSupplier = ref<Supplier | null>(null);
+
+const openViewModal = (supplier: Supplier) => {
+  selectedSupplier.value = supplier;
+  viewModalOpen.value = true;
+};
+
+const closeViewModal = () => {
+  viewModalOpen.value = false;
+  selectedSupplier.value = null;
+};
+
+const exportSupplierPDF = (supplier: Supplier) => {
+  const { exportSupplierDetail } = useReceiptExport();
+  exportSupplierDetail(supplier);
+};
+
+// Export functions
+const handleExportExcel = () => {
+  const { exportToExcel } = useExport();
+  const columns = [
+    { header: 'Company Name', key: 'company_name', width: 25 },
+    { header: 'Contact Person', key: 'contact_person', width: 20 },
+    { header: 'Sale Agent', key: 'sale_agent', width: 20 },
+    { header: 'Phone', key: 'phone', width: 15 },
+    { header: 'Email', key: 'email', width: 25 },
+    { header: 'Address', key: 'address', width: 30 },
+    { header: 'Lead Time (Days)', key: 'lead_time_days', width: 15 },
+  ];
+  exportToExcel(filteredSuppliers.value, columns, 'suppliers');
+};
+
+const handleExportPDF = () => {
+  const { exportToPDF } = useExport();
+  const columns = [
+    { header: 'Company', key: 'company_name' },
+    { header: 'Contact', key: 'contact_person' },
+    { header: 'Phone', key: 'phone' },
+    { header: 'Email', key: 'email' },
+    { header: 'Lead Time', key: 'lead_time_days' },
+  ];
+  exportToPDF(filteredSuppliers.value, columns, 'Suppliers Report', 'suppliers');
 };
 </script>

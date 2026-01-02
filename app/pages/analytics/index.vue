@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-zinc-50">
+  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -13,8 +13,22 @@
           </div>
         </div>
         
-        <!-- Date Range Filter -->
-        <div class="flex items-center gap-3">
+        <!-- Export Buttons and Date Range Filter -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+          <button 
+            @click="handleExportExcel"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-emerald-100"
+          >
+            <UIcon name="i-lucide-file-spreadsheet" class="w-3.5 h-3.5" />
+            Excel
+          </button>
+          <button 
+            @click="handleExportPDF"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-red-100"
+          >
+            <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5" />
+            PDF
+          </button>
           <DateRangePicker v-model="dateRange" />
         </div>
       </div>
@@ -682,4 +696,47 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+// Export functions
+const handleExportExcel = () => {
+  const { exportToExcel } = useExport();
+  
+  const analyticsData = [
+    { metric: 'Total Revenue', value: totalRevenue.value },
+    { metric: 'Total PO Costs', value: totalPOValue.value },
+    { metric: 'Gross Profit', value: grossProfit.value },
+    { metric: 'Total Sales', value: filteredSales.value.length },
+    { metric: 'Products In Stock', value: stockStats.value.inStockProducts },
+    { metric: 'Products Low Stock', value: stockStats.value.lowStockProducts },
+    { metric: 'Products Out of Stock', value: stockStats.value.outOfStockProducts },
+  ];
+  
+  const columns = [
+    { header: 'Metric', key: 'metric', width: 25 },
+    { header: 'Value', key: 'value', width: 15 },
+  ];
+  
+  exportToExcel(analyticsData, columns, 'analytics_summary');
+};
+
+const handleExportPDF = () => {
+  const { exportToPDF } = useExport();
+  
+  const analyticsData = [
+    { metric: 'Total Revenue', value: `$${formatNumber(totalRevenue.value)}` },
+    { metric: 'Total PO Costs', value: `$${formatNumber(totalPOValue.value)}` },
+    { metric: 'Gross Profit', value: `$${formatNumber(grossProfit.value)}` },
+    { metric: 'Total Sales', value: filteredSales.value.length },
+    { metric: 'In Stock Products', value: stockStats.value.inStockProducts },
+    { metric: 'Low Stock Products', value: stockStats.value.lowStockProducts },
+    { metric: 'Out of Stock Products', value: stockStats.value.outOfStockProducts },
+  ];
+  
+  const columns = [
+    { header: 'Metric', key: 'metric' },
+    { header: 'Value', key: 'value' },
+  ];
+  
+  exportToPDF(analyticsData, columns, 'Analytics Report', 'analytics');
+};
 </script>

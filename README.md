@@ -1,148 +1,211 @@
-# BEV Flow - Inventory Management System
+# BEV Flow - Beverage Inventory Management System
 
-A Nuxt 3 application for managing beverage inventory, suppliers, purchase orders, sales, and forecasting.
+A modern, full-featured inventory management system designed for beverage distributors, retailers, and karaoke businesses.
 
-## Features
+**Live Demo**: [Your Vercel URL here]
 
-- **Dashboard**: Overview of key metrics (products, suppliers, active POs, sales, profit)
-- **Products Management**: Add, edit, and view products with SKU, pricing, and profit calculations
-- **Suppliers Management**: Manage supplier information and lead times
-- **Purchase Orders**: Track purchase orders with status management (Pending, Shipped, Received, Cancelled)
-- **Sales Tracking**: Record and view sales transactions with date filtering
-- **Sales Forecasting**: Generate forecasts based on historical sales data
+---
 
-## Database Schema
+## 🔐 Test Credentials
 
-The application is designed to work with the following MySQL database structure:
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@bevflow.com | admin123 |
+| Manager | manager@bevflow.com | manager123 |
+| Staff | staff@bevflow.com | staff123 |
 
-- **Suppliers**: Company details, contact info, lead times
-- **Products**: SKU, pricing, descriptions, supplier relationships
-- **PurchaseOrders**: PO tracking with status and dates
-- **PurchaseOrderItems**: Line items for each PO
-- **Sales**: Daily sales transactions
-- **SalesForecasts**: Predicted sales based on historical data
+---
 
-## Project Structure
+## ✨ Features
+
+### 📊 Dashboard
+- Real-time sales overview with daily statistics
+- Low stock alerts (items below minimum level)
+- Sales trend charts and analytics
+- Top selling products ranking
+- Quick navigation to all sections
+- **Export to PDF** - Generate comprehensive dashboard reports
+
+### 📦 Products Management
+- View all products with stock levels, pricing, and profit margins
+- Add new products with SKU, cost/selling prices, and supplier assignment
+- Edit and update product details
+- Delete products with confirmation
+- **View Detail Modal** - Quick view of product information
+- **Export to Excel/PDF** - Individual product detail export
+- Search, filter by stock status/supplier, and pagination
+- Stock level color indicators (green/amber/red)
+
+### 🏢 Suppliers Management
+- Complete supplier information management
+- Track contact details, sales agents, and lead times
+- Products supplied tracking
+- **View Detail Modal** - Full supplier profile view
+- **Export to Excel/PDF** - Individual supplier profile export
+- Search and pagination
+
+### 📋 Purchase Orders
+- Create purchase orders with auto-generated PO numbers
+- Multi-item orders with product selection
+- Track order status (Pending, Ordered, Shipped, Received, Cancelled)
+- Calculate totals with subtotal, shipping, and promotions
+- Third-party agent information tracking
+- **View Detail Modal** - Full PO with items breakdown
+- **Export to Excel/PDF** - Professional PO document export
+- Date range filtering and supplier filtering
+
+### 💰 Sales Recording
+- Record sales transactions with auto-generated invoice numbers
+- **Multi-item invoices** - Add multiple products to a single sale (like how customers buy 2+ different items)
+- Track sales by product and customer
+- Real-time stock level display for each product
+- Calculate subtotals and totals automatically
+- **Edit Sales** - Modify existing sale records with multi-item support
+- **View Detail Modal** - Invoice-style sale view with all items
+- **Export as Invoice PDF** - Professional invoice with branding header
+- **Export as Invoice Excel** - Spreadsheet format export
+- Date range filtering and product filtering
+- Sales summary statistics (total sales, transactions, items sold, avg sale)
+
+### 📈 Analytics Dashboard
+- Revenue overview with interactive charts
+- Monthly sales trends visualization
+- Inventory health status monitoring
+- Purchase order status breakdown
+- Category distribution analysis
+- **Export to Excel/PDF** - Analytics summary report
+
+### 🔮 Sales Forecasts
+- AI-powered sales predictions for inventory planning
+- Confidence score indicators
+- Restock recommendations
+- **View Detail Modal** - Forecast details with AI recommendation
+- **Export to Excel/PDF** - Individual forecast detail export
+- Filter by period and confidence level
+
+### 👤 Profile Management
+- View and edit profile information (name, phone, location)
+- Email display (read-only for security)
+- Change password with current password validation
+- Role-based access display
+
+### 🎨 User Interface
+- Clean, minimalist design
+- Fully responsive (mobile, tablet, desktop)
+- Dark/light theme toggle
+- Real user data in sidebar (fetched from profile)
+- Smooth animations and transitions
+- Toast notifications for actions
+
+---
+
+## 📤 Export Capabilities
+
+Every data page includes comprehensive export options:
+
+| Page | Excel | PDF | Individual Export |
+|------|-------|-----|-------------------|
+| Dashboard | - | ✅ Summary Report | - |
+| Products | ✅ | ✅ | ✅ PDF & Excel (Detail Sheet) |
+| Suppliers | ✅ | ✅ | ✅ PDF & Excel (Profile Sheet) |
+| Sales | ✅ | ✅ | ✅ PDF & Excel (Invoice) |
+| Purchase Orders | ✅ | ✅ | ✅ PDF & Excel (PO Document) |
+| Forecasts | ✅ | ✅ | ✅ PDF & Excel (Forecast Report) |
+| Analytics | ✅ | ✅ | - |
+
+**Export Features:**
+- Professional PDF layouts with BEV Flow logo/branding header
+- Multi-item invoice support for sales exports
+- Excel exports with formatted cells and proper column widths
+- One-click export from list views and detail modals
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Vue 3 + Nuxt 3
+- **UI Components**: Nuxt UI
+- **Styling**: Tailwind CSS
+- **Database**: SQLite (better-sqlite3)
+- **Export**: xlsx, jsPDF, jspdf-autotable
+- **Icons**: Lucide Icons
+- **Animations**: @vueuse/motion
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm or pnpm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/bev-flow.git
+cd bev-flow
+
+# Install dependencies
+npm install
+
+# Initialize the database
+npm run db:init
+
+# Start development server
+npm run dev
+```
+
+The app will be available at `http://localhost:3000`
+
+### Production Build
+
+```bash
+npm run build
+npm run preview
+```
+
+---
+
+## 📁 Project Structure
 
 ```
 bev-flow/
 ├── app/
-│   ├── components/        # Reusable Vue components
-│   │   ├── SupplierForm.vue
-│   │   ├── ProductForm.vue
-│   │   └── SaleForm.vue
-│   ├── layouts/          # Layout templates
-│   │   └── default.vue   # Main layout with sidebar navigation
-│   ├── pages/            # Route pages
-│   │   ├── index.vue     # Dashboard
-│   │   ├── suppliers/    # Supplier pages
-│   │   ├── products/     # Product pages
-│   │   ├── purchase-orders/  # PO pages
-│   │   ├── sales/        # Sales pages
-│   │   └── forecasts/    # Forecast pages
-├── composables/          # Composable functions for state/API
-│   ├── useSuppliers.ts
-│   ├── useProducts.ts
-│   ├── usePurchaseOrders.ts
-│   ├── useSales.ts
-│   └── useForecasts.ts
-├── types/                # TypeScript type definitions
-│   └── index.ts
-├── server/               # Backend API routes
-│   └── api/
-│       ├── suppliers/
-│       ├── products/
-│       └── dashboard/
-└── assets/css/           # Global styles
+│   ├── components/     # Reusable Vue components
+│   ├── composables/    # Vue composables (useSales, useProducts, useExport, etc.)
+│   ├── layouts/        # Page layouts (default, auth)
+│   ├── pages/          # Route pages
+│   └── utils/          # Utility functions
+├── server/
+│   ├── api/            # API endpoints
+│   └── utils/          # Server utilities (db)
+├── database/           # Database schema
+├── types/              # TypeScript type definitions
+└── public/             # Static assets
 ```
 
-## Setup
+---
 
-Make sure to install dependencies:
+## 🔒 Security Notes
 
-```bash
-npm install
-```
+- Passwords are hashed using bcrypt
+- Session-based authentication
+- Protected API routes
+- Input validation on all forms
 
-2. Set up your MySQL database using the provided SQL schema
+---
 
-3. Configure database connection in `server/` directory (create database connection utility)
+## 📝 License
 
-4. Update API endpoints in composables to connect to your database
+MIT License - feel free to use this project for your own purposes.
 
-5. Run development server:
-```bash
-npm run dev
-```
+---
 
-## Database Connection
+## 🤝 Contributing
 
-To connect to your MySQL database, install a MySQL client:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-```bash
-npm install mysql2
-```
+---
 
-Then create a database connection utility in `server/utils/db.ts`:
-
-```typescript
-import mysql from 'mysql2/promise';
-
-export const connectToDatabase = async () => {
-  return await mysql.createConnection({
-    host: 'localhost',
-    user: 'your_username',
-    password: 'your_password',
-    database: 'bev_flow'
-  });
-};
-```
-
-## API Endpoints
-
-The application expects the following API endpoints:
-
-- `GET /api/suppliers` - List all suppliers
-- `POST /api/suppliers` - Create supplier
-- `PUT /api/suppliers/:id` - Update supplier
-- `DELETE /api/suppliers/:id` - Delete supplier
-
-- `GET /api/products` - List all products
-- `POST /api/products` - Create product
-- `PUT /api/products/:id` - Update product
-- `DELETE /api/products/:id` - Delete product
-
-- `GET /api/purchase-orders` - List all POs
-- `POST /api/purchase-orders` - Create PO
-- `PUT /api/purchase-orders/:id` - Update PO
-- `DELETE /api/purchase-orders/:id` - Delete PO
-
-- `GET /api/sales` - List sales (with date filters)
-- `POST /api/sales` - Record sale
-- `DELETE /api/sales/:id` - Delete sale
-
-- `GET /api/forecasts` - List forecasts
-- `POST /api/forecasts/generate` - Generate forecast
-
-- `GET /api/dashboard/stats` - Dashboard statistics
-
-## TODO
-
-- [ ] Implement actual database connections in API routes
-- [ ] Add authentication and user management
-- [ ] Implement PO item management
-- [ ] Add inventory stock tracking
-- [ ] Implement forecast calculation algorithm
-- [ ] Add export functionality (PDF/Excel)
-- [ ] Add charts and visualizations
-- [ ] Implement search and filtering
-- [ ] Add pagination for large datasets
-- [ ] Add validation and error handling
-
-## Production
-
-Build the application for production:
-
-```bash
-npm run build
-```
+Made with ❤️ for beverage inventory management

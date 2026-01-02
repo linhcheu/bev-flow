@@ -7,13 +7,29 @@
           <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Sales</h1>
           <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500">Track customer sales at your karaoke</p>
         </div>
-        <NuxtLink 
-          to="/sales/new" 
-          class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 no-underline w-full sm:w-auto"
-        >
-          <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          Add Sale
-        </NuxtLink>
+        <div class="flex flex-wrap items-center gap-2">
+          <button 
+            @click="handleExportExcel"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-emerald-100"
+          >
+            <UIcon name="i-lucide-file-spreadsheet" class="w-3.5 h-3.5" />
+            Excel
+          </button>
+          <button 
+            @click="handleExportPDF"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-red-100"
+          >
+            <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5" />
+            PDF
+          </button>
+          <NuxtLink 
+            to="/sales/new" 
+            class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+          >
+            <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            Add Sale
+          </NuxtLink>
+        </div>
       </div>
 
       <!-- Summary Stats -->
@@ -118,10 +134,25 @@
                   <span class="inline-flex items-center px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] sm:text-xs font-medium rounded mb-1.5">
                     {{ sale.invoice_number }}
                   </span>
-                  <h3 class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ sale.product?.product_name }}</h3>
+                  <h3 v-if="sale.items && sale.items.length > 1" class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ sale.items.length }} items</h3>
+                  <h3 v-else class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ sale.product?.product_name || sale.items?.[0]?.product?.product_name }}</h3>
                   <p class="text-xs text-zinc-500 mt-0.5">{{ sale.customer_name || 'Walk-in Customer' }}</p>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
+                  <button 
+                    @click="openViewModal(sale)" 
+                    class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                    title="View"
+                  >
+                    <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                  </button>
+                  <NuxtLink 
+                    :to="`/sales/${sale.sale_id}/edit`" 
+                    class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors no-underline"
+                    title="Edit"
+                  >
+                    <UIcon name="i-lucide-pencil" class="w-4 h-4" />
+                  </NuxtLink>
                   <button 
                     @click="handleDelete(sale.sale_id!)" 
                     class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -141,11 +172,11 @@
               <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="bg-white rounded-lg p-2">
                   <p class="text-[10px] text-zinc-500 mb-0.5">Qty</p>
-                  <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ sale.quantity }}</p>
+                  <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ getTotalQuantity(sale) }}</p>
                 </div>
                 <div class="bg-white rounded-lg p-2">
-                  <p class="text-[10px] text-zinc-500 mb-0.5">Unit</p>
-                  <p class="text-xs sm:text-sm font-medium text-zinc-900">${{ Number(sale.unit_price).toFixed(2) }}</p>
+                  <p class="text-[10px] text-zinc-500 mb-0.5">Items</p>
+                  <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ sale.items?.length || 1 }}</p>
                 </div>
                 <div class="bg-emerald-50 rounded-lg p-2">
                   <p class="text-[10px] text-emerald-600 mb-0.5">Total</p>
@@ -218,18 +249,36 @@
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-900">{{ sale.customer_name || 'Walk-in' }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatDate(sale.sale_date) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
-                  <div>
-                    <p class="text-sm font-medium text-zinc-900">{{ sale.product?.product_name }}</p>
-                    <p class="text-xs text-zinc-500">{{ sale.product?.sku }}</p>
+                  <div v-if="sale.items && sale.items.length > 1">
+                    <p class="text-sm font-medium text-zinc-900">{{ sale.items.length }} items</p>
+                    <p class="text-xs text-zinc-500">{{ sale.items.map(i => i.product?.product_name).slice(0, 2).join(', ') }}{{ sale.items.length > 2 ? '...' : '' }}</p>
+                  </div>
+                  <div v-else>
+                    <p class="text-sm font-medium text-zinc-900">{{ sale.product?.product_name || sale.items?.[0]?.product?.product_name }}</p>
+                    <p class="text-xs text-zinc-500">{{ sale.product?.sku || sale.items?.[0]?.product?.sku }}</p>
                   </div>
                 </td>
-                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 text-right">{{ sale.quantity }}</td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 text-right">{{ getTotalQuantity(sale) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 text-right">${{ Number(sale.unit_price).toFixed(2) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-right">
                   <span class="text-sm font-medium text-emerald-600">${{ Number(sale.total_amount).toFixed(2) }}</span>
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <div class="flex items-center justify-end gap-1">
+                    <button 
+                      @click="openViewModal(sale)" 
+                      class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                      title="View"
+                    >
+                      <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                    </button>
+                    <NuxtLink 
+                      :to="`/sales/${sale.sale_id}/edit`" 
+                      class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors no-underline"
+                      title="Edit"
+                    >
+                      <UIcon name="i-lucide-pencil" class="w-4 h-4" />
+                    </NuxtLink>
                     <button 
                       @click="handleDelete(sale.sale_id!)" 
                       class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -280,6 +329,113 @@
         />
       </div>
     </div>
+    
+    <!-- View Sale Modal -->
+    <Teleport to="body">
+      <div v-if="viewModalOpen" class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="fixed inset-0 bg-black/50" @click="closeViewModal"></div>
+          <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6">
+            <!-- Receipt Header -->
+            <div class="text-center border-b border-dashed border-zinc-300 pb-4 mb-4">
+              <h2 class="text-lg font-bold text-zinc-900">BEV FLOW</h2>
+              <p class="text-xs text-zinc-500">Karaoke Inventory System</p>
+            </div>
+            
+            <!-- Invoice Info -->
+            <div class="text-center mb-4">
+              <span class="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded-full">
+                {{ selectedSale?.invoice_number }}
+              </span>
+            </div>
+            
+            <div class="space-y-2 text-sm border-b border-dashed border-zinc-300 pb-4 mb-4">
+              <div class="flex justify-between">
+                <span class="text-zinc-500">Date:</span>
+                <span class="font-medium">{{ selectedSale ? formatDate(selectedSale.sale_date) : '' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-zinc-500">Customer:</span>
+                <span class="font-medium">{{ selectedSale?.customer_name || 'Walk-in Customer' }}</span>
+              </div>
+            </div>
+            
+            <!-- Item Details -->
+            <div class="border-b border-dashed border-zinc-300 pb-4 mb-4">
+              <!-- Multi-item display -->
+              <div v-if="selectedSale?.items && selectedSale.items.length > 0" class="space-y-3">
+                <div v-for="(item, idx) in selectedSale.items" :key="idx" class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <p class="font-medium text-zinc-900">{{ item.product?.product_name }}</p>
+                    <p class="text-xs text-zinc-500">SKU: {{ item.product?.sku }}</p>
+                    <p class="text-xs text-zinc-500">{{ item.quantity }} × ${{ Number(item.unit_price || 0).toFixed(2) }}</p>
+                  </div>
+                  <span class="font-medium text-sm">${{ Number(item.amount || item.quantity * item.unit_price).toFixed(2) }}</span>
+                </div>
+              </div>
+              <!-- Single item fallback -->
+              <div v-else>
+                <div class="flex justify-between items-start mb-2">
+                  <div class="flex-1">
+                    <p class="font-medium text-zinc-900">{{ selectedSale?.product?.product_name }}</p>
+                    <p class="text-xs text-zinc-500">SKU: {{ selectedSale?.product?.sku }}</p>
+                  </div>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-zinc-500">{{ selectedSale?.quantity }} × ${{ Number(selectedSale?.unit_price || 0).toFixed(2) }}</span>
+                  <span class="font-medium">${{ Number(selectedSale?.total_amount || 0).toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Total -->
+            <div class="flex justify-between items-center text-lg font-bold mb-4">
+              <span>TOTAL</span>
+              <span class="text-amber-600">${{ Number(selectedSale?.total_amount || 0).toFixed(2) }}</span>
+            </div>
+            
+            <!-- Notes -->
+            <div v-if="selectedSale?.notes" class="bg-zinc-50 rounded-lg p-3 mb-4">
+              <p class="text-xs text-zinc-500 mb-1">Notes:</p>
+              <p class="text-sm text-zinc-700">{{ selectedSale.notes }}</p>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+              <button 
+                @click="exportReceiptPDF(selectedSale!)"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100"
+              >
+                <UIcon name="i-lucide-file-text" class="w-4 h-4" />
+                PDF
+              </button>
+              <button 
+                @click="exportReceiptExcel(selectedSale!)"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-lg hover:bg-emerald-100"
+              >
+                <UIcon name="i-lucide-file-spreadsheet" class="w-4 h-4" />
+                Excel
+              </button>
+              <NuxtLink 
+                :to="`/sales/${selectedSale?.sale_id}/edit`"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+              >
+                <UIcon name="i-lucide-pencil" class="w-4 h-4" />
+                Edit
+              </NuxtLink>
+            </div>
+            
+            <!-- Close button -->
+            <button 
+              @click="closeViewModal" 
+              class="absolute top-3 right-3 p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg"
+            >
+              <UIcon name="i-lucide-x" class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -373,8 +529,16 @@ const totalSales = computed(() => {
 });
 
 const totalQuantity = computed(() => {
-  return sales.value.reduce((sum, s) => sum + (s.quantity || 0), 0);
+  return sales.value.reduce((sum, s) => sum + getTotalQuantity(s), 0);
 });
+
+// Helper to get total quantity from sale (handles multi-item)
+const getTotalQuantity = (sale: Sale) => {
+  if (sale.items && sale.items.length > 0) {
+    return sale.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  }
+  return sale.quantity || 0;
+};
 
 const avgSale = computed(() => {
   return sales.value.length > 0 ? totalSales.value / sales.value.length : 0;
@@ -392,5 +556,69 @@ const handleDelete = async (id: number) => {
   if (confirm('Are you sure you want to delete this sale?')) {
     await deleteSale(id);
   }
+};
+
+// View modal
+const viewModalOpen = ref(false);
+const selectedSale = ref<Sale | null>(null);
+
+const openViewModal = (sale: Sale) => {
+  selectedSale.value = sale;
+  viewModalOpen.value = true;
+};
+
+const closeViewModal = () => {
+  viewModalOpen.value = false;
+  selectedSale.value = null;
+};
+
+const exportReceiptPDF = (sale: Sale) => {
+  const { exportSaleReceipt } = useReceiptExport();
+  exportSaleReceipt(sale);
+};
+
+const exportReceiptExcel = (sale: Sale) => {
+  const { exportSaleReceiptExcel } = useReceiptExport();
+  exportSaleReceiptExcel(sale);
+};
+
+// Export functions
+const handleExportExcel = () => {
+  const { exportToExcel } = useExport();
+  const columns = [
+    { header: 'Invoice #', key: 'invoice_number', width: 15 },
+    { header: 'Date', key: 'sale_date', width: 12 },
+    { header: 'Customer', key: 'customer_name', width: 20 },
+    { header: 'Product', key: 'product_name', width: 25 },
+    { header: 'Quantity', key: 'quantity', width: 10 },
+    { header: 'Unit Price', key: 'unit_price', width: 12 },
+    { header: 'Total', key: 'total_amount', width: 12 },
+  ];
+  
+  const data = filteredSales.value.map(s => ({
+    ...s,
+    product_name: s.product?.product_name || 'N/A',
+  }));
+  
+  exportToExcel(data, columns, 'sales');
+};
+
+const handleExportPDF = () => {
+  const { exportToPDF } = useExport();
+  const columns = [
+    { header: 'Invoice', key: 'invoice_number' },
+    { header: 'Date', key: 'sale_date' },
+    { header: 'Customer', key: 'customer_name' },
+    { header: 'Product', key: 'product_name' },
+    { header: 'Qty', key: 'quantity' },
+    { header: 'Total', key: 'total_amount' },
+  ];
+  
+  const data = filteredSales.value.map(s => ({
+    ...s,
+    product_name: s.product?.product_name || 'N/A',
+  }));
+  
+  exportToPDF(data, columns, 'Sales Report', 'sales');
 };
 </script>

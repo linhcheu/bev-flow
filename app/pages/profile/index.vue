@@ -8,7 +8,18 @@
       </div>
 
       <!-- Profile Content -->
-      <div class="space-y-3 sm:space-y-4 md:space-y-6">
+      <div v-if="loading" class="flex items-center justify-center py-12">
+        <UIcon name="i-lucide-loader-2" class="w-6 h-6 text-amber-500 animate-spin" />
+      </div>
+
+      <div v-else-if="error" class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-700 flex items-center gap-2">
+          <UIcon name="i-lucide-alert-circle" class="w-4 h-4" />
+          {{ error }}
+        </p>
+      </div>
+
+      <div v-else class="space-y-3 sm:space-y-4 md:space-y-6">
         <!-- Profile Card -->
         <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-6">
           <div class="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 md:gap-5 text-center sm:text-left">
@@ -126,13 +137,44 @@
 import { ref, computed, onMounted } from 'vue';
 
 const profile = ref({
-  name: 'Admin User',
-  role: 'System Administrator',
-  email: 'admin@bevflow.com',
-  phone: '+855 23 456 7890',
-  location: 'Phnom Penh, Cambodia',
-  joinDate: 'January 2024',
-  lastLogin: 'Today at 9:30 AM',
+  name: '',
+  role: '',
+  email: '',
+  phone: '',
+  location: '',
+  joinDate: '',
+  lastLogin: '',
+});
+
+const loading = ref(true);
+const error = ref('');
+
+// Fetch profile from API
+const fetchProfile = async () => {
+  loading.value = true;
+  error.value = '';
+  
+  try {
+    const data = await $fetch('/api/profile');
+    profile.value = {
+      name: data.name,
+      role: data.role,
+      email: data.email,
+      phone: data.phone,
+      location: data.location,
+      joinDate: data.joinDate,
+      lastLogin: data.lastLogin,
+    };
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Failed to load profile';
+    console.error('Error fetching profile:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchProfile();
 });
 
 const sessionExpiry = computed(() => {

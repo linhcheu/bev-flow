@@ -1,6 +1,27 @@
 <template>
-  <div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-white">
-    <div class="max-w-2xl mx-auto">
+  <div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-white relative">
+    <!-- Under Maintenance Overlay -->
+    <div class="absolute inset-0 bg-white/90 backdrop-blur-sm z-40 flex items-center justify-center">
+      <div class="text-center p-6 max-w-md">
+        <div class="w-16 h-16 mx-auto mb-4 bg-amber-50 rounded-full flex items-center justify-center">
+          <UIcon name="i-lucide-wrench" class="w-8 h-8 text-amber-500" />
+        </div>
+        <h2 class="text-xl font-semibold text-zinc-900 mb-2">Under Maintenance</h2>
+        <p class="text-sm text-zinc-500 mb-4">
+          Settings are currently being updated and are temporarily unavailable. 
+          We're working hard to bring you new features soon!
+        </p>
+        <NuxtLink 
+          to="/profile" 
+          class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+        >
+          <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
+          Back to Profile
+        </NuxtLink>
+      </div>
+    </div>
+
+    <div class="max-w-2xl mx-auto pointer-events-none opacity-50">
       <!-- Header -->
       <div class="mb-6 lg:mb-8">
         <NuxtLink to="/profile" class="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 mb-4 no-underline">

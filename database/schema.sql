@@ -100,20 +100,31 @@ CREATE TABLE IF NOT EXISTS PurchaseOrderItems (
     FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE RESTRICT
 );
 
--- 7. SALES TABLE (based on Sale Entry sheet)
+-- 7. SALES TABLE (based on Sale Entry sheet - header info)
 CREATE TABLE IF NOT EXISTS Sales (
     sale_id INTEGER PRIMARY KEY AUTOINCREMENT,
     invoice_number VARCHAR(50) UNIQUE NOT NULL,
     customer_id INTEGER,
     customer_name VARCHAR(100),
     sale_date DATE NOT NULL,
-    product_id INTEGER NOT NULL,
-    unit_price DECIMAL(10, 2) NOT NULL,
-    quantity INTEGER NOT NULL CHECK(quantity > 0),
+    subtotal DECIMAL(10, 2) DEFAULT 0,
+    discount_amount DECIMAL(10, 2) DEFAULT 0,
     total_amount DECIMAL(10, 2) NOT NULL,
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id) ON DELETE SET NULL
+);
+
+-- 7b. SALE ITEMS TABLE (line items for multi-product sales)
+CREATE TABLE IF NOT EXISTS SaleItems (
+    item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sale_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL CHECK(quantity > 0),
+    unit_price DECIMAL(10, 2) NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sale_id) REFERENCES Sales(sale_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE RESTRICT
 );
 

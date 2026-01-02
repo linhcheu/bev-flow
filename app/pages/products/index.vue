@@ -7,13 +7,30 @@
           <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Products</h1>
           <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500">Manage your product inventory</p>
         </div>
-        <NuxtLink 
-          to="/products/new" 
-          class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 no-underline w-full sm:w-auto"
-        >
-          <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          Add Product
-        </NuxtLink>
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Export Buttons -->
+          <button 
+            @click="handleExportExcel"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-emerald-100"
+          >
+            <UIcon name="i-lucide-file-spreadsheet" class="w-3.5 h-3.5" />
+            Excel
+          </button>
+          <button 
+            @click="handleExportPDF"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-red-100"
+          >
+            <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5" />
+            PDF
+          </button>
+          <NuxtLink 
+            to="/products/new" 
+            class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+          >
+            <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            Add Product
+          </NuxtLink>
+        </div>
       </div>
 
       <!-- Summary Stats -->
@@ -130,15 +147,24 @@
                   <p class="text-xs text-zinc-500 mt-0.5">{{ product.supplier?.company_name || 'No supplier' }}</p>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
+                  <button 
+                    @click="openViewModal(product)" 
+                    class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                    title="View"
+                  >
+                    <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                  </button>
                   <NuxtLink 
                     :to="`/products/${product.product_id}/edit`" 
-                    class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors no-underline"
+                    class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors no-underline"
+                    title="Edit"
                   >
                     <UIcon name="i-lucide-pencil" class="w-4 h-4" />
                   </NuxtLink>
                   <button 
                     @click="handleDelete(product.product_id!)" 
                     class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Delete"
                   >
                     <UIcon name="i-lucide-trash-2" class="w-4 h-4" />
                   </button>
@@ -243,9 +269,16 @@
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ product.supplier?.company_name || '-' }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <div class="flex items-center justify-end gap-1">
+                    <button 
+                      @click="openViewModal(product)" 
+                      class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                      title="View"
+                    >
+                      <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                    </button>
                     <NuxtLink 
                       :to="`/products/${product.product_id}/edit`" 
-                      class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors no-underline"
+                      class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors no-underline"
                       title="Edit"
                     >
                       <UIcon name="i-lucide-pencil" class="w-4 h-4" />
@@ -300,6 +333,90 @@
         />
       </div>
     </div>
+    
+    <!-- View Product Modal -->
+    <Teleport to="body">
+      <div v-if="viewModalOpen" class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="fixed inset-0 bg-black/50" @click="closeViewModal"></div>
+          <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-5 sm:p-6">
+            <!-- Header -->
+            <div class="flex items-start gap-4 mb-5">
+              <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-package" class="w-6 h-6 text-amber-600" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h2 class="text-lg font-semibold text-zinc-900">{{ selectedProduct?.product_name }}</h2>
+                <p class="text-sm text-zinc-500">SKU: {{ selectedProduct?.sku || 'N/A' }}</p>
+              </div>
+              <button 
+                @click="closeViewModal" 
+                class="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg"
+              >
+                <UIcon name="i-lucide-x" class="w-5 h-5" />
+              </button>
+            </div>
+            
+            <!-- Details -->
+            <div class="space-y-4 mb-5">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-zinc-50 rounded-lg p-3">
+                  <p class="text-xs text-zinc-500 mb-1">Cost Price</p>
+                  <p class="text-lg font-semibold text-zinc-900">${{ Number(selectedProduct?.cost_price || 0).toFixed(2) }}</p>
+                </div>
+                <div class="bg-zinc-50 rounded-lg p-3">
+                  <p class="text-xs text-zinc-500 mb-1">Selling Price</p>
+                  <p class="text-lg font-semibold text-zinc-900">${{ Number(selectedProduct?.selling_price || 0).toFixed(2) }}</p>
+                </div>
+                <div class="bg-zinc-50 rounded-lg p-3">
+                  <p class="text-xs text-zinc-500 mb-1">Current Stock</p>
+                  <p :class="['text-lg font-semibold', getStockColorClass(selectedProduct?.current_stock || 0)]">{{ selectedProduct?.current_stock || 0 }}</p>
+                </div>
+                <div class="bg-zinc-50 rounded-lg p-3">
+                  <p class="text-xs text-zinc-500 mb-1">Profit Margin</p>
+                  <p :class="['text-lg font-semibold', getProfitColorClass(selectedProduct?.profit || 0)]">
+                    {{ (selectedProduct?.profit || 0) >= 0 ? '+' : '' }}${{ (selectedProduct?.profit || 0).toFixed(2) }}
+                  </p>
+                </div>
+              </div>
+              
+              <div class="bg-zinc-50 rounded-lg p-3">
+                <p class="text-xs text-zinc-500 mb-1">Supplier</p>
+                <p class="text-sm font-medium text-zinc-900">{{ selectedProduct?.supplier?.company_name || 'No supplier assigned' }}</p>
+              </div>
+              
+              <div class="bg-zinc-50 rounded-lg p-3">
+                <p class="text-xs text-zinc-500 mb-1">Min Stock Level</p>
+                <p class="text-sm font-medium text-zinc-900">{{ selectedProduct?.min_stock_level || 0 }}</p>
+              </div>
+              
+              <div v-if="selectedProduct?.description" class="bg-zinc-50 rounded-lg p-3">
+                <p class="text-xs text-zinc-500 mb-1">Description</p>
+                <p class="text-sm text-zinc-700">{{ selectedProduct.description }}</p>
+              </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+              <button 
+                @click="exportProductPDF(selectedProduct!)"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100"
+              >
+                <UIcon name="i-lucide-file-text" class="w-4 h-4" />
+                Export PDF
+              </button>
+              <NuxtLink 
+                :to="`/products/${selectedProduct?.product_id}/edit`"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+              >
+                <UIcon name="i-lucide-pencil" class="w-4 h-4" />
+                Edit
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -425,5 +542,65 @@ const handleDelete = async (id: number) => {
   if (confirm('Are you sure you want to delete this product?')) {
     await deleteProduct(id);
   }
+};
+
+// View modal
+const viewModalOpen = ref(false);
+const selectedProduct = ref<Product | null>(null);
+
+const openViewModal = (product: Product) => {
+  selectedProduct.value = product;
+  viewModalOpen.value = true;
+};
+
+const closeViewModal = () => {
+  viewModalOpen.value = false;
+  selectedProduct.value = null;
+};
+
+const exportProductPDF = (product: Product) => {
+  const { exportProductDetail } = useReceiptExport();
+  exportProductDetail(product);
+};
+
+// Export functions
+const handleExportExcel = () => {
+  const { exportToExcel } = useExport();
+  const columns = [
+    { header: 'SKU', key: 'sku', width: 10 },
+    { header: 'Product Name', key: 'product_name', width: 25 },
+    { header: 'Description', key: 'description', width: 20 },
+    { header: 'Supplier', key: 'supplier_name', width: 20 },
+    { header: 'Cost Price', key: 'cost_price', width: 12 },
+    { header: 'Selling Price', key: 'selling_price', width: 12 },
+    { header: 'Profit', key: 'profit', width: 12 },
+    { header: 'Current Stock', key: 'current_stock', width: 12 },
+  ];
+  
+  const data = filteredProducts.value.map(p => ({
+    ...p,
+    supplier_name: p.supplier?.company_name || 'N/A',
+  }));
+  
+  exportToExcel(data, columns, 'products');
+};
+
+const handleExportPDF = () => {
+  const { exportToPDF } = useExport();
+  const columns = [
+    { header: 'SKU', key: 'sku' },
+    { header: 'Product', key: 'product_name' },
+    { header: 'Supplier', key: 'supplier_name' },
+    { header: 'Cost', key: 'cost_price' },
+    { header: 'Price', key: 'selling_price' },
+    { header: 'Stock', key: 'current_stock' },
+  ];
+  
+  const data = filteredProducts.value.map(p => ({
+    ...p,
+    supplier_name: p.supplier?.company_name || 'N/A',
+  }));
+  
+  exportToPDF(data, columns, 'Products Report', 'products');
 };
 </script>

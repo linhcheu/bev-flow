@@ -146,6 +146,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
+const router = useRouter();
+
 const form = ref({
   currentPassword: '',
   newPassword: '',
@@ -179,22 +181,18 @@ const handleSubmit = async () => {
   success.value = false;
   
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await $fetch('/api/profile/password', {
+      method: 'PUT',
+      body: {
+        currentPassword: form.value.currentPassword,
+        newPassword: form.value.newPassword,
+      },
+    });
     
-    // Demo validation - current password is admin123
-    if (form.value.currentPassword !== 'admin123') {
-      error.value = 'Current password is incorrect.';
-      return;
-    }
-    
-    success.value = true;
-    form.value = { currentPassword: '', newPassword: '', confirmPassword: '' };
-    
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      success.value = false;
-    }, 3000);
+    // Redirect to profile page after successful password change
+    router.push('/profile');
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Failed to update password';
   } finally {
     loading.value = false;
   }

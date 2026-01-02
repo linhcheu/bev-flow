@@ -56,6 +56,28 @@ export const useSales = () => {
     }
   };
 
+  const updateSale = async (id: number, sale: SaleFormData) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await $fetch<Sale>(`/api/sales/${id}`, {
+        method: 'PUT',
+        body: sale,
+      });
+      const index = sales.value.findIndex(s => s.sale_id === id);
+      if (index !== -1) {
+        sales.value[index] = response;
+      }
+      return response;
+    } catch (e) {
+      error.value = 'Failed to update sale';
+      console.error(e);
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const deleteSale = async (id: number) => {
     loading.value = true;
     error.value = null;
@@ -100,6 +122,7 @@ export const useSales = () => {
     fetchSales,
     getSale,
     createSale,
+    updateSale,
     deleteSale,
     generateInvoiceNumber,
   };

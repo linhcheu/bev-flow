@@ -7,14 +7,30 @@
           <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Sales Forecasts</h1>
           <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500">AI-powered sales predictions for inventory planning</p>
         </div>
-        <button 
-          @click="generateForecasts"
-          :disabled="generating"
-          class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50 w-full sm:w-auto"
-        >
-          <UIcon :name="generating ? 'i-lucide-loader-2' : 'i-lucide-sparkles'" :class="['w-3.5 h-3.5 sm:w-4 sm:h-4', { 'animate-spin': generating }]" />
-          {{ generating ? 'Generating...' : 'Generate Forecasts' }}
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+          <button 
+            @click="handleExportExcel"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-emerald-100"
+          >
+            <UIcon name="i-lucide-file-spreadsheet" class="w-3.5 h-3.5" />
+            Excel
+          </button>
+          <button 
+            @click="handleExportPDF"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-red-100"
+          >
+            <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5" />
+            PDF
+          </button>
+          <button 
+            @click="generateForecasts"
+            :disabled="generating"
+            class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
+          >
+            <UIcon :name="generating ? 'i-lucide-loader-2' : 'i-lucide-sparkles'" :class="['w-3.5 h-3.5 sm:w-4 sm:h-4', { 'animate-spin': generating }]" />
+            {{ generating ? 'Generating...' : 'Generate Forecasts' }}
+          </button>
+        </div>
       </div>
 
       <!-- Summary Stats -->
@@ -125,6 +141,13 @@
                   <p class="text-xs text-zinc-500 mt-0.5">{{ formatPeriod(forecast.forecast_period) }}</p>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
+                  <button 
+                    @click="openViewModal(forecast)" 
+                    class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                    title="View"
+                  >
+                    <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                  </button>
                   <button 
                     @click="handleDelete(forecast.forecast_id!)" 
                     class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -237,6 +260,13 @@
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <div class="flex items-center justify-end gap-1">
                     <button 
+                      @click="openViewModal(forecast)" 
+                      class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                      title="View"
+                    >
+                      <UIcon name="i-lucide-eye" class="w-4 h-4" />
+                    </button>
+                    <button 
                       @click="handleDelete(forecast.forecast_id!)" 
                       class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Delete"
@@ -284,9 +314,96 @@
           @next="nextPage"
           @last="lastPage"
           @goto="goToPage"
-        />
+                />
       </div>
     </div>
+    
+    <!-- View Forecast Modal -->
+    <Teleport to="body">
+      <div v-if="viewModalOpen" class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="fixed inset-0 bg-black/50" @click="closeViewModal"></div>
+          <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-5 sm:p-6">
+            <!-- Header -->
+            <div class="flex items-start gap-4 mb-5">
+              <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-sparkles" class="w-6 h-6 text-amber-600" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h2 class="text-lg font-semibold text-zinc-900">AI Sales Forecast</h2>
+                <p class="text-sm text-zinc-500">{{ formatPeriod(selectedForecast?.forecast_period) }}</p>
+              </div>
+              <button 
+                @click="closeViewModal" 
+                class="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg"
+              >
+                <UIcon name="i-lucide-x" class="w-5 h-5" />
+              </button>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="bg-zinc-50 rounded-lg p-4 mb-4">
+              <p class="text-xs text-zinc-500 mb-1">Product</p>
+              <p class="text-base font-semibold text-zinc-900">{{ selectedForecast?.product?.product_name }}</p>
+              <p class="text-xs text-zinc-500">SKU: {{ selectedForecast?.product?.sku || 'N/A' }}</p>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-amber-50 rounded-lg p-4 text-center">
+                <p class="text-xs text-amber-600 mb-1">Predicted Quantity</p>
+                <p class="text-2xl font-bold text-amber-700">{{ selectedForecast?.predicted_quantity }}</p>
+              </div>
+              <div class="bg-blue-50 rounded-lg p-4 text-center">
+                <p class="text-xs text-blue-600 mb-1">Confidence Score</p>
+                <p class="text-2xl font-bold text-blue-700">{{ selectedForecast?.confidence_score }}%</p>
+              </div>
+              <div class="bg-zinc-50 rounded-lg p-4 text-center">
+                <p class="text-xs text-zinc-500 mb-1">Current Stock</p>
+                <p class="text-2xl font-bold text-zinc-900">{{ selectedForecast?.product?.current_stock || 0 }}</p>
+              </div>
+              <div :class="needsRestock(selectedForecast!) ? 'bg-red-50' : 'bg-emerald-50'" class="rounded-lg p-4 text-center">
+                <p :class="needsRestock(selectedForecast!) ? 'text-red-600' : 'text-emerald-600'" class="text-xs mb-1">Restock Needed</p>
+                <p :class="needsRestock(selectedForecast!) ? 'text-red-700' : 'text-emerald-700'" class="text-2xl font-bold">
+                  {{ needsRestock(selectedForecast!) ? 'Yes' : 'No' }}
+                </p>
+              </div>
+            </div>
+            
+            <!-- Recommendation -->
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-5">
+              <div class="flex items-start gap-2">
+                <UIcon name="i-lucide-lightbulb" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p class="text-sm font-medium text-amber-800 mb-1">AI Recommendation</p>
+                  <p class="text-sm text-amber-700">
+                    {{ getRecommendation(selectedForecast!) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+              <button 
+                @click="exportForecastPDF(selectedForecast!)"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100"
+              >
+                <UIcon name="i-lucide-file-text" class="w-4 h-4" />
+                Export PDF
+              </button>
+              <button 
+                @click="closeViewModal"
+                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600"
+              >
+                <UIcon name="i-lucide-check" class="w-4 h-4" />
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -454,5 +571,79 @@ const handleDelete = async (id: number) => {
   if (confirm('Are you sure you want to delete this forecast?')) {
     await deleteForecast(id);
   }
+};
+
+// View modal
+const viewModalOpen = ref(false);
+const selectedForecast = ref<Forecast | null>(null);
+
+const openViewModal = (forecast: Forecast) => {
+  selectedForecast.value = forecast;
+  viewModalOpen.value = true;
+};
+
+const closeViewModal = () => {
+  viewModalOpen.value = false;
+  selectedForecast.value = null;
+};
+
+const getRecommendation = (forecast: Forecast) => {
+  if (!forecast) return '';
+  const currentStock = forecast.product?.current_stock || 0;
+  const predicted = forecast.predicted_quantity || 0;
+  const minLevel = forecast.product?.min_stock_level || 10;
+  
+  if (predicted > currentStock) {
+    const reorderQty = predicted - currentStock + minLevel;
+    return `Based on the ${forecast.confidence_score}% confidence forecast, consider ordering ${reorderQty} units to meet predicted demand and maintain safety stock.`;
+  }
+  return `Current stock levels appear sufficient. Monitor sales trends and re-forecast before the period ends.`;
+};
+
+const exportForecastPDF = (forecast: Forecast) => {
+  const { exportForecastDetail } = useReceiptExport();
+  exportForecastDetail(forecast);
+};
+
+// Export functions
+const handleExportExcel = () => {
+  const { exportToExcel } = useExport();
+  const columns = [
+    { header: 'Product', key: 'product_name', width: 25 },
+    { header: 'Forecast Period', key: 'forecast_period', width: 15 },
+    { header: 'Predicted Qty', key: 'predicted_quantity', width: 15 },
+    { header: 'Confidence %', key: 'confidence_score', width: 12 },
+    { header: 'Current Stock', key: 'current_stock', width: 12 },
+    { header: 'Needs Restock', key: 'needs_restock', width: 12 },
+  ];
+  
+  const data = filteredForecasts.value.map(f => ({
+    ...f,
+    product_name: f.product?.product_name || 'N/A',
+    current_stock: f.product?.current_stock || 0,
+    needs_restock: needsRestock(f) ? 'Yes' : 'No',
+  }));
+  
+  exportToExcel(data, columns, 'forecasts');
+};
+
+const handleExportPDF = () => {
+  const { exportToPDF } = useExport();
+  const columns = [
+    { header: 'Product', key: 'product_name' },
+    { header: 'Period', key: 'forecast_period' },
+    { header: 'Predicted', key: 'predicted_quantity' },
+    { header: 'Confidence', key: 'confidence_score' },
+    { header: 'Stock', key: 'current_stock' },
+  ];
+  
+  const data = filteredForecasts.value.map(f => ({
+    ...f,
+    product_name: f.product?.product_name || 'N/A',
+    current_stock: f.product?.current_stock || 0,
+    confidence_score: `${f.confidence_score}%`,
+  }));
+  
+  exportToPDF(data, columns, 'Sales Forecasts Report', 'forecasts');
 };
 </script>

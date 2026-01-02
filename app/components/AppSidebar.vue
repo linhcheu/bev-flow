@@ -73,23 +73,23 @@
       </button>
       
       <!-- User Section -->
-      <div :class="['flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-50', !isExpanded && 'justify-center px-2']">
+      <NuxtLink to="/profile" :class="['flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-50 no-underline hover:bg-zinc-100 transition-colors', !isExpanded && 'justify-center px-2']">
         <div class="w-8 h-8 bg-zinc-200 rounded-full flex items-center justify-center shrink-0">
           <UIcon name="i-lucide-user" class="w-4 h-4 text-zinc-600" />
         </div>
         <div v-if="isExpanded" class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-zinc-900 truncate">Admin</p>
-          <p class="text-[10px] text-zinc-500 truncate">admin@bevflow.com</p>
+          <p class="text-sm font-medium text-zinc-900 truncate">{{ userName }}</p>
+          <p class="text-[10px] text-zinc-500 truncate">{{ userEmail }}</p>
         </div>
         <button 
           v-if="isExpanded"
-          @click="handleLogout"
+          @click.prevent="handleLogout"
           class="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
           title="Logout"
         >
           <UIcon name="i-lucide-log-out" class="w-4 h-4" />
         </button>
-      </div>
+      </NuxtLink>
       <button 
         v-if="!isExpanded"
         @click="handleLogout"
@@ -103,9 +103,30 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+
 const route = useRoute();
 const router = useRouter();
 const { isExpanded, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
+
+// User data
+const userName = ref('Admin');
+const userEmail = ref('admin@bevflow.com');
+
+// Fetch user profile
+const fetchUserProfile = async () => {
+  try {
+    const data = await $fetch('/api/profile');
+    userName.value = data.name || 'Admin';
+    userEmail.value = data.email || 'admin@bevflow.com';
+  } catch (error) {
+    console.error('Failed to fetch profile:', error);
+  }
+};
+
+onMounted(() => {
+  fetchUserProfile();
+});
 
 const mainMenuItems = [
   { path: '/', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },

@@ -12,7 +12,11 @@
       </div>
 
       <!-- Edit Form -->
-      <form @submit.prevent="handleSubmit" class="space-y-6">
+      <div v-if="pageLoading" class="flex items-center justify-center py-12">
+        <UIcon name="i-lucide-loader-2" class="w-6 h-6 text-amber-500 animate-spin" />
+      </div>
+
+      <form v-else @submit.prevent="handleSubmit" class="space-y-6">
         <div class="bg-white border border-zinc-200 rounded-lg p-4 sm:p-6">
           <!-- Profile Picture -->
           <div class="mb-6 pb-6 border-b border-zinc-100">
@@ -49,9 +53,10 @@
                 id="email"
                 v-model="form.email"
                 type="email"
-                required
-                class="w-full px-4 py-2.5 bg-white border border-zinc-300 rounded-lg text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"
+                disabled
+                class="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-500 cursor-not-allowed"
               />
+              <p class="mt-1 text-xs text-zinc-400">Email cannot be changed</p>
             </div>
 
             <div>
@@ -97,6 +102,14 @@
           </p>
         </div>
 
+        <!-- Error Message -->
+        <div v-if="error" class="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-sm text-red-700 flex items-center gap-2">
+            <UIcon name="i-lucide-alert-circle" class="w-4 h-4" />
+            {{ error }}
+          </p>
+        </div>
+
         <!-- Actions -->
         <div class="flex items-center justify-end gap-3">
           <NuxtLink 
@@ -120,32 +133,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+
+const router = useRouter();
 
 const form = ref({
-  name: 'Admin User',
-  email: 'admin@bevflow.com',
-  phone: '+855 23 456 7890',
-  location: 'Phnom Penh, Cambodia',
+  name: '',
+  email: '',
+  phone: '',
+  location: '',
   role: 'System Administrator',
 });
 
 const loading = ref(false);
+const pageLoading = ref(true);
 const success = ref(false);
+const error = ref('');
+
+// Fetch current profile data
+const fetchProfile = async () => {
+  pageLoading.value = true;
+  try {
+    const data = await $fetch('/api/profile');
+    form.value = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      location: data.location,
+      role: data.role,
+    };
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Failed to load profile';
+  } finally {
+    pageLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchProfile();
+});
 
 const handleSubmit = async () => {
   loading.value = true;
   success.value = false;
+  error.value = '';
   
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    success.value = true;
+    await $fetch('/api/profile', {
+      method: 'PUT',
+      body: {
+        name: form.value.name,
+        phone: form.value.phone,
+        location: form.value.location,
+        role: form.value.role,
+      },
+    });
     
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      success.value = false;
-    }, 3000);
+    // Redirect to profile page after successful save
+    router.push('/profile');
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Failed to update profile';
   } finally {
     loading.value = false;
   }

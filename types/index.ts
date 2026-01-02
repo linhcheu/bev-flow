@@ -100,12 +100,26 @@ export interface Sale {
   customer?: Partial<Customer> | null;
   customer_name?: string;
   sale_date: string;
-  product_id: number;
+  product_id?: number;
   product?: Partial<Product> | null;
-  unit_price: number;
-  quantity: number;
+  unit_price?: number;
+  quantity?: number;
+  items?: SaleItem[];
+  subtotal?: number;
+  discount_amount?: number;
   total_amount?: number;
   notes?: string;
+  created_at?: string;
+}
+
+export interface SaleItem {
+  item_id?: number;
+  sale_id?: number;
+  product_id: number;
+  product?: Partial<Product> | null;
+  quantity: number;
+  unit_price: number;
+  amount: number;
   created_at?: string;
 }
 
@@ -235,10 +249,15 @@ export interface SaleFormData {
   customer_id?: number;
   customer_name?: string;
   sale_date: string;
-  product_id: number;
-  unit_price: number;
-  quantity: number;
+  items: SaleItemFormData[];
+  discount_amount?: number;
   notes?: string;
+}
+
+export interface SaleItemFormData {
+  product_id: number;
+  quantity: number;
+  unit_price: number;
 }
 
 // API Response types
