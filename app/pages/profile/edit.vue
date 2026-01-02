@@ -150,11 +150,22 @@ const pageLoading = ref(true);
 const success = ref(false);
 const error = ref('');
 
+interface ProfileData {
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  role: string;
+  joinDate?: string;
+  lastLogin?: string;
+  isActive?: boolean;
+}
+
 // Fetch current profile data
 const fetchProfile = async () => {
   pageLoading.value = true;
   try {
-    const data = await $fetch('/api/profile');
+    const data = await $fetch<ProfileData>('/api/profile');
     form.value = {
       name: data.name,
       email: data.email,

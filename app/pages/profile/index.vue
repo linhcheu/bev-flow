@@ -149,13 +149,24 @@ const profile = ref({
 const loading = ref(true);
 const error = ref('');
 
+interface ProfileData {
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  role: string;
+  joinDate: string;
+  lastLogin: string;
+  isActive?: boolean;
+}
+
 // Fetch profile from API
 const fetchProfile = async () => {
   loading.value = true;
   error.value = '';
   
   try {
-    const data = await $fetch('/api/profile');
+    const data = await $fetch<ProfileData>('/api/profile');
     profile.value = {
       name: data.name,
       role: data.role,

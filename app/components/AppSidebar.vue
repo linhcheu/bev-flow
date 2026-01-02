@@ -113,10 +113,15 @@ const { isExpanded, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSideb
 const userName = ref('Admin');
 const userEmail = ref('admin@bevflow.com');
 
+interface ProfileData {
+  name: string;
+  email: string;
+}
+
 // Fetch user profile
 const fetchUserProfile = async () => {
   try {
-    const data = await $fetch('/api/profile');
+    const data = await $fetch<ProfileData>('/api/profile');
     userName.value = data.name || 'Admin';
     userEmail.value = data.email || 'admin@bevflow.com';
   } catch (error) {
