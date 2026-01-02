@@ -384,38 +384,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 
-// Server-side: always redirect to login (client will handle auth check there)
-if (import.meta.server) {
-  // On server, we redirect to login - the login page will check if already authenticated
-  // and redirect back to dashboard if needed
-}
-
-// Auth check - redirect to login if not authenticated
-if (import.meta.client) {
-  const isAuthenticated = localStorage.getItem('isAuthenticated');
-  const tokenExpiry = localStorage.getItem('tokenExpiry');
-  
-  let shouldRedirect = false;
-  
-  if (!isAuthenticated) {
-    shouldRedirect = true;
-  } else if (tokenExpiry) {
-    const expiryTime = parseInt(tokenExpiry);
-    if (Date.now() > expiryTime) {
-      shouldRedirect = true;
-    }
-  } else {
-    shouldRedirect = true;
-  }
-  
-  if (shouldRedirect) {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('tokenExpiry');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userName');
-    navigateTo('/login', { replace: true });
-  }
-}
+// Auth check is handled by the global middleware
+// No need to duplicate it here
 
 interface DashboardStats {
   totalProducts: number;

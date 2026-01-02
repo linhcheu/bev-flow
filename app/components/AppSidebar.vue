@@ -144,8 +144,16 @@ const isActive = (path: string) => {
   return route.path.startsWith(path);
 };
 
+// Cookies for SSR auth
+const authCookie = useCookie('isAuthenticated');
+const expiryCookie = useCookie('tokenExpiry');
+
 const handleLogout = () => {
   localStorage.removeItem('isAuthenticated');
+  localStorage.removeItem('tokenExpiry');
+  // Also clear cookies
+  authCookie.value = null;
+  expiryCookie.value = null;
   closeMobileSidebar();
   router.push('/login');
 };

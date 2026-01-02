@@ -158,10 +158,3 @@ export const supabaseRawQuery = async <T = any>(
 
   return (data || []) as T[];
 };
-
-// Check if we're in production (Vercel/Supabase mode)
-export const isProduction = () => {
-  return process.env.NODE_ENV === 'production' || 
-         process.env.VERCEL === '1' ||
-         !!process.env.SUPABASE_URL;
-};

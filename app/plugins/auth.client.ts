@@ -1,6 +1,26 @@
-// Client-side auth plugin that runs before route navigation
+// Client-side auth plugin that syncs localStorage with cookies for SSR
 export default defineNuxtPlugin(() => {
   const router = useRouter();
+  const authCookie = useCookie('isAuthenticated', { maxAge: 60 * 60 * 24 * 7 });
+  const expiryCookie = useCookie('tokenExpiry', { maxAge: 60 * 60 * 24 * 7 });
+  
+  const clearAuth = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('tokenExpiry');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    authCookie.value = null;
+    expiryCookie.value = null;
+  };
+  
+  const syncCookies = () => {
+    const isAuth = localStorage.getItem('isAuthenticated');
+    const expiry = localStorage.getItem('tokenExpiry');
+    if (isAuth && expiry) {
+      authCookie.value = isAuth;
+      expiryCookie.value = expiry;
+    }
+  };
   
   // Check auth on every route change
   router.beforeEach((to, from) => {
@@ -26,15 +46,12 @@ export default defineNuxtPlugin(() => {
     }
     
     if (shouldRedirect) {
-      // Clear any stale auth data
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('tokenExpiry');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userName');
-      
+      clearAuth();
       return '/login';
     }
     
+    // Sync cookies for SSR
+    syncCookies();
     return true;
   });
   
@@ -58,12 +75,11 @@ export default defineNuxtPlugin(() => {
     }
     
     if (shouldRedirect) {
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('tokenExpiry');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userName');
-      
+      clearAuth();
       navigateTo('/login', { replace: true });
+    } else {
+      // Sync cookies on successful auth
+      syncCookies();
     }
   }
 });

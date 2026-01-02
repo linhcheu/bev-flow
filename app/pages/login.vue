@@ -208,6 +208,10 @@ const showPassword = ref(false);
 const loading = ref(false);
 const error = ref('');
 
+// Cookies for SSR auth
+const authCookie = useCookie('isAuthenticated', { maxAge: 60 * 60 * 24 * 7 });
+const expiryCookie = useCookie('tokenExpiry', { maxAge: 60 * 60 * 24 * 7 });
+
 const handleLogin = async () => {
   loading.value = true;
   error.value = '';
@@ -218,12 +222,16 @@ const handleLogin = async () => {
     
     // Demo validation
     if (form.value.email === 'admin@bevflow.com' && form.value.password === 'admin123') {
-      // Set authenticated flag
+      // Set authenticated flag in localStorage
       localStorage.setItem('isAuthenticated', 'true');
       
       // Set token expiry time
       const expiryTime = Date.now() + AUTH_CONFIG.TOKEN_EXPIRY_MS;
       localStorage.setItem('tokenExpiry', expiryTime.toString());
+      
+      // Also set cookies for SSR
+      authCookie.value = 'true';
+      expiryCookie.value = expiryTime.toString();
       
       router.push('/');
     } else {
