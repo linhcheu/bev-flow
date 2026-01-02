@@ -19,7 +19,7 @@
             <label class="block text-sm font-medium text-zinc-700 mb-3">Profile Picture</label>
             <div class="flex items-center gap-4">
               <div class="w-20 h-20 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-50">
-                <img src="/images/logo-2.png" alt="Profile" class="w-full h-full object-cover" />
+                <img src="/images/logo-1.png" alt="Profile" class="w-full h-full object-cover" />
               </div>
               <div>
                 <button type="button" class="px-3 py-1.5 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-lg hover:bg-zinc-200">

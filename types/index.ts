@@ -166,8 +166,10 @@ export interface Forecast {
   product_id: number;
   product?: Partial<Product> | null;
   forecast_date: string;
+  forecast_period?: string;
   predicted_quantity: number;
   confidence_level?: number;
+  confidence_score?: number;
   notes?: string;
   created_at?: string;
 }

@@ -92,12 +92,19 @@ export const usePurchaseOrders = () => {
     }
   };
 
-  // Generate next PO number
+  // Generate next PO number (sequential)
   const generatePONumber = () => {
-    const date = new Date();
-    const month = String(date.getMonth() + 1).padStart(3, '0');
-    const existingCount = purchaseOrders.value.length + 1;
-    return `PO-${month}-${String(existingCount).padStart(3, '0')}`;
+    // Find the highest existing PO number
+    let maxNum = 0;
+    purchaseOrders.value.forEach(po => {
+      const match = po.po_number?.match(/PO-(\d+)/);
+      if (match && match[1]) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNum) maxNum = num;
+      }
+    });
+    const nextNum = maxNum + 1;
+    return `PO-${String(nextNum).padStart(4, '0')}`;
   };
 
   return {

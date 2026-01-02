@@ -4,6 +4,7 @@ export const useForecasts = () => {
   const forecasts = ref<Forecast[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const generating = ref(false);
 
   const fetchForecasts = async () => {
     loading.value = true;
@@ -16,6 +17,24 @@ export const useForecasts = () => {
       console.error(e);
     } finally {
       loading.value = false;
+    }
+  };
+
+  const generateForecasts = async () => {
+    generating.value = true;
+    error.value = null;
+    try {
+      const response = await $fetch<{ message: string; forecasts: Forecast[] }>('/api/forecasts/generate', {
+        method: 'POST',
+      });
+      forecasts.value = response.forecasts;
+      return response;
+    } catch (e) {
+      error.value = 'Failed to generate forecasts';
+      console.error(e);
+      return null;
+    } finally {
+      generating.value = false;
     }
   };
 
@@ -59,8 +78,10 @@ export const useForecasts = () => {
   return {
     forecasts,
     loading,
+    generating,
     error,
     fetchForecasts,
+    generateForecasts,
     createForecast,
     deleteForecast,
   };

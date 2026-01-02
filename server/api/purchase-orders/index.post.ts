@@ -13,15 +13,37 @@ interface POItemRow {
   sku: string;
 }
 
+// Generate next sequential PO number
+const generateNextPONumber = (): string => {
+  const result = queryOne<{ max_po: string | null }>(`
+    SELECT po_number as max_po FROM PurchaseOrders 
+    WHERE po_number LIKE 'PO-%' 
+    ORDER BY CAST(SUBSTR(po_number, 4) AS INTEGER) DESC 
+    LIMIT 1
+  `);
+  
+  let nextNum = 1;
+  if (result?.max_po) {
+    const match = result.max_po.match(/PO-(\d+)/);
+    if (match) {
+      nextNum = parseInt(match[1], 10) + 1;
+    }
+  }
+  return `PO-${String(nextNum).padStart(4, '0')}`;
+};
+
 export default defineEventHandler(async (event) => {
   const body = await readBody<PurchaseOrderFormData>(event);
   
-  if (!body.po_number || !body.supplier_id || !body.items || body.items.length === 0) {
+  if (!body.supplier_id || !body.items || body.items.length === 0) {
     throw createError({
       statusCode: 400,
-      message: 'PO number, supplier ID, and at least one item are required'
+      message: 'Supplier ID and at least one item are required'
     });
   }
+  
+  // Auto-generate PO number (ignore any user input)
+  const poNumber = generateNextPONumber();
   
   // Calculate subtotal from items
   const subtotal = body.items.reduce((sum, item) => {
@@ -46,7 +68,7 @@ export default defineEventHandler(async (event) => {
     )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
-    body.po_number,
+    poNumber,
     body.supplier_id,
     body.order_date || new Date().toISOString().split('T')[0],
     body.eta_date || null,

@@ -3,8 +3,8 @@
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- SKU & Product Name -->
       <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
-          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-3">
+          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
             <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
           </div>
           Basic Information
@@ -51,8 +51,8 @@
       
       <!-- Pricing -->
       <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
-          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-3">
+          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
             <UIcon name="i-lucide-banknote" class="w-4 h-4 text-amber-600" />
           </div>
           Pricing
@@ -64,7 +64,7 @@
               Cost Price <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">$</span>
               <input 
                 id="cost_price"
                 v-model.number="form.cost_price" 
@@ -83,7 +83,7 @@
               Selling Price <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">$</span>
               <input 
                 id="selling_price"
                 v-model.number="form.selling_price" 
@@ -99,16 +99,25 @@
         </div>
         
         <!-- Profit Preview -->
-        <div v-if="form.cost_price && form.selling_price" class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-          <span class="text-sm font-medium text-emerald-700">Profit Margin</span>
-          <span class="text-xl font-semibold text-emerald-600">${{ (form.selling_price - form.cost_price).toFixed(2) }}</span>
+        <div v-if="form.cost_price && form.selling_price" 
+          :class="[
+            'flex items-center justify-between p-4 border rounded-xl',
+            profitMargin >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'
+          ]"
+        >
+          <span :class="['text-sm font-medium', profitMargin >= 0 ? 'text-emerald-700' : 'text-red-700']">
+            Profit Margin
+          </span>
+          <span :class="['text-xl font-semibold', profitMargin >= 0 ? 'text-emerald-600' : 'text-red-600']">
+            {{ profitMargin >= 0 ? '+' : '' }}${{ profitMargin.toFixed(2) }}
+          </span>
         </div>
       </div>
       
       <!-- Supplier -->
       <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
-          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-3">
+          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
             <UIcon name="i-lucide-building-2" class="w-4 h-4 text-amber-600" />
           </div>
           Supplier
@@ -179,6 +188,11 @@ const form = ref<Product>({
   cost_price: props.product?.cost_price || 0,
   selling_price: props.product?.selling_price || 0,
   supplier_id: props.product?.supplier_id,
+});
+
+// Computed profit margin with proper color logic
+const profitMargin = computed(() => {
+  return (form.value.selling_price || 0) - (form.value.cost_price || 0);
 });
 
 onMounted(() => {

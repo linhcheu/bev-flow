@@ -180,12 +180,31 @@ body {
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background-color: white !important;
-  border: 1px solid #e4e4e7 !important;
-  border-radius: 0.75rem;
+  background-color: #ffffff !important;
+  border: 1.5px solid #d4d4d8 !important;
+  border-radius: 0.5rem;
   color: #18181b !important;
   font-size: 0.875rem;
   transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.input:hover {
+  border-color: #a1a1aa !important;
+}
+
+/* Input with left icon - ensure proper padding */
+.input.pl-11,
+.input[class*="pl-"] {
+  padding-left: 2.75rem !important;
+}
+
+.input.pl-10 {
+  padding-left: 2.5rem !important;
+}
+
+.input.pl-12 {
+  padding-left: 3rem !important;
 }
 
 .input::placeholder {
@@ -223,9 +242,9 @@ body {
 .select {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 1rem;
-  background-color: white !important;
-  border: 1px solid #e4e4e7 !important;
-  border-radius: 0.75rem;
+  background-color: #ffffff !important;
+  border: 1.5px solid #d4d4d8 !important;
+  border-radius: 0.5rem;
   color: #18181b !important;
   font-size: 0.875rem;
   transition: all 0.2s;
@@ -235,6 +254,11 @@ body {
   background-position: right 0.75rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.select:hover {
+  border-color: #a1a1aa !important;
 }
 
 .dark .select {

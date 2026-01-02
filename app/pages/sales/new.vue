@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8 min-h-screen bg-white">
+  <div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-white">
     <div class="max-w-3xl mx-auto">
       <!-- Header -->
       <div class="mb-6 sm:mb-8">
@@ -8,12 +8,12 @@
           Back to Sales
         </NuxtLink>
         <h1 class="text-xl sm:text-2xl font-semibold text-zinc-900">Record Sale</h1>
-        <p class="mt-1 text-sm text-zinc-500">Create a new sale entry</p>
+        <p class="mt-1 text-sm text-zinc-500">Record a sale to a customer at your karaoke</p>
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Sale Details Card -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+        <div class="bg-white border border-zinc-200 rounded-xl p-4 sm:p-6 space-y-5">
           <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-receipt" class="w-4 h-4 text-amber-600" />
@@ -30,9 +30,11 @@
                 v-model="form.invoice_number" 
                 type="text"
                 required
-                placeholder="e.g. 1001"
-                class="input"
+                placeholder="Auto-generated"
+                class="input bg-zinc-50"
+                readonly
               />
+              <p class="text-xs text-zinc-400 mt-1">Auto-generated sequential number</p>
             </div>
             
             <div class="form-group">
@@ -53,7 +55,7 @@
         </div>
         
         <!-- Customer Card -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+        <div class="bg-white border border-zinc-200 rounded-xl p-4 sm:p-6 space-y-5">
           <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-user" class="w-4 h-4 text-amber-600" />
@@ -63,13 +65,13 @@
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="form-group">
-              <label class="input-label">Select Customer</label>
+              <label class="input-label">Select Customer (Optional)</label>
               <select 
                 v-model="form.customer_id"
                 class="select"
                 @change="onCustomerChange"
               >
-                <option :value="undefined">-- Select or enter name --</option>
+                <option :value="undefined">-- Walk-in Customer --</option>
                 <option v-for="customer in customers" :key="customer.customer_id" :value="customer.customer_id">
                   {{ customer.customer_name }}
                 </option>
@@ -81,7 +83,7 @@
               <input 
                 v-model="form.customer_name" 
                 type="text"
-                placeholder="Customer name"
+                placeholder="Walk-in customer name (optional)"
                 class="input"
               />
             </div>
@@ -89,7 +91,7 @@
         </div>
         
         <!-- Product Card -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+        <div class="bg-white border border-zinc-200 rounded-xl p-4 sm:p-6 space-y-5">
           <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
             <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />

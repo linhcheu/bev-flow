@@ -1,83 +1,192 @@
 <template>
-  <div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-white">
+  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-zinc-50">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="mb-6 lg:mb-8">
-        <h1 class="text-xl sm:text-2xl font-semibold text-zinc-900">Dashboard</h1>
-        <p class="mt-1 text-sm text-zinc-500">Welcome back! Here's your business overview.</p>
+      <div class="mb-4 sm:mb-6 lg:mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-layout-dashboard" class="w-5 h-5 text-zinc-600" />
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Dashboard</h1>
+            <p class="text-xs sm:text-sm text-zinc-500">{{ todayFormatted }}</p>
+          </div>
+        </div>
       </div>
       
       <!-- Stats Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 lg:mb-8">
-        <div class="bg-white border border-zinc-200 rounded-lg p-4 sm:p-5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-50 rounded-lg flex items-center justify-center">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 lg:mb-8">
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
             </div>
-            <span class="text-[10px] sm:text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full">+12%</span>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-zinc-900">{{ stats.totalProducts }}</p>
-          <p class="text-[10px] sm:text-xs text-zinc-500 mt-1">Total Products</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.totalProducts }}</p>
+          <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Total Products</p>
         </div>
         
-        <div class="bg-white border border-zinc-200 rounded-lg p-4 sm:p-5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-amber-600" />
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-blue-600" />
             </div>
-            <span class="text-[10px] sm:text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full">+3</span>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-zinc-900">{{ stats.totalSuppliers }}</p>
-          <p class="text-[10px] sm:text-xs text-zinc-500 mt-1">Total Suppliers</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.totalSuppliers }}</p>
+          <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Total Suppliers</p>
         </div>
         
-        <div class="bg-white border border-zinc-200 rounded-lg p-4 sm:p-5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-amber-600" />
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-purple-600" />
             </div>
-            <span class="text-[10px] sm:text-xs font-medium text-amber-600 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-full">Pending</span>
+            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Active</span>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-zinc-900">{{ stats.activePOs }}</p>
-          <p class="text-[10px] sm:text-xs text-zinc-500 mt-1">Active POs</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.activePOs }}</p>
+          <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Pending POs</p>
         </div>
         
-        <div class="bg-white border border-zinc-200 rounded-lg p-4 sm:p-5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-trending-up" class="w-4 h-4 text-amber-600" />
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="w-8 h-8 bg-cyan-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-shopping-bag" class="w-4 h-4 text-cyan-600" />
             </div>
-            <span class="text-[10px] sm:text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full">+8.2%</span>
+            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded-full">Today</span>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-zinc-900">${{ stats.monthlySales.toFixed(2) }}</p>
-          <p class="text-[10px] sm:text-xs text-zinc-500 mt-1">Monthly Sales</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.todayOrders || 0 }}</p>
+          <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Today's Orders</p>
         </div>
         
-        <div class="bg-white border border-zinc-200 rounded-lg p-4 sm:p-5 col-span-2 sm:col-span-1">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-wallet" class="w-4 h-4 text-amber-600" />
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-trending-up" class="w-4 h-4 text-emerald-600" />
             </div>
-            <span class="text-[10px] sm:text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full">+15%</span>
+            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded-full">Today</span>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-zinc-900">${{ stats.monthlyProfit.toFixed(2) }}</p>
-          <p class="text-[10px] sm:text-xs text-zinc-500 mt-1">Monthly Profit</p>
+          <p :class="['text-base sm:text-lg md:text-xl font-semibold', getSalesColorClass(stats.todaySales)]">
+            ${{ formatNumber(stats.todaySales) }}
+          </p>
+          <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Today's Sales</p>
+        </div>
+        
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors col-span-2 sm:col-span-1">
+          <div class="flex items-center justify-between mb-2 sm:mb-3">
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-wallet" class="w-4 h-4 text-green-600" />
+            </div>
+            <span :class="['text-[9px] sm:text-[10px] md:text-xs font-medium px-1.5 py-0.5 rounded-full', getProfitBadgeClass(stats.todayProfit)]">
+              Today
+            </span>
+          </div>
+          <p :class="['text-base sm:text-lg md:text-xl font-semibold', getProfitColorClass(stats.todayProfit)]">
+            {{ stats.todayProfit >= 0 ? '+' : '' }}${{ formatNumber(stats.todayProfit) }}
+          </p>
+          <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Today's Profit</p>
+        </div>
+      </div>
+
+      <!-- Sales Trend Chart -->
+      <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 lg:mb-8 border border-zinc-200">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-line-chart" class="w-4 h-4 text-emerald-600" />
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-medium text-zinc-900">Today's Hourly Sales</h3>
+              <p class="text-xs text-zinc-500">Sales activity throughout today</p>
+            </div>
+          </div>
+          <div class="flex gap-4 text-xs">
+            <span class="flex items-center gap-1.5">
+              <span class="w-3 h-3 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"></span>
+              Hourly Revenue
+            </span>
+          </div>
+        </div>
+        
+        <!-- Sales Trend SVG Chart -->
+        <div class="relative overflow-x-auto">
+          <svg class="w-full min-w-[400px] h-48 sm:h-56" viewBox="0 0 800 220" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="trendAreaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.3" />
+                <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.02" />
+              </linearGradient>
+              <linearGradient id="trendLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#34d399" />
+                <stop offset="100%" style="stop-color:#059669" />
+              </linearGradient>
+            </defs>
+            
+            <!-- Grid lines -->
+            <g stroke="#e4e4e7" stroke-width="1" stroke-dasharray="4,4">
+              <line x1="60" y1="30" x2="780" y2="30" />
+              <line x1="60" y1="70" x2="780" y2="70" />
+              <line x1="60" y1="110" x2="780" y2="110" />
+              <line x1="60" y1="150" x2="780" y2="150" />
+              <line x1="60" y1="190" x2="780" y2="190" />
+            </g>
+            
+            <!-- Y-axis labels -->
+            <g fill="#71717a" font-size="10" font-weight="500">
+              <text x="50" y="34" text-anchor="end">${{ formatChartValue(maxHourlyValue) }}</text>
+              <text x="50" y="74" text-anchor="end">${{ formatChartValue(maxHourlyValue * 0.75) }}</text>
+              <text x="50" y="114" text-anchor="end">${{ formatChartValue(maxHourlyValue * 0.5) }}</text>
+              <text x="50" y="154" text-anchor="end">${{ formatChartValue(maxHourlyValue * 0.25) }}</text>
+              <text x="50" y="194" text-anchor="end">$0</text>
+            </g>
+            
+            <!-- Area fill -->
+            <path :d="trendAreaPath" fill="url(#trendAreaGradient)" />
+            
+            <!-- Line -->
+            <path :d="trendLinePath" fill="none" stroke="url(#trendLineGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            
+            <!-- Data points -->
+            <g v-for="(point, index) in hourlyChartData" :key="index">
+              <circle 
+                :cx="point.x" 
+                :cy="point.y" 
+                r="6" 
+                fill="white" 
+                stroke="#10b981" 
+                stroke-width="3" 
+                class="cursor-pointer hover:r-8 transition-all"
+                @mouseenter="showTooltip($event, `${point.label}: $${formatNumber(point.value)}`)"
+                @mouseleave="hideTooltip"
+              />
+              <text :x="point.x" y="210" text-anchor="middle" fill="#71717a" font-size="10" font-weight="500">{{ point.label }}</text>
+            </g>
+            
+            <!-- No data message -->
+            <g v-if="hourlyChartData.length === 0">
+              <text x="420" y="110" text-anchor="middle" fill="#a1a1aa" font-size="14">No sales data for today yet</text>
+            </g>
+          </svg>
         </div>
       </div>
 
       <!-- Charts Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 lg:mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 lg:mb-8">
         <!-- Sales by Category Chart -->
-        <div class="lg:col-span-2 bg-white border border-zinc-200 rounded-lg p-4 sm:p-6">
-          <div class="flex items-center gap-2 mb-4 sm:mb-6">
-            <UIcon name="i-lucide-pie-chart" class="w-5 h-5 text-amber-600" />
-            <h3 class="text-sm sm:text-base font-medium text-zinc-900">Sales by Beer Category</h3>
+        <div class="lg:col-span-2 bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+          <div class="flex items-center gap-3 mb-3 sm:mb-4 md:mb-6">
+            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-pie-chart" class="w-4 h-4 text-purple-600" />
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-zinc-900">Today's Sales by Product</h3>
+              <p class="text-xs text-zinc-500">Revenue distribution</p>
+            </div>
           </div>
           
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-center">
             <!-- Donut Chart -->
             <div class="flex items-center justify-center">
-              <svg width="180" height="180" viewBox="0 0 200 200" class="transform -rotate-90 w-40 h-40 sm:w-[180px] sm:h-[180px]">
+              <svg width="180" height="180" viewBox="0 0 200 200" class="transform -rotate-90 w-32 h-32 sm:w-40 sm:h-40 md:w-[180px] md:h-[180px]">
                 <circle cx="100" cy="100" r="70" fill="none" class="stroke-zinc-100" stroke-width="30" />
                 <circle
                   v-for="segment in chartSegments"
@@ -87,153 +196,249 @@
                   stroke-width="30"
                   :stroke-dasharray="`${segment.percentage * 4.4} 440`"
                   :stroke-dashoffset="segment.offset"
+                  class="cursor-pointer hover:opacity-80 transition-opacity"
+                  @mouseenter="showTooltip($event, `${segment.category}: ${segment.percentage}%`)"
+                  @mouseleave="hideTooltip"
                 />
                 <circle cx="100" cy="100" r="50" class="fill-white" />
               </svg>
             </div>
             
-            <!-- Legend -->
-            <div class="space-y-2">
+            <!-- Legend with scrollable container -->
+            <div class="max-h-[180px] overflow-y-auto space-y-1.5 sm:space-y-2 pr-2">
               <div 
                 v-for="category in analytics.categories" 
                 :key="category.name"
-                class="flex items-center justify-between py-1.5"
+                class="flex items-center justify-between py-1 sm:py-1.5 px-2 rounded-lg hover:bg-zinc-50 transition-colors"
               >
-                <div class="flex items-center gap-2">
-                  <div class="w-2.5 h-2.5 rounded-full" :style="{backgroundColor: category.color}" />
-                  <span class="text-sm text-zinc-600">{{ category.name }}</span>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                  <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" :style="{backgroundColor: category.color}" />
+                  <span class="text-[10px] sm:text-xs md:text-sm text-zinc-600 truncate">{{ category.name }}</span>
                 </div>
-                <span class="text-sm font-medium text-zinc-900">{{ category.percentage }}%</span>
+                <span class="text-[10px] sm:text-xs md:text-sm font-medium text-zinc-900 ml-2">{{ category.percentage }}%</span>
+              </div>
+              <div v-if="analytics.categories.length === 0" class="text-center py-4">
+                <p class="text-xs text-zinc-400">No sales data today</p>
               </div>
             </div>
           </div>
           
           <!-- Summary -->
-          <div class="mt-6 pt-6 border-t border-zinc-100 grid grid-cols-2 gap-4">
-            <div class="bg-zinc-50 rounded-lg p-4">
-              <p class="text-xs text-zinc-500 mb-1">Total Revenue</p>
-              <p class="text-lg font-semibold text-zinc-900">${{ analytics.totalRevenue.toLocaleString() }}</p>
+          <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-zinc-100 grid grid-cols-2 gap-3 sm:gap-4">
+            <div class="bg-emerald-50 rounded-lg p-3 sm:p-4">
+              <p class="text-[10px] sm:text-xs text-emerald-600 mb-0.5 sm:mb-1">Today's Revenue</p>
+              <p class="text-sm sm:text-base md:text-lg font-semibold text-emerald-700">${{ analytics.totalRevenue.toLocaleString() }}</p>
             </div>
-            <div class="bg-amber-50 rounded-lg p-4">
-              <p class="text-xs text-amber-600 mb-1">Top Category</p>
-              <p class="text-lg font-semibold text-amber-700">{{ analytics.categories[0]?.name || 'N/A' }}</p>
+            <div class="bg-amber-50 rounded-lg p-3 sm:p-4">
+              <p class="text-[10px] sm:text-xs text-amber-600 mb-0.5 sm:mb-1">Top Product</p>
+              <p class="text-sm sm:text-base md:text-lg font-semibold text-amber-700 truncate">{{ analytics.categories[0]?.name || 'N/A' }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Top Products -->
-        <div class="bg-white border border-zinc-200 rounded-lg p-6">
-          <div class="flex items-center gap-2 mb-6">
-            <UIcon name="i-lucide-beer" class="w-5 h-5 text-amber-600" />
-            <h3 class="text-base font-medium text-zinc-900">Top Selling Beers</h3>
+        <!-- Top Products & Stock Alerts -->
+        <div class="space-y-3 sm:space-y-4 md:space-y-6">
+          <!-- Top Products -->
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+            <div class="flex items-center gap-3 mb-3 sm:mb-4">
+              <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-trophy" class="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-zinc-900">Top Selling Today</h3>
+                <p class="text-xs text-zinc-500">Best performers</p>
+              </div>
+            </div>
+            
+            <div class="max-h-[200px] overflow-y-auto space-y-2 sm:space-y-3">
+              <div 
+                v-for="(product, index) in displayTopProducts" 
+                :key="product.name"
+                class="flex items-center gap-2 sm:gap-3 p-2 bg-zinc-50 rounded-lg"
+              >
+                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-amber-100 rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-semibold text-amber-700 shrink-0">
+                  {{ index + 1 }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-[10px] sm:text-xs font-medium text-zinc-900 truncate">{{ product.name }}</p>
+                </div>
+                <span class="text-[10px] sm:text-xs font-semibold text-amber-600 shrink-0">{{ product.sold }} sold</span>
+              </div>
+            </div>
           </div>
-          
-          <div class="space-y-4">
-            <div 
-              v-for="(product, index) in analytics.topProducts" 
-              :key="product.name"
-              class="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg"
-            >
-              <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-sm font-semibold text-amber-700">
-                {{ index + 1 }}
+
+          <!-- Low Stock Alerts -->
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+            <div class="flex items-center gap-3 mb-3 sm:mb-4">
+              <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-alert-triangle" class="w-4 h-4 text-red-600" />
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-zinc-900 truncate">{{ product.name }}</p>
-                <p class="text-xs text-zinc-500">{{ product.type }}</p>
+              <div>
+                <h3 class="text-sm font-medium text-zinc-900">Low Stock Alerts</h3>
+                <p class="text-xs text-zinc-500">Needs attention</p>
               </div>
-              <span class="text-sm font-semibold text-amber-600">{{ product.sold }}</span>
+            </div>
+            
+            <div v-if="stats.lowStockProducts && stats.lowStockProducts.length > 0" class="max-h-[150px] overflow-y-auto space-y-2">
+              <div 
+                v-for="product in stats.lowStockProducts" 
+                :key="product.product_id"
+                class="flex items-center justify-between p-2 bg-red-50 rounded-lg"
+              >
+                <span class="text-[10px] sm:text-xs text-red-700 font-medium truncate">{{ product.product_name }}</span>
+                <span class="text-[10px] sm:text-xs font-semibold text-red-600 shrink-0 bg-red-100 px-2 py-0.5 rounded-full">{{ product.current_stock }} left</span>
+              </div>
+            </div>
+            <div v-else class="text-center py-4">
+              <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <UIcon name="i-lucide-check-circle" class="w-5 h-5 text-emerald-500" />
+              </div>
+              <p class="text-xs text-zinc-500">All stock levels are healthy!</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Quick Actions -->
-      <div class="bg-white border border-zinc-200 rounded-lg p-6">
-        <h2 class="text-base font-medium text-zinc-900 mb-4">Quick Actions</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <NuxtLink 
-          to="/products/new" 
-          class="flex flex-col items-center gap-2 p-4 bg-zinc-50 border border-zinc-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors no-underline"
-        >
-          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-package-plus" class="w-5 h-5 text-amber-600" />
+      <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-zap" class="w-4 h-4 text-indigo-600" />
           </div>
-          <span class="text-sm font-medium text-zinc-700">Add Product</span>
-        </NuxtLink>
-        
-        <NuxtLink 
-          to="/suppliers/new" 
-          class="flex flex-col items-center gap-2 p-4 bg-zinc-50 border border-zinc-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors no-underline"
-        >
-          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-building-2" class="w-5 h-5 text-amber-600" />
+          <div>
+            <h3 class="text-sm font-medium text-zinc-900">Quick Actions</h3>
+            <p class="text-xs text-zinc-500">Common operations</p>
           </div>
-          <span class="text-sm font-medium text-zinc-700">Add Supplier</span>
-        </NuxtLink>
-        
-        <NuxtLink 
-          to="/purchase-orders/new" 
-          class="flex flex-col items-center gap-2 p-4 bg-zinc-50 border border-zinc-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors no-underline"
-        >
-          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-file-plus" class="w-5 h-5 text-amber-600" />
-          </div>
-          <span class="text-sm font-medium text-zinc-700">Create PO</span>
-        </NuxtLink>
-        
-        <NuxtLink 
-          to="/sales/new" 
-          class="flex flex-col items-center gap-2 p-4 bg-zinc-50 border border-zinc-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors no-underline"
-        >
-          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-receipt" class="w-5 h-5 text-amber-600" />
-          </div>
-          <span class="text-sm font-medium text-zinc-700">Record Sale</span>
-        </NuxtLink>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+          <NuxtLink 
+            to="/products/new" 
+            class="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors no-underline"
+          >
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-package-plus" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+            </div>
+            <span class="text-[10px] sm:text-xs md:text-sm font-medium text-zinc-700 text-center">Add Product</span>
+          </NuxtLink>
+          
+          <NuxtLink 
+            to="/suppliers/new" 
+            class="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors no-underline"
+          >
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-building-2" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+            </div>
+            <span class="text-[10px] sm:text-xs md:text-sm font-medium text-zinc-700 text-center">Add Supplier</span>
+          </NuxtLink>
+          
+          <NuxtLink 
+            to="/purchase-orders/new" 
+            class="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors no-underline"
+          >
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-file-plus" class="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+            </div>
+            <span class="text-[10px] sm:text-xs md:text-sm font-medium text-zinc-700 text-center">Create PO</span>
+          </NuxtLink>
+          
+          <NuxtLink 
+            to="/sales/new" 
+            class="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors no-underline"
+          >
+            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-receipt" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+            </div>
+            <span class="text-[10px] sm:text-xs md:text-sm font-medium text-zinc-700 text-center">Add Sale</span>
+          </NuxtLink>
         </div>
       </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div 
+      v-if="tooltip.show"
+      class="fixed z-50 px-3 py-2 bg-zinc-900 text-white text-xs rounded-lg shadow-lg pointer-events-none"
+      :style="{ left: `${tooltip.x}px`, top: `${tooltip.y}px` }"
+    >
+      {{ tooltip.text }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { DashboardStats } from '~/types';
+
+interface DashboardStats {
+  totalProducts: number;
+  totalSuppliers: number;
+  activePOs: number;
+  todaySales: number;
+  todayProfit: number;
+  todayOrders: number;
+  lowStockProducts?: { product_id: number; product_name: string; current_stock: number; min_stock_level: number }[];
+  recentSales?: any[];
+  analytics?: {
+    totalRevenue: number;
+    topProducts: { name: string; type: string; sold: number }[];
+    categories: { name: string; percentage: number; color: string; revenue: number }[];
+    hourlySalesData: { hour: string; total: number }[];
+  };
+}
 
 const stats = ref<DashboardStats>({
   totalProducts: 0,
   totalSuppliers: 0,
   activePOs: 0,
-  monthlySales: 0,
-  monthlyProfit: 0,
+  todaySales: 0,
+  todayProfit: 0,
+  todayOrders: 0,
+  lowStockProducts: [],
 });
+
+// Today's formatted date
+const todayFormatted = computed(() => {
+  return new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+});
+
+// Tooltip state
+const tooltip = ref({ show: false, x: 0, y: 0, text: '' });
+
+const showTooltip = (event: MouseEvent, text: string) => {
+  tooltip.value = {
+    show: true,
+    x: event.clientX + 10,
+    y: event.clientY - 30,
+    text
+  };
+};
+
+const hideTooltip = () => {
+  tooltip.value.show = false;
+};
 
 // Analytics Data for charts
 const analytics = ref({
-  totalRevenue: 245000,
-  topProducts: [
-    { name: 'Angkor Beer', type: 'Lager', sold: 1250 },
-    { name: 'Anchor Beer', type: 'Pilsner', sold: 980 },
-    { name: 'ABC Extra Stout', type: 'Stout', sold: 850 },
-    { name: 'Tiger Beer', type: 'Lager', sold: 720 },
-    { name: 'Heineken', type: 'Premium', sold: 650 },
-  ],
-  categories: [
-    { name: 'Premium Lager', percentage: 28, color: '#8b5cf6' },
-    { name: 'Craft Beer', percentage: 18, color: '#3b82f6' },
-    { name: 'Stout & Porter', percentage: 15, color: '#22c55e' },
-    { name: 'IPA', percentage: 12, color: '#06b6d4' },
-    { name: 'Wheat Beer', percentage: 10, color: '#ec4899' },
-    { name: 'Pale Ale', percentage: 8, color: '#f59e0b' },
-    { name: 'Light Beer', percentage: 5, color: '#eab308' },
-    { name: 'Dark Lager', percentage: 4, color: '#f97316' },
-  ],
+  totalRevenue: 0,
+  topProducts: [] as { name: string; type: string; sold: number }[],
+  categories: [] as { name: string; percentage: number; color: string }[],
+  hourlySalesData: [] as { hour: string; total: number }[],
 });
+
+// Default category colors for display
+const defaultCategories = [
+  { name: 'No Data', percentage: 100, color: '#e4e4e7' }
+];
 
 // Calculate chart segments for donut chart
 const chartSegments = computed(() => {
+  const cats = analytics.value.categories.length > 0 ? analytics.value.categories : defaultCategories;
   let cumulativePercentage = 0;
-  return analytics.value.categories.map((category) => {
+  return cats.map((category) => {
     const segment = {
       category: category.name,
       percentage: category.percentage,
@@ -245,12 +450,100 @@ const chartSegments = computed(() => {
   });
 });
 
+// Hourly trend chart data (changed from monthly)
+const maxHourlyValue = computed(() => {
+  if (analytics.value.hourlySalesData.length === 0) return 1000;
+  return Math.max(...analytics.value.hourlySalesData.map(d => d.total)) * 1.2;
+});
+
+const hourlyChartData = computed(() => {
+  const data = analytics.value.hourlySalesData;
+  if (data.length === 0) return [];
+  
+  const chartWidth = 720;
+  const chartHeight = 160;
+  const startX = 80;
+  const spacing = data.length > 1 ? chartWidth / (data.length - 1) : chartWidth;
+  
+  return data.map((d, i) => ({
+    x: startX + (i * spacing),
+    y: 190 - (d.total / maxHourlyValue.value) * chartHeight,
+    value: d.total,
+    label: d.hour
+  }));
+});
+
+const trendLinePath = computed(() => {
+  if (hourlyChartData.value.length === 0) return '';
+  return hourlyChartData.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+});
+
+const trendAreaPath = computed(() => {
+  if (hourlyChartData.value.length === 0) return '';
+  const points = hourlyChartData.value;
+  const firstX = points[0]?.x || 80;
+  const lastX = points[points.length - 1]?.x || 760;
+  return `${trendLinePath.value} L ${lastX} 190 L ${firstX} 190 Z`;
+});
+
+// Default top products if none available
+const displayTopProducts = computed(() => {
+  if (analytics.value.topProducts.length > 0) {
+    return analytics.value.topProducts.slice(0, 5);
+  }
+  return [{ name: 'No sales today', type: 'N/A', sold: 0 }];
+});
+
 onMounted(async () => {
   try {
     const response = await $fetch<DashboardStats>('/api/dashboard/stats');
     stats.value = response;
+    
+    // Update analytics from API response
+    if (response.analytics) {
+      analytics.value.totalRevenue = response.analytics.totalRevenue;
+      analytics.value.topProducts = response.analytics.topProducts;
+      analytics.value.categories = response.analytics.categories;
+      analytics.value.hourlySalesData = response.analytics.hourlySalesData || [];
+    }
   } catch (error) {
     console.error('Failed to fetch dashboard stats:', error);
   }
 });
+
+// Helper functions
+const formatNumber = (num: number) => {
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
+const formatChartValue = (value: number) => {
+  if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+  if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
+  return value.toFixed(0);
+};
+
+const formatMonthLabel = (month: string) => {
+  const parts = month.split('-');
+  const m = parts[1] || '01';
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[parseInt(m) - 1] || month;
+};
+
+// Profit color classes
+const getProfitColorClass = (profit: number) => {
+  if (profit > 0) return 'text-emerald-600';
+  if (profit < 0) return 'text-red-600';
+  return 'text-zinc-600';
+};
+
+const getProfitBadgeClass = (profit: number) => {
+  if (profit > 0) return 'text-emerald-600 bg-emerald-50';
+  if (profit < 0) return 'text-red-600 bg-red-50';
+  return 'text-zinc-600 bg-zinc-50';
+};
+
+const getSalesColorClass = (sales: number) => {
+  if (sales > 0) return 'text-emerald-600';
+  return 'text-zinc-900';
+};
 </script>
