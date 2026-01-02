@@ -57,7 +57,31 @@ export default defineNuxtConfig({
     head: {
       script: [
         {
-          innerHTML: `(function(){document.documentElement.classList.remove('dark');localStorage.removeItem('theme');})();`,
+          innerHTML: `(function(){
+            document.documentElement.classList.remove('dark');
+            localStorage.removeItem('theme');
+            // Auth redirect - runs before Vue hydrates
+            if(window.location.pathname !== '/login'){
+              var isAuth = localStorage.getItem('isAuthenticated');
+              var expiry = localStorage.getItem('tokenExpiry');
+              var shouldRedirect = false;
+              if(!isAuth){
+                shouldRedirect = true;
+              } else if(expiry){
+                if(Date.now() > parseInt(expiry)){
+                  localStorage.removeItem('isAuthenticated');
+                  localStorage.removeItem('tokenExpiry');
+                  shouldRedirect = true;
+                }
+              } else {
+                localStorage.removeItem('isAuthenticated');
+                shouldRedirect = true;
+              }
+              if(shouldRedirect){
+                window.location.replace('/login');
+              }
+            }
+          })();`,
           type: 'text/javascript',
         }
       ],

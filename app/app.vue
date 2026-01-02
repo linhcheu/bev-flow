@@ -1,14 +1,15 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <div>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
-// Ensure light mode (remove dark class if present)
-if (process.client) {
+// Remove dark mode on client
+if (import.meta.client) {
   document.documentElement.classList.remove('dark');
   localStorage.removeItem('theme');
 }
 </script>
-

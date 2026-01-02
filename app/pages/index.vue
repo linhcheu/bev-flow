@@ -384,6 +384,33 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 
+// Auth check - redirect to login if not authenticated
+if (import.meta.client) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
+  const tokenExpiry = localStorage.getItem('tokenExpiry');
+  
+  let shouldRedirect = false;
+  
+  if (!isAuthenticated) {
+    shouldRedirect = true;
+  } else if (tokenExpiry) {
+    const expiryTime = parseInt(tokenExpiry);
+    if (Date.now() > expiryTime) {
+      shouldRedirect = true;
+    }
+  } else {
+    shouldRedirect = true;
+  }
+  
+  if (shouldRedirect) {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('tokenExpiry');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    navigateTo('/login', { replace: true });
+  }
+}
+
 interface DashboardStats {
   totalProducts: number;
   totalSuppliers: number;
