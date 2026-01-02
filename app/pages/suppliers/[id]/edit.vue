@@ -1,9 +1,22 @@
 <template>
-  <div class="p-8">
-    <div v-if="loading" class="flex items-center justify-center py-20">
-      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-zinc-400 animate-spin" />
+  <div class="p-8 min-h-screen bg-white">
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-6">
+        <NuxtLink to="/suppliers" class="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 no-underline mb-3">
+          <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
+          Back to Suppliers
+        </NuxtLink>
+        <h1 class="text-2xl font-semibold text-zinc-900">Edit Supplier</h1>
+        <p class="mt-1 text-sm text-zinc-500">Update supplier information</p>
+      </div>
+      
+      <div v-if="loading" class="flex items-center justify-center py-20">
+        <UIcon name="i-lucide-loader-2" class="w-6 h-6 text-amber-500 animate-spin" />
+      </div>
+      <div v-else-if="supplier" class="bg-white border border-zinc-200 rounded-lg p-6">
+        <SupplierForm :supplier="supplier" :is-edit="true" @submit="handleSubmit" />
+      </div>
     </div>
-    <SupplierForm v-else-if="supplier" :supplier="supplier" :is-edit="true" @submit="handleSubmit" />
   </div>
 </template>
 

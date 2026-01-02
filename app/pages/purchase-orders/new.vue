@@ -1,22 +1,22 @@
 <template>
-  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950">
+  <div class="p-8 min-h-screen bg-white">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <NuxtLink to="/purchase-orders" class="btn-ghost no-underline mb-4 -ml-3">
+        <NuxtLink to="/purchase-orders" class="inline-flex items-center gap-2 text-sm text-zinc-600 hover:text-amber-600 no-underline mb-4">
           <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
           Back to Purchase Orders
         </NuxtLink>
-        <h1 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Create Purchase Order</h1>
-        <p class="mt-1 text-zinc-600 dark:text-zinc-400">Create a new purchase order with multiple items</p>
+        <h1 class="text-2xl font-semibold text-zinc-900">Create Purchase Order</h1>
+        <p class="mt-1 text-sm text-zinc-500">Create a new purchase order with multiple items</p>
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- PO Details Card -->
-        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-zinc-900" />
+        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-amber-600" />
             </div>
             Order Details
           </h3>
@@ -84,11 +84,11 @@
         </div>
         
         <!-- Items Card -->
-        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
+        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-              <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-900" />
+            <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+              <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
               </div>
               Order Items
             </h3>
@@ -106,13 +106,13 @@
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
-                <tr class="border-b border-zinc-200 dark:border-zinc-700">
-                  <th class="text-left py-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase">No.</th>
-                  <th class="text-left py-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase">Product</th>
-                  <th class="text-left py-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase">Description</th>
-                  <th class="text-right py-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase">Qty</th>
-                  <th class="text-right py-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase">Unit Cost</th>
-                  <th class="text-right py-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase">Amount</th>
+                <tr class="border-b border-zinc-200">
+                  <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">No.</th>
+                  <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">Product</th>
+                  <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">Description</th>
+                  <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Qty</th>
+                  <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Unit Cost</th>
+                  <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Amount</th>
                   <th class="w-10"></th>
                 </tr>
               </thead>
@@ -120,9 +120,9 @@
                 <tr 
                   v-for="(item, index) in form.items" 
                   :key="index" 
-                  class="border-b border-zinc-100 dark:border-zinc-800"
+                  class="border-b border-zinc-100"
                 >
-                  <td class="py-3 text-sm text-zinc-600 dark:text-zinc-400">{{ index + 1 }}</td>
+                  <td class="py-3 text-sm text-zinc-500">{{ index + 1 }}</td>
                   <td class="py-3">
                     <select 
                       v-model="item.product_id"
@@ -135,7 +135,7 @@
                       </option>
                     </select>
                   </td>
-                  <td class="py-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  <td class="py-3 text-sm text-zinc-500">
                     {{ getProductDescription(item.product_id) }}
                   </td>
                   <td class="py-3">
@@ -161,7 +161,7 @@
                     </div>
                   </td>
                   <td class="py-3 text-right">
-                    <span class="text-sm font-semibold text-zinc-900 dark:text-white">
+                    <span class="text-sm font-medium text-zinc-900">
                       ${{ (item.quantity * item.unit_cost).toFixed(2) }}
                     </span>
                   </td>
@@ -181,17 +181,17 @@
           </div>
           
           <!-- Totals -->
-          <div class="border-t border-zinc-200 dark:border-zinc-700 pt-4 space-y-2">
+          <div class="border-t border-zinc-200 pt-4 space-y-2">
             <div class="flex justify-end items-center gap-4">
-              <span class="text-sm text-zinc-600 dark:text-zinc-400">Subtotal:</span>
-              <span class="text-sm font-semibold text-zinc-900 dark:text-white w-28 text-right">${{ subtotal.toFixed(2) }}</span>
+              <span class="text-sm text-zinc-500">Subtotal:</span>
+              <span class="text-sm font-medium text-zinc-900 w-28 text-right">${{ subtotal.toFixed(2) }}</span>
             </div>
             <div class="flex justify-end items-center gap-4">
-              <span class="text-sm text-zinc-600 dark:text-zinc-400">Shipping (3%):</span>
-              <span class="text-sm text-zinc-900 dark:text-white w-28 text-right">${{ shippingCost.toFixed(2) }}</span>
+              <span class="text-sm text-zinc-500">Shipping (3%):</span>
+              <span class="text-sm text-zinc-900 w-28 text-right">${{ shippingCost.toFixed(2) }}</span>
             </div>
             <div class="flex justify-end items-center gap-4">
-              <span class="text-sm text-zinc-600 dark:text-zinc-400">Promotion:</span>
+              <span class="text-sm text-zinc-500">Promotion:</span>
               <div class="relative w-28">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">-$</span>
                 <input 
@@ -203,18 +203,18 @@
                 />
               </div>
             </div>
-            <div class="flex justify-end items-center gap-4 pt-2 border-t border-zinc-200 dark:border-zinc-700">
-              <span class="text-base font-semibold text-zinc-900 dark:text-white">Total:</span>
-              <span class="text-xl font-bold text-amber-600 dark:text-amber-500 w-28 text-right">${{ total.toFixed(2) }}</span>
+            <div class="flex justify-end items-center gap-4 pt-2 border-t border-zinc-200">
+              <span class="text-base font-medium text-zinc-900">Total:</span>
+              <span class="text-xl font-semibold text-amber-600 w-28 text-right">${{ total.toFixed(2) }}</span>
             </div>
           </div>
         </div>
         
         <!-- Remarks Card -->
-        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-message-square" class="w-4 h-4 text-zinc-900" />
+        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-message-square" class="w-4 h-4 text-amber-600" />
             </div>
             Notes & Remarks
           </h3>
@@ -245,10 +245,10 @@
         <!-- Error Message -->
         <div 
           v-if="error" 
-          class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl"
+          class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl"
         >
           <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
-          <p class="text-sm text-red-700 dark:text-red-400">{{ error }}</p>
+          <p class="text-sm text-red-700">{{ error }}</p>
         </div>
         
         <!-- Actions -->

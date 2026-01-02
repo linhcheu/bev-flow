@@ -1,22 +1,22 @@
 <template>
-  <div class="p-8 min-h-screen bg-white dark:bg-zinc-950">
+  <div class="p-8 min-h-screen bg-white">
     <div class="max-w-3xl mx-auto">
       <!-- Header -->
-      <div class="mb-8">
-        <NuxtLink to="/sales" class="btn-ghost no-underline mb-4 -ml-3">
+      <div class="mb-6 sm:mb-8">
+        <NuxtLink to="/sales" class="inline-flex items-center gap-2 text-sm text-zinc-600 hover:text-amber-600 no-underline mb-4">
           <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
           Back to Sales
         </NuxtLink>
-        <h1 class="text-3xl font-bold text-zinc-900 dark:text-white tracking-tight">Record Sale</h1>
-        <p class="mt-1 text-zinc-600 dark:text-zinc-400">Create a new sale entry</p>
+        <h1 class="text-xl sm:text-2xl font-semibold text-zinc-900">Record Sale</h1>
+        <p class="mt-1 text-sm text-zinc-500">Create a new sale entry</p>
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Sale Details Card -->
-        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-receipt" class="w-4 h-4 text-zinc-900" />
+        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-receipt" class="w-4 h-4 text-amber-600" />
             </div>
             Sale Details
           </h3>
@@ -53,10 +53,10 @@
         </div>
         
         <!-- Customer Card -->
-        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-user" class="w-4 h-4 text-zinc-900" />
+        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-user" class="w-4 h-4 text-amber-600" />
             </div>
             Customer Information
           </h3>
@@ -89,10 +89,10 @@
         </div>
         
         <!-- Product Card -->
-        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-900" />
+        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
             </div>
             Product Details
           </h3>
@@ -149,8 +149,8 @@
             
             <div class="form-group">
               <label class="input-label">Total Amount</label>
-              <div class="flex items-center h-12 px-4 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl">
-                <span class="text-xl font-bold text-amber-600 dark:text-amber-500">
+              <div class="flex items-center h-12 px-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <span class="text-xl font-semibold text-amber-600">
                   ${{ totalAmount.toFixed(2) }}
                 </span>
               </div>
@@ -159,10 +159,10 @@
         </div>
         
         <!-- Notes Card -->
-        <div class="bg-zinc-50 dark:bg-zinc-900 border-2 border-amber-500/50 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-file-text" class="w-4 h-4 text-zinc-900" />
+        <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-file-text" class="w-4 h-4 text-amber-600" />
             </div>
             Notes
           </h3>
@@ -181,10 +181,10 @@
         <!-- Error Message -->
         <div 
           v-if="error" 
-          class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl"
+          class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl"
         >
           <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 shrink-0" />
-          <p class="text-sm text-red-700 dark:text-red-400">{{ error }}</p>
+          <p class="text-sm text-red-700">{{ error }}</p>
         </div>
         
         <!-- Actions -->
