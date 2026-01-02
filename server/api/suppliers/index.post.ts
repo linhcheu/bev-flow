@@ -1,5 +1,5 @@
 // API endpoint for creating a supplier
-import { execute, getLastInsertId, queryOne } from '~/server/utils/db';
+import { execute, getLastInsertId, queryOne, isProduction, getSupabase } from '~/server/utils/db';
 import type { Supplier } from '~/types';
 
 export default defineEventHandler(async (event) => {
@@ -12,6 +12,34 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data, error } = await supabase
+      .from('suppliers')
+      .insert({
+        company_name: body.company_name,
+        contact_person: body.contact_person || null,
+        sale_agent: body.sale_agent || null,
+        phone: body.phone || null,
+        email: body.email || null,
+        address: body.address || null,
+        lead_time_days: body.lead_time_days || 7,
+        is_active: body.is_active === undefined ? true : Boolean(body.is_active)
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating supplier:', error);
+      throw createError({ statusCode: 500, message: 'Failed to create supplier' });
+    }
+    
+    return data;
+  }
+  
+  // Development: Use SQLite
   execute(`
     INSERT INTO Suppliers (company_name, contact_person, sale_agent, phone, email, address, lead_time_days, is_active)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -23,7 +51,7 @@ export default defineEventHandler(async (event) => {
     body.email || null,
     body.address || null,
     body.lead_time_days || 7,
-    body.is_active !== false ? 1 : 0
+    body.is_active === undefined ? 1 : (body.is_active ? 1 : 0)
   ]);
   
   const id = getLastInsertId();

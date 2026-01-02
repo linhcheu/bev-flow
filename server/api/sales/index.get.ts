@@ -1,5 +1,5 @@
 // API endpoint for getting all sales with items
-import { queryAll } from '~/server/utils/db';
+import { queryAll, isProduction, getSupabase } from '~/server/utils/db';
 import type { Sale, SaleItem } from '~/types';
 
 interface SaleRow {
@@ -31,6 +31,107 @@ interface SaleItemRow {
 }
 
 export default defineEventHandler(async () => {
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: sales, error } = await supabase
+      .from('sales')
+      .select(`
+        *,
+        products (
+          product_id,
+          product_name,
+          sku
+        ),
+        customers (
+          customer_id,
+          customer_name
+        )
+      `)
+      .order('sale_date', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching sales:', error);
+      throw createError({ statusCode: 500, message: 'Failed to fetch sales' });
+    }
+    
+    // Get all sale items
+    const { data: allItems } = await supabase
+      .from('saleitems')
+      .select(`
+        *,
+        products (
+          product_id,
+          product_name,
+          sku
+        )
+      `);
+    
+    // Group items by sale_id
+    const itemsBySale = new Map<number, SaleItem[]>();
+    for (const item of allItems || []) {
+      const saleItems = itemsBySale.get(item.sale_id) || [];
+      saleItems.push({
+        item_id: item.item_id,
+        sale_id: item.sale_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: Number(item.unit_price),
+        amount: Number(item.amount),
+        product: {
+          product_id: item.product_id,
+          product_name: (item.products as any)?.product_name || '',
+          sku: (item.products as any)?.sku || ''
+        }
+      });
+      itemsBySale.set(item.sale_id, saleItems);
+    }
+    
+    return (sales || []).map((s: any): Sale => {
+      const items = itemsBySale.get(s.sale_id) || [];
+      const subtotal = items.length > 0 
+        ? items.reduce((sum, item) => sum + item.amount, 0)
+        : Number(s.total_amount);
+      
+      return {
+        sale_id: s.sale_id,
+        invoice_number: s.invoice_number,
+        customer_id: s.customer_id || undefined,
+        customer_name: s.customer_name || s.customers?.customer_name || undefined,
+        sale_date: s.sale_date,
+        product_id: s.product_id,
+        unit_price: Number(s.unit_price),
+        quantity: s.quantity,
+        subtotal,
+        total_amount: Number(s.total_amount),
+        notes: s.notes || undefined,
+        created_at: s.created_at,
+        items: items.length > 0 ? items : [{
+          product_id: s.product_id,
+          quantity: s.quantity,
+          unit_price: Number(s.unit_price),
+          amount: Number(s.total_amount),
+          product: {
+            product_id: s.product_id,
+            product_name: s.products?.product_name || '',
+            sku: s.products?.sku || ''
+          }
+        }],
+        product: {
+          product_id: s.product_id,
+          product_name: s.products?.product_name || '',
+          sku: s.products?.sku || ''
+        },
+        customer: s.customer_id ? {
+          customer_id: s.customer_id,
+          customer_name: s.customers?.customer_name || ''
+        } : undefined
+      };
+    });
+  }
+  
+  // Development: Use SQLite
   const sales = queryAll<SaleRow>(`
     SELECT 
       s.*,

@@ -1,5 +1,5 @@
 // API endpoint for creating a customer
-import { execute, getLastInsertId, queryOne } from '~/server/utils/db';
+import { execute, getLastInsertId, queryOne, isProduction, getSupabase } from '~/server/utils/db';
 import type { Customer } from '~/types';
 
 export default defineEventHandler(async (event) => {
@@ -12,6 +12,32 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data, error } = await supabase
+      .from('customers')
+      .insert({
+        customer_name: body.customer_name,
+        contact_person: body.contact_person || null,
+        phone: body.phone || null,
+        email: body.email || null,
+        address: body.address || null,
+        is_active: body.is_active === undefined ? true : Boolean(body.is_active)
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating customer:', error);
+      throw createError({ statusCode: 500, message: 'Failed to create customer' });
+    }
+    
+    return data;
+  }
+  
+  // Development: Use SQLite
   execute(`
     INSERT INTO Customers (customer_name, contact_person, phone, email, address, is_active)
     VALUES (?, ?, ?, ?, ?, ?)
@@ -21,7 +47,7 @@ export default defineEventHandler(async (event) => {
     body.phone || null,
     body.email || null,
     body.address || null,
-    body.is_active !== false ? 1 : 0
+    body.is_active === undefined ? 1 : (body.is_active ? 1 : 0)
   ]);
   
   const id = getLastInsertId();

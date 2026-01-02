@@ -1,5 +1,5 @@
 // API endpoint for getting all purchase orders with items
-import { queryAll } from '~/server/utils/db';
+import { queryAll, isProduction, getSupabase } from '~/server/utils/db';
 import type { PurchaseOrder, PurchaseOrderItem } from '~/types';
 
 interface PurchaseOrderRow {
@@ -42,6 +42,98 @@ interface POItemRow {
 }
 
 export default defineEventHandler(async () => {
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: orders, error } = await supabase
+      .from('purchaseorders')
+      .select(`
+        *,
+        suppliers (
+          supplier_id,
+          company_name,
+          contact_person,
+          phone,
+          email,
+          address
+        )
+      `)
+      .order('order_date', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching purchase orders:', error);
+      throw createError({ statusCode: 500, message: 'Failed to fetch purchase orders' });
+    }
+    
+    // Get all PO items
+    const { data: items } = await supabase
+      .from('purchaseorderitems')
+      .select(`
+        *,
+        products (
+          product_id,
+          product_name,
+          sku,
+          description
+        )
+      `);
+    
+    // Group items by po_id
+    const itemsByPO: Record<number, PurchaseOrderItem[]> = {};
+    for (const item of items || []) {
+      if (!itemsByPO[item.po_id]) {
+        itemsByPO[item.po_id] = [];
+      }
+      itemsByPO[item.po_id].push({
+        item_id: item.item_id,
+        po_id: item.po_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_cost: Number(item.unit_cost),
+        amount: Number(item.amount),
+        product: {
+          product_id: item.product_id,
+          product_name: (item.products as any)?.product_name || '',
+          sku: (item.products as any)?.sku || '',
+          description: (item.products as any)?.description || undefined,
+        },
+      });
+    }
+    
+    return (orders || []).map((o: any): PurchaseOrder => ({
+      po_id: o.po_id,
+      po_number: o.po_number,
+      supplier_id: o.supplier_id,
+      order_date: o.order_date,
+      eta_date: o.eta_date || undefined,
+      subtotal: Number(o.subtotal),
+      shipping_rate: Number(o.shipping_rate),
+      shipping_cost: Number(o.shipping_cost),
+      promotion_amount: Number(o.promotion_amount),
+      total_amount: Number(o.total_amount),
+      status: o.status as PurchaseOrder['status'],
+      truck_remark: o.truck_remark || undefined,
+      overall_remark: o.overall_remark || undefined,
+      third_party_agent: o.third_party_agent || undefined,
+      agent_phone: o.agent_phone || undefined,
+      agent_email: o.agent_email || undefined,
+      agent_address: o.agent_address || undefined,
+      created_at: o.created_at,
+      updated_at: o.updated_at,
+      supplier: {
+        supplier_id: o.supplier_id,
+        company_name: o.suppliers?.company_name || '',
+        contact_person: o.suppliers?.contact_person || undefined,
+        phone: o.suppliers?.phone || undefined,
+        email: o.suppliers?.email || undefined,
+        address: o.suppliers?.address || undefined,
+      },
+      items: itemsByPO[o.po_id] || [],
+    }));
+  }
+  
+  // Development: Use SQLite
   // Get all purchase orders with supplier info
   const orders = queryAll<PurchaseOrderRow>(`
     SELECT 

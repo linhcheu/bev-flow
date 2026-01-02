@@ -1,8 +1,27 @@
 // API endpoint for getting all suppliers
-import { queryAll } from '~/server/utils/db';
+import { queryAll, isProduction, getSupabase } from '~/server/utils/db';
 import type { Supplier } from '~/types';
 
 export default defineEventHandler(async () => {
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: suppliers, error } = await supabase
+      .from('suppliers')
+      .select('*')
+      .eq('is_active', true)
+      .order('company_name', { ascending: true });
+    
+    if (error) {
+      console.error('Error fetching suppliers:', error);
+      throw createError({ statusCode: 500, message: 'Failed to fetch suppliers' });
+    }
+    
+    return suppliers || [];
+  }
+  
+  // Development: Use SQLite
   const suppliers = queryAll<Supplier>(`
     SELECT 
       supplier_id,

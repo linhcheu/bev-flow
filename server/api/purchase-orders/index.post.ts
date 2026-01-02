@@ -1,5 +1,5 @@
 // API endpoint for creating a purchase order with items
-import { execute, getLastInsertId, queryOne, queryAll } from '~/server/utils/db';
+import { execute, getLastInsertId, queryOne, queryAll, isProduction, getSupabase } from '~/server/utils/db';
 import type { PurchaseOrder, PurchaseOrderFormData, PurchaseOrderItem } from '~/types';
 
 interface POItemRow {
@@ -32,6 +32,26 @@ const generateNextPONumber = (): string => {
   return `PO-${String(nextNum).padStart(4, '0')}`;
 };
 
+// Generate next PO number for Supabase
+const generateNextPONumberSupabase = async (): Promise<string> => {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('purchaseorders')
+    .select('po_number')
+    .like('po_number', 'PO-%')
+    .order('po_number', { ascending: false })
+    .limit(1);
+  
+  let nextNum = 1;
+  if (data && data[0]?.po_number) {
+    const match = data[0].po_number.match(/PO-(\d+)/);
+    if (match) {
+      nextNum = parseInt(match[1], 10) + 1;
+    }
+  }
+  return `PO-${String(nextNum).padStart(4, '0')}`;
+};
+
 export default defineEventHandler(async (event) => {
   const body = await readBody<PurchaseOrderFormData>(event);
   
@@ -41,9 +61,6 @@ export default defineEventHandler(async (event) => {
       message: 'Supplier ID and at least one item are required'
     });
   }
-  
-  // Auto-generate PO number (ignore any user input)
-  const poNumber = generateNextPONumber();
   
   // Calculate subtotal from items
   const subtotal = body.items.reduce((sum, item) => {
@@ -57,6 +74,81 @@ export default defineEventHandler(async (event) => {
   // Calculate total
   const promotionAmount = body.promotion_amount || 0;
   const totalAmount = subtotal + shippingCost - promotionAmount;
+  
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    const poNumber = await generateNextPONumberSupabase();
+    
+    const { data: order, error } = await supabase
+      .from('purchaseorders')
+      .insert({
+        po_number: poNumber,
+        supplier_id: body.supplier_id,
+        order_date: body.order_date || new Date().toISOString().split('T')[0],
+        eta_date: body.eta_date || null,
+        subtotal,
+        shipping_rate: shippingRate,
+        shipping_cost: shippingCost,
+        promotion_amount: promotionAmount,
+        total_amount: totalAmount,
+        status: 'Pending',
+        truck_remark: body.truck_remark || null,
+        overall_remark: body.overall_remark || null,
+        third_party_agent: body.third_party_agent || null,
+        agent_phone: body.agent_phone || null,
+        agent_email: body.agent_email || null,
+        agent_address: body.agent_address || null
+      })
+      .select()
+      .single();
+    
+    if (error || !order) {
+      console.error('Error creating PO:', error);
+      throw createError({ statusCode: 500, message: 'Failed to create purchase order' });
+    }
+    
+    // Insert items
+    const itemsData = body.items.map(item => ({
+      po_id: order.po_id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_cost: item.unit_cost,
+      amount: item.quantity * item.unit_cost
+    }));
+    
+    await supabase.from('purchaseorderitems').insert(itemsData);
+    
+    // Get items with product info
+    const { data: items } = await supabase
+      .from('purchaseorderitems')
+      .select(`
+        *,
+        products (product_id, product_name, sku)
+      `)
+      .eq('po_id', order.po_id);
+    
+    return {
+      ...order,
+      items: (items || []).map((item: any): PurchaseOrderItem => ({
+        item_id: item.item_id,
+        po_id: item.po_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_cost: Number(item.unit_cost),
+        amount: Number(item.amount),
+        product: {
+          product_id: item.product_id,
+          product_name: item.products?.product_name || '',
+          sku: item.products?.sku || '',
+        },
+      })),
+    };
+  }
+  
+  // Development: Use SQLite
+  // Auto-generate PO number (ignore any user input)
+  const poNumber = generateNextPONumber();
   
   // Insert purchase order
   execute(`

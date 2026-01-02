@@ -1,5 +1,5 @@
 // API endpoint for generating forecasts based on sales history
-import { execute, queryAll, getLastInsertId } from '~/server/utils/db';
+import { execute, queryAll, getLastInsertId, isProduction, getSupabase } from '~/server/utils/db';
 import type { Forecast } from '~/types';
 
 interface SalesStats {
@@ -20,6 +20,114 @@ interface ProductInfo {
 }
 
 export default defineEventHandler(async () => {
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    // Clear existing forecasts
+    await supabase.from('forecasts').delete().gte('forecast_id', 0);
+    
+    // Get all active products
+    const { data: products } = await supabase
+      .from('products')
+      .select('product_id, product_name, current_stock, min_stock_level')
+      .eq('is_active', true);
+    
+    // Get sales with dates for statistics
+    const { data: allSales } = await supabase
+      .from('sales')
+      .select('product_id, quantity, sale_date');
+    
+    const forecasts: Forecast[] = [];
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+    
+    for (const product of (products || [])) {
+      const productSales = (allSales || []).filter(s => s.product_id === product.product_id);
+      
+      // Calculate stats
+      const salesDates = [...new Set(productSales.map(s => s.sale_date))];
+      const totalSold = productSales.reduce((sum, s) => sum + (s.quantity || 0), 0);
+      const avgDailySales = salesDates.length > 0 ? totalSold / salesDates.length : 0;
+      
+      const last30DaysSales = productSales
+        .filter(s => new Date(s.sale_date) >= thirtyDaysAgo)
+        .reduce((sum, s) => sum + (s.quantity || 0), 0);
+      
+      const prev30DaysSales = productSales
+        .filter(s => {
+          const d = new Date(s.sale_date);
+          return d >= sixtyDaysAgo && d < thirtyDaysAgo;
+        })
+        .reduce((sum, s) => sum + (s.quantity || 0), 0);
+      
+      // Calculate base forecast
+      let baseForecast = avgDailySales * 30;
+      
+      // Apply trend adjustment
+      if (prev30DaysSales > 0) {
+        const trend = (last30DaysSales - prev30DaysSales) / prev30DaysSales;
+        baseForecast *= (1 + Math.max(-0.5, Math.min(0.5, trend)));
+      }
+      
+      const predictedQuantity = Math.max(Math.round(baseForecast), product.min_stock_level || 0);
+      
+      // Calculate confidence level
+      let confidence = 0.75;
+      if (salesDates.length > 300) confidence += 0.15;
+      else if (salesDates.length > 200) confidence += 0.10;
+      else if (salesDates.length > 100) confidence += 0.05;
+      if (last30DaysSales > 0) confidence += 0.05;
+      confidence = Math.min(confidence, 0.95);
+      
+      // Set forecast date as 30 days from now
+      const forecastDate = new Date();
+      forecastDate.setDate(forecastDate.getDate() + 30);
+      
+      // Generate note
+      let notes = `Based on ${salesDates.length} days of sales history. `;
+      if (prev30DaysSales > 0 && last30DaysSales !== prev30DaysSales) {
+        const change = ((last30DaysSales - prev30DaysSales) / prev30DaysSales * 100).toFixed(1);
+        notes += `${parseFloat(change) >= 0 ? '+' : ''}${change}% sales trend.`;
+      }
+      
+      // Insert forecast
+      const { data: forecast } = await supabase
+        .from('forecasts')
+        .insert({
+          product_id: product.product_id,
+          forecast_date: forecastDate.toISOString().split('T')[0],
+          predicted_quantity: predictedQuantity,
+          confidence_level: confidence,
+          notes: notes.trim()
+        })
+        .select()
+        .single();
+      
+      if (forecast) {
+        forecasts.push({
+          forecast_id: forecast.forecast_id,
+          product_id: product.product_id,
+          forecast_date: forecastDate.toISOString().split('T')[0],
+          predicted_quantity: predictedQuantity,
+          confidence_level: confidence,
+          notes: notes.trim(),
+          product: {
+            product_id: product.product_id,
+            product_name: product.product_name
+          }
+        });
+      }
+    }
+    
+    return {
+      message: `Generated ${forecasts.length} forecasts based on sales history`,
+      forecasts
+    };
+  }
+  
+  // Development: Use SQLite
   // Clear existing forecasts
   execute('DELETE FROM Forecasts');
   

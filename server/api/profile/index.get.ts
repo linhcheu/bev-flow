@@ -1,11 +1,43 @@
 // Get current user profile
-import { queryOne } from '~/server/utils/db';
+import { queryOne, isProduction, getSupabase } from '~/server/utils/db';
 
 export default defineEventHandler(async (event) => {
   try {
     // Get user_id from session/token (for now, use admin user as seed data)
     const userId = 1; // Admin user from seed data
 
+    // Production: Use Supabase
+    if (isProduction()) {
+      const supabase = getSupabase();
+      
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('user_id, username, email, full_name, role, phone, location, is_active, created_at, updated_at')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error || !user) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'User not found',
+        });
+      }
+      
+      return {
+        id: user.user_id,
+        name: user.full_name || 'Admin User',
+        username: user.username,
+        email: user.email,
+        role: user.role === 'admin' ? 'System Administrator' : user.role === 'manager' ? 'Manager' : 'Staff',
+        phone: user.phone || '+855 23 456 7890',
+        location: user.location || 'Phnom Penh, Cambodia',
+        joinDate: formatDate(user.created_at),
+        lastLogin: 'Today at ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        isActive: user.is_active === true,
+      };
+    }
+
+    // Development: Use SQLite
     const user = queryOne<{
       user_id: number;
       username: string;

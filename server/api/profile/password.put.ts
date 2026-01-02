@@ -1,5 +1,5 @@
 // Update user password
-import { execute, queryOne } from '~/server/utils/db';
+import { execute, queryOne, isProduction, getSupabase } from '~/server/utils/db';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -39,6 +39,45 @@ export default defineEventHandler(async (event) => {
     // Get user_id from session/token (for now, use admin user)
     const userId = 1;
 
+    // Production: Use Supabase
+    if (isProduction()) {
+      const supabase = getSupabase();
+      
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('password_hash')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error || !user) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'User not found',
+        });
+      }
+      
+      if (user.password_hash !== currentPassword) {
+        throw createError({
+          statusCode: 401,
+          statusMessage: 'Current password is incorrect',
+        });
+      }
+      
+      await supabase
+        .from('users')
+        .update({
+          password_hash: newPassword,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+      
+      return {
+        success: true,
+        message: 'Password updated successfully',
+      };
+    }
+
+    // Development: Use SQLite
     // Verify current password
     // Note: In production, this should use proper password hashing (bcrypt, argon2, etc.)
     const user = queryOne<{ password_hash: string }>(

@@ -184,6 +184,17 @@ export default defineNuxtConfig({
     }
   },
   
+  // Runtime configuration for environment variables
+  runtimeConfig: {
+    // Server-side only
+    supabaseUrl: process.env.SUPABASE_URL || '',
+    supabaseKey: process.env.SUPABASE_KEY || '',
+    // Public (available on client)
+    public: {
+      supabaseUrl: process.env.SUPABASE_URL || '',
+    }
+  },
+  
   // Vite configuration to suppress warnings and optimize build
   vite: {
     build: {

@@ -1,7 +1,118 @@
 // API endpoint for dashboard statistics - TODAY's data only
-import { queryOne, queryAll } from '~/server/utils/db';
+import { queryOne, queryAll, isProduction, getSupabase } from '~/server/utils/db';
 
 export default defineEventHandler(async () => {
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Get total products count
+    const { count: productCount } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true);
+    
+    // Get total suppliers count
+    const { count: supplierCount } = await supabase
+      .from('suppliers')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true);
+    
+    // Get active POs count
+    const { count: activePoCount } = await supabase
+      .from('purchaseorders')
+      .select('*', { count: 'exact', head: true })
+      .not('status', 'in', '("Received","Cancelled")');
+    
+    // Get TODAY's sales
+    const { data: todaySalesData } = await supabase
+      .from('sales')
+      .select('total_amount')
+      .gte('sale_date', today)
+      .lt('sale_date', new Date(Date.now() + 86400000).toISOString().split('T')[0]);
+    
+    const todaySalesTotal = todaySalesData?.reduce((sum, s) => sum + Number(s.total_amount), 0) || 0;
+    
+    // Get TODAY's sales with product info for profit calculation
+    const { data: salesWithProducts } = await supabase
+      .from('sales')
+      .select(`
+        quantity,
+        products (
+          selling_price,
+          cost_price
+        )
+      `)
+      .gte('sale_date', today)
+      .lt('sale_date', new Date(Date.now() + 86400000).toISOString().split('T')[0]);
+    
+    const todayProfitTotal = salesWithProducts?.reduce((sum, s) => {
+      const product = s.products as any;
+      if (product) {
+        return sum + ((Number(product.selling_price) - Number(product.cost_price)) * s.quantity);
+      }
+      return sum;
+    }, 0) || 0;
+    
+    // Get TODAY's orders count
+    const { count: todayOrdersCount } = await supabase
+      .from('sales')
+      .select('*', { count: 'exact', head: true })
+      .gte('sale_date', today);
+    
+    // Get low stock products
+    const { data: lowStockProducts } = await supabase
+      .from('products')
+      .select('product_id, product_name, current_stock, min_stock_level')
+      .eq('is_active', true)
+      .lt('current_stock', 50)
+      .order('current_stock', { ascending: true })
+      .limit(10);
+    
+    // Get recent sales
+    const { data: recentSales } = await supabase
+      .from('sales')
+      .select(`
+        sale_id,
+        quantity,
+        total_amount,
+        sale_date,
+        products (
+          product_name
+        )
+      `)
+      .gte('sale_date', today)
+      .order('sale_date', { ascending: false })
+      .limit(5);
+    
+    const formattedRecentSales = recentSales?.map(s => ({
+      sale_id: s.sale_id,
+      product_name: (s.products as any)?.product_name || 'Unknown',
+      quantity: s.quantity,
+      total_amount: s.total_amount,
+      sale_date: s.sale_date
+    })) || [];
+    
+    return {
+      totalProducts: productCount || 0,
+      totalSuppliers: supplierCount || 0,
+      activePOs: activePoCount || 0,
+      todaySales: todaySalesTotal,
+      todayProfit: todayProfitTotal,
+      todayOrders: todayOrdersCount || 0,
+      lowStockProducts: lowStockProducts || [],
+      recentSales: formattedRecentSales,
+      analytics: {
+        totalRevenue: todaySalesTotal,
+        topProducts: [],
+        categories: [],
+        hourlySalesData: []
+      }
+    };
+  }
+  
+  // Development: Use SQLite
   // Get total products count
   const productCount = queryOne<{ count: number }>('SELECT COUNT(*) as count FROM Products WHERE is_active = 1');
   

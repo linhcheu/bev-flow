@@ -1,5 +1,5 @@
 // API endpoint for updating a supplier
-import { execute, queryOne } from '~/server/utils/db';
+import { execute, queryOne, isProduction, getSupabase } from '~/server/utils/db';
 import type { Supplier } from '~/types';
 
 export default defineEventHandler(async (event) => {
@@ -13,6 +13,45 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: existing } = await supabase
+      .from('suppliers')
+      .select('supplier_id')
+      .eq('supplier_id', id)
+      .single();
+    
+    if (!existing) {
+      throw createError({ statusCode: 404, message: 'Supplier not found' });
+    }
+    
+    const { data, error } = await supabase
+      .from('suppliers')
+      .update({
+        company_name: body.company_name,
+        contact_person: body.contact_person || null,
+        phone: body.phone || null,
+        email: body.email || null,
+        address: body.address || null,
+        lead_time_days: body.lead_time_days || 0,
+        is_active: body.is_active == null ? true : !!body.is_active,
+        updated_at: new Date().toISOString()
+      })
+      .eq('supplier_id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error updating supplier:', error);
+      throw createError({ statusCode: 500, message: 'Failed to update supplier' });
+    }
+    
+    return data;
+  }
+  
+  // Development: Use SQLite
   // Check if supplier exists
   const existing = queryOne('SELECT supplier_id FROM Suppliers WHERE supplier_id = ?', [id]);
   if (!existing) {
@@ -40,7 +79,7 @@ export default defineEventHandler(async (event) => {
     body.email || null,
     body.address || null,
     body.lead_time_days || 0,
-    body.is_active !== false ? 1 : 0,
+    body.is_active == null ? 1 : (body.is_active ? 1 : 0),
     id
   ]);
   

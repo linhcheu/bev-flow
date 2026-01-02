@@ -1,5 +1,5 @@
 // Update current user profile
-import { execute, queryOne } from '~/server/utils/db';
+import { execute, queryOne, isProduction, getSupabase } from '~/server/utils/db';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -25,6 +25,42 @@ export default defineEventHandler(async (event) => {
     };
     const dbRole = roleMap[role] || 'user';
 
+    // Production: Use Supabase
+    if (isProduction()) {
+      const supabase = getSupabase();
+      
+      await supabase
+        .from('users')
+        .update({
+          full_name: name,
+          phone: phone || null,
+          location: location || null,
+          role: dbRole,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+      
+      const { data: updatedUser } = await supabase
+        .from('users')
+        .select('user_id, username, email, full_name, role, phone, location')
+        .eq('user_id', userId)
+        .single();
+      
+      return {
+        success: true,
+        message: 'Profile updated successfully',
+        profile: {
+          id: updatedUser?.user_id,
+          name: updatedUser?.full_name,
+          email: updatedUser?.email,
+          role: role,
+          phone: updatedUser?.phone || '+855 23 456 7890',
+          location: updatedUser?.location || 'Phnom Penh, Cambodia',
+        },
+      };
+    }
+
+    // Development: Use SQLite
     // Update user profile (email is not editable)
     execute(
       `UPDATE Users 

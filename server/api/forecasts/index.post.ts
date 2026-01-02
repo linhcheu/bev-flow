@@ -1,5 +1,5 @@
 // API endpoint for creating a forecast
-import { execute, getLastInsertId, queryOne } from '~/server/utils/db';
+import { execute, getLastInsertId, queryOne, isProduction, getSupabase } from '~/server/utils/db';
 import type { Forecast } from '~/types';
 
 export default defineEventHandler(async (event) => {
@@ -12,6 +12,31 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: forecast, error } = await supabase
+      .from('forecasts')
+      .insert({
+        product_id: body.product_id,
+        forecast_date: body.forecast_date,
+        predicted_quantity: body.predicted_quantity,
+        confidence_level: body.confidence_level || 0.8,
+        notes: body.notes || null
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating forecast:', error);
+      throw createError({ statusCode: 500, message: 'Failed to create forecast' });
+    }
+    
+    return forecast;
+  }
+  
+  // Development: Use SQLite
   execute(`
     INSERT INTO Forecasts (product_id, forecast_date, predicted_quantity, confidence_level, notes)
     VALUES (?, ?, ?, ?, ?)

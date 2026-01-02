@@ -1,5 +1,5 @@
 // API endpoint for getting a single supplier by ID
-import { queryOne } from '~/server/utils/db';
+import { queryOne, isProduction, getSupabase } from '~/server/utils/db';
 import type { Supplier } from '~/types';
 
 export default defineEventHandler(async (event) => {
@@ -12,6 +12,24 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: supplier, error } = await supabase
+      .from('suppliers')
+      .select('*')
+      .eq('supplier_id', id)
+      .single();
+    
+    if (error || !supplier) {
+      throw createError({ statusCode: 404, message: 'Supplier not found' });
+    }
+    
+    return supplier;
+  }
+  
+  // Development: Use SQLite
   const supplier = queryOne<Supplier>('SELECT * FROM Suppliers WHERE supplier_id = ?', [id]);
   
   if (!supplier) {

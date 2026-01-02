@@ -1,5 +1,5 @@
 // API endpoint for user authentication
-import { queryOne } from '~/server/utils/db';
+import { queryOne, isProduction, getSupabase } from '~/server/utils/db';
 import type { User } from '~/types';
 
 export default defineEventHandler(async (event) => {
@@ -12,6 +12,42 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', body.email)
+      .eq('is_active', true)
+      .single();
+    
+    if (error || !user) {
+      throw createError({
+        statusCode: 401,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // In a real application, you would hash passwords and compare them
+    if (user.password_hash !== body.password) {
+      throw createError({
+        statusCode: 401,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Return user data without password
+    const { password_hash, ...safeUser } = user;
+    
+    return {
+      success: true,
+      user: safeUser
+    };
+  }
+  
+  // Development: Use SQLite
   // Find user by email
   const user = queryOne<User>('SELECT * FROM Users WHERE email = ? AND is_active = 1', [body.email]);
   

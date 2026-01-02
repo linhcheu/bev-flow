@@ -1,5 +1,5 @@
 // API endpoint for getting a single product by ID
-import { queryOne } from '~/server/utils/db';
+import { queryOne, isProduction, getSupabase } from '~/server/utils/db';
 import type { Product } from '~/types';
 
 interface ProductRow extends Product {
@@ -16,6 +16,38 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: product, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        suppliers (
+          supplier_id,
+          company_name
+        )
+      `)
+      .eq('product_id', id)
+      .single();
+    
+    if (error || !product) {
+      throw createError({ statusCode: 404, message: 'Product not found' });
+    }
+    
+    return {
+      ...product,
+      profit: Number(product.selling_price) - Number(product.cost_price),
+      supplier_name: product.suppliers?.company_name || null,
+      supplier: product.supplier_id ? {
+        supplier_id: product.supplier_id,
+        company_name: product.suppliers?.company_name
+      } : null
+    };
+  }
+  
+  // Development: Use SQLite
   const product = queryOne<ProductRow>(`
     SELECT 
       p.*,

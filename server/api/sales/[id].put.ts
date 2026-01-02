@@ -1,5 +1,5 @@
 // API endpoint for updating a sale with multi-item support
-import { execute, queryOne, queryAll, useDatabase } from '~/server/utils/db';
+import { execute, queryOne, queryAll, useDatabase, isProduction, getSupabase } from '~/server/utils/db';
 import type { Sale, SaleItem, SaleItemFormData } from '~/types';
 
 interface SaleItemRow {
@@ -24,6 +24,154 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  const { invoice_number, customer_name, sale_date, items, notes } = body;
+  const itemsArray: SaleItemFormData[] = items || [];
+  const subtotal = itemsArray.reduce((sum: number, item: SaleItemFormData) => {
+    return sum + (item.quantity * item.unit_price);
+  }, 0);
+  const total_amount = subtotal;
+  
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    // Check if sale exists
+    const { data: existing, error: fetchError } = await supabase
+      .from('sales')
+      .select('*')
+      .eq('sale_id', id)
+      .single();
+    
+    if (fetchError || !existing) {
+      throw createError({ statusCode: 404, message: 'Sale not found' });
+    }
+    
+    // Get old items to restore stock
+    const { data: oldItems } = await supabase
+      .from('saleitems')
+      .select('product_id, quantity')
+      .eq('sale_id', id);
+    
+    // Restore stock from old items
+    for (const oldItem of (oldItems || [])) {
+      await supabase.rpc('increment_stock', {
+        p_product_id: oldItem.product_id,
+        p_quantity: oldItem.quantity
+      });
+    }
+    
+    // Also restore from old main record if no items existed
+    if ((!oldItems || oldItems.length === 0) && existing.product_id) {
+      await supabase.rpc('increment_stock', {
+        p_product_id: existing.product_id,
+        p_quantity: existing.quantity
+      });
+    }
+    
+    // Delete old sale items
+    await supabase.from('saleitems').delete().eq('sale_id', id);
+    
+    // Get first item for backwards compatibility
+    const firstItem = itemsArray[0] || {
+      product_id: existing.product_id,
+      quantity: existing.quantity,
+      unit_price: existing.unit_price
+    };
+    
+    // Update main sale record
+    await supabase
+      .from('sales')
+      .update({
+        invoice_number,
+        customer_name: customer_name || null,
+        sale_date,
+        product_id: firstItem.product_id,
+        unit_price: firstItem.unit_price,
+        quantity: firstItem.quantity,
+        total_amount,
+        notes: notes || null
+      })
+      .eq('sale_id', id);
+    
+    // Insert new items and update stock
+    for (const item of itemsArray) {
+      const amount = item.quantity * item.unit_price;
+      await supabase.from('saleitems').insert({
+        sale_id: Number(id),
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        amount
+      });
+      
+      // Deduct stock for new items
+      await supabase.rpc('decrement_stock', {
+        p_product_id: item.product_id,
+        p_quantity: item.quantity
+      });
+    }
+    
+    // Get updated items
+    const { data: updatedItems } = await supabase
+      .from('saleitems')
+      .select(`
+        *,
+        products (product_id, product_name, sku)
+      `)
+      .eq('sale_id', id);
+    
+    // Get updated sale
+    const { data: updated } = await supabase
+      .from('sales')
+      .select(`
+        *,
+        products (product_id, product_name, sku),
+        customers (customer_id, customer_name)
+      `)
+      .eq('sale_id', id)
+      .single();
+    
+    const resultItems: SaleItem[] = (updatedItems || []).map((item: any) => ({
+      item_id: item.item_id,
+      sale_id: item.sale_id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: Number(item.unit_price),
+      amount: Number(item.amount),
+      product: {
+        product_id: item.product_id,
+        product_name: item.products?.product_name || '',
+        sku: item.products?.sku || ''
+      }
+    }));
+    
+    return {
+      sale_id: updated?.sale_id,
+      invoice_number: updated?.invoice_number,
+      customer_id: updated?.customer_id || undefined,
+      customer_name: updated?.customer_name || updated?.customers?.customer_name || undefined,
+      sale_date: updated?.sale_date,
+      product_id: updated?.product_id,
+      unit_price: Number(updated?.unit_price),
+      quantity: updated?.quantity,
+      subtotal,
+      total_amount: Number(updated?.total_amount),
+      notes: updated?.notes || undefined,
+      created_at: updated?.created_at,
+      items: resultItems,
+      product: updated?.product_id ? {
+        product_id: updated.product_id,
+        product_name: updated.products?.product_name || '',
+        sku: updated.products?.sku || ''
+      } : null,
+      customer: updated?.customer_id ? {
+        customer_id: updated.customer_id,
+        customer_name: updated.customers?.customer_name || ''
+      } : undefined
+    };
+  }
+  
+  // Development: Use SQLite
   // Check if sale exists
   const existing = queryOne<Sale>('SELECT * FROM Sales WHERE sale_id = ?', [id]);
   if (!existing) {
@@ -32,15 +180,6 @@ export default defineEventHandler(async (event) => {
       message: 'Sale not found'
     });
   }
-  
-  const { invoice_number, customer_name, sale_date, items, notes } = body;
-  
-  // Calculate totals from items
-  const itemsArray: SaleItemFormData[] = items || [];
-  const subtotal = itemsArray.reduce((sum: number, item: SaleItemFormData) => {
-    return sum + (item.quantity * item.unit_price);
-  }, 0);
-  const total_amount = subtotal;
   
   // Get first item for backwards compatibility with old single-product schema
   const firstItem = itemsArray[0] || { product_id: existing.product_id, quantity: existing.quantity, unit_price: existing.unit_price };

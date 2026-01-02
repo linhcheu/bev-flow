@@ -1,5 +1,5 @@
 // API endpoint for getting a single purchase order with items
-import { queryOne, queryAll } from '~/server/utils/db';
+import { queryOne, queryAll, isProduction, getSupabase } from '~/server/utils/db';
 import type { PurchaseOrder, PurchaseOrderItem } from '~/types';
 
 interface POItemRow {
@@ -24,6 +24,68 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Production: Use Supabase
+  if (isProduction()) {
+    const supabase = getSupabase();
+    
+    const { data: order, error } = await supabase
+      .from('purchaseorders')
+      .select(`
+        *,
+        suppliers (
+          supplier_id,
+          company_name,
+          contact_person,
+          phone,
+          email,
+          address
+        )
+      `)
+      .eq('po_id', id)
+      .single();
+    
+    if (error || !order) {
+      throw createError({ statusCode: 404, message: 'Purchase order not found' });
+    }
+    
+    // Get items
+    const { data: items } = await supabase
+      .from('purchaseorderitems')
+      .select(`
+        *,
+        products (
+          product_id,
+          product_name,
+          sku,
+          description
+        )
+      `)
+      .eq('po_id', id);
+    
+    return {
+      ...order,
+      supplier: {
+        supplier_id: order.supplier_id,
+        company_name: order.suppliers?.company_name || '',
+      },
+      items: (items || []).map((item: any): PurchaseOrderItem => ({
+        item_id: item.item_id,
+        po_id: item.po_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_cost: Number(item.unit_cost),
+        amount: Number(item.amount),
+        product: {
+          product_id: item.product_id,
+          product_name: item.products?.product_name || '',
+          sku: item.products?.sku || '',
+          description: item.products?.description || undefined,
+        },
+      })),
+    };
+  }
+  
+  // Development: Use SQLite
   const order = queryOne<PurchaseOrder & { supplier_name: string }>(`
     SELECT 
       po.*,
