@@ -1,4 +1,4 @@
-import type { Sale } from '~/types';
+import type { Sale, SaleFormData } from '~/types';
 
 export const useSales = () => {
   const sales = ref<Sale[]>([]);
@@ -9,7 +9,6 @@ export const useSales = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       const params = new URLSearchParams();
       if (startDate) params.append('start_date', startDate);
       if (endDate) params.append('end_date', endDate);
@@ -28,7 +27,6 @@ export const useSales = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       return await $fetch<Sale>(`/api/sales/${id}`);
     } catch (e) {
       error.value = 'Failed to fetch sale';
@@ -39,11 +37,10 @@ export const useSales = () => {
     }
   };
 
-  const createSale = async (sale: Sale) => {
+  const createSale = async (sale: SaleFormData) => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       const response = await $fetch<Sale>('/api/sales', {
         method: 'POST',
         body: sale,
@@ -59,11 +56,32 @@ export const useSales = () => {
     }
   };
 
+  const updateSale = async (id: number, sale: SaleFormData) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const response = await $fetch<Sale>(`/api/sales/${id}`, {
+        method: 'PUT',
+        body: sale,
+      });
+      const index = sales.value.findIndex(s => s.sale_id === id);
+      if (index !== -1) {
+        sales.value[index] = response;
+      }
+      return response;
+    } catch (e) {
+      error.value = 'Failed to update sale';
+      console.error(e);
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const deleteSale = async (id: number) => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       await $fetch(`/api/sales/${id}`, {
         method: 'DELETE',
       });
@@ -78,6 +96,25 @@ export const useSales = () => {
     }
   };
 
+  // Generate next invoice number (sequential)
+  const generateInvoiceNumber = () => {
+    // Find the highest existing invoice number
+    let maxNum = 0;
+    sales.value.forEach(sale => {
+      const match = sale.invoice_number?.match(/INV-(\d+)/);
+      if (match && match[1]) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNum) maxNum = num;
+      } else {
+        // Handle old format numbers
+        const num = parseInt(sale.invoice_number || '0', 10);
+        if (num > maxNum) maxNum = num;
+      }
+    });
+    const nextNum = maxNum + 1;
+    return `INV-${String(nextNum).padStart(4, '0')}`;
+  };
+
   return {
     sales,
     loading,
@@ -85,6 +122,8 @@ export const useSales = () => {
     fetchSales,
     getSale,
     createSale,
+    updateSale,
     deleteSale,
+    generateInvoiceNumber,
   };
 };

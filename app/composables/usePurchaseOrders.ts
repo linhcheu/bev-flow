@@ -1,4 +1,4 @@
-import type { PurchaseOrder } from '~/types';
+import type { PurchaseOrder, PurchaseOrderFormData } from '~/types';
 
 export const usePurchaseOrders = () => {
   const purchaseOrders = ref<PurchaseOrder[]>([]);
@@ -9,7 +9,6 @@ export const usePurchaseOrders = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       const response = await $fetch<PurchaseOrder[]>('/api/purchase-orders');
       purchaseOrders.value = response;
     } catch (e) {
@@ -24,7 +23,6 @@ export const usePurchaseOrders = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       return await $fetch<PurchaseOrder>(`/api/purchase-orders/${id}`);
     } catch (e) {
       error.value = 'Failed to fetch purchase order';
@@ -35,11 +33,10 @@ export const usePurchaseOrders = () => {
     }
   };
 
-  const createPurchaseOrder = async (po: PurchaseOrder) => {
+  const createPurchaseOrder = async (po: PurchaseOrderFormData) => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       const response = await $fetch<PurchaseOrder>('/api/purchase-orders', {
         method: 'POST',
         body: po,
@@ -55,11 +52,10 @@ export const usePurchaseOrders = () => {
     }
   };
 
-  const updatePurchaseOrder = async (id: number, po: PurchaseOrder) => {
+  const updatePurchaseOrder = async (id: number, po: Partial<PurchaseOrderFormData> & { status?: string }) => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       const response = await $fetch<PurchaseOrder>(`/api/purchase-orders/${id}`, {
         method: 'PUT',
         body: po,
@@ -82,7 +78,6 @@ export const usePurchaseOrders = () => {
     loading.value = true;
     error.value = null;
     try {
-      // TODO: Replace with actual API endpoint
       await $fetch(`/api/purchase-orders/${id}`, {
         method: 'DELETE',
       });
@@ -97,6 +92,21 @@ export const usePurchaseOrders = () => {
     }
   };
 
+  // Generate next PO number (sequential)
+  const generatePONumber = () => {
+    // Find the highest existing PO number
+    let maxNum = 0;
+    purchaseOrders.value.forEach(po => {
+      const match = po.po_number?.match(/PO-(\d+)/);
+      if (match && match[1]) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNum) maxNum = num;
+      }
+    });
+    const nextNum = maxNum + 1;
+    return `PO-${String(nextNum).padStart(4, '0')}`;
+  };
+
   return {
     purchaseOrders,
     loading,
@@ -106,5 +116,6 @@ export const usePurchaseOrders = () => {
     createPurchaseOrder,
     updatePurchaseOrder,
     deletePurchaseOrder,
+    generatePONumber,
   };
 };

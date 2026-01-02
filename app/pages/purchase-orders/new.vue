@@ -1,48 +1,54 @@
 <template>
-  <div class="p-8">
-    <div class="max-w-3xl">
+  <div class="p-8 min-h-screen bg-white">
+    <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <NuxtLink to="/purchase-orders" class="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors no-underline mb-4">
+        <NuxtLink to="/purchase-orders" class="inline-flex items-center gap-2 text-sm text-zinc-600 hover:text-amber-600 no-underline mb-4">
           <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
           Back to Purchase Orders
         </NuxtLink>
-        <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">Create Purchase Order</h1>
-        <p class="mt-1 text-zinc-500">Create a new purchase order for your suppliers</p>
+        <h1 class="text-2xl font-semibold text-zinc-900">Create Purchase Order</h1>
+        <p class="mt-1 text-sm text-zinc-500">Create a new purchase order with multiple items</p>
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
-        <!-- PO Details -->
+        <!-- PO Details Card -->
         <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-            <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-zinc-500" />
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-amber-600" />
+            </div>
             Order Details
           </h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label for="po_number" class="block text-sm font-medium text-zinc-700 mb-2">
+            <div class="form-group">
+              <label class="input-label">
                 PO Number <span class="text-red-500">*</span>
               </label>
-              <input 
-                id="po_number"
-                v-model="form.po_number" 
-                type="text"
-                required
-                placeholder="e.g. PO-2024-001"
-                class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
-              />
+              <div class="relative">
+                <input 
+                  v-model="form.po_number" 
+                  type="text"
+                  readonly
+                  class="input bg-zinc-50 cursor-not-allowed pr-10"
+                />
+                <div class="absolute right-3 top-1/2 -translate-y-1/2">
+                  <span class="text-xs text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded">Auto</span>
+                </div>
+              </div>
+              <p class="text-xs text-zinc-400 mt-1">PO number is auto-generated</p>
             </div>
             
-            <div>
-              <label for="supplier_id" class="block text-sm font-medium text-zinc-700 mb-2">
+            <div class="form-group">
+              <label class="input-label">
                 Supplier <span class="text-red-500">*</span>
               </label>
               <select 
-                id="supplier_id"
                 v-model="form.supplier_id"
                 required
-                class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
+                class="select"
+                @change="onSupplierChange"
               >
                 <option :value="undefined">-- Select Supplier --</option>
                 <option v-for="supplier in suppliers" :key="supplier.supplier_id" :value="supplier.supplier_id">
@@ -53,109 +59,199 @@
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label for="order_date" class="block text-sm font-medium text-zinc-700 mb-2">
+            <div class="form-group">
+              <label class="input-label">
                 Order Date <span class="text-red-500">*</span>
               </label>
               <div class="relative">
-                <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                 <input 
-                  id="order_date"
                   v-model="form.order_date" 
                   type="date"
                   required
-                  class="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                  class="input pl-11"
                 />
               </div>
             </div>
             
-            <div>
-              <label for="eta_date" class="block text-sm font-medium text-zinc-700 mb-2">Expected Arrival</label>
+            <div class="form-group">
+              <label class="input-label">ETA (Expected Arrival)</label>
               <div class="relative">
-                <UIcon name="i-lucide-truck" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <UIcon name="i-lucide-truck" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                 <input 
-                  id="eta_date"
                   v-model="form.eta_date" 
                   type="date"
-                  class="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                  class="input pl-11"
                 />
               </div>
             </div>
           </div>
         </div>
         
-        <!-- Status & Promotion -->
+        <!-- Items Card -->
         <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-            <UIcon name="i-lucide-settings" class="w-4 h-4 text-zinc-500" />
-            Status & Promotion
-          </h3>
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+              <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
+              </div>
+              Order Items
+            </h3>
+            <button 
+              type="button" 
+              @click="addItem"
+              class="btn-secondary text-xs"
+            >
+              <UIcon name="i-lucide-plus" class="w-4 h-4" />
+              Add Item
+            </button>
+          </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label for="status" class="block text-sm font-medium text-zinc-700 mb-2">Status</label>
-              <select 
-                id="status"
-                v-model="form.status"
-                class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
-              >
-                <option value="Pending">Pending</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Received">Received</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
+          <!-- Items Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-zinc-200">
+                  <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">No.</th>
+                  <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">Product</th>
+                  <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">Description</th>
+                  <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Qty</th>
+                  <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Unit Cost</th>
+                  <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Amount</th>
+                  <th class="w-10"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr 
+                  v-for="(item, index) in form.items" 
+                  :key="index" 
+                  class="border-b border-zinc-100"
+                >
+                  <td class="py-3 text-sm text-zinc-500">{{ index + 1 }}</td>
+                  <td class="py-3">
+                    <select 
+                      v-model="item.product_id"
+                      class="select text-sm py-2"
+                      @change="onProductChange(index)"
+                    >
+                      <option :value="0">-- Select --</option>
+                      <option v-for="product in products" :key="product.product_id" :value="product.product_id">
+                        {{ product.product_name }}
+                      </option>
+                    </select>
+                  </td>
+                  <td class="py-3 text-sm text-zinc-500">
+                    {{ getProductDescription(item.product_id) }}
+                  </td>
+                  <td class="py-3">
+                    <input 
+                      v-model.number="item.quantity"
+                      type="number"
+                      min="1"
+                      class="input text-sm py-2 w-20 text-right"
+                      @input="calculateTotals"
+                    />
+                  </td>
+                  <td class="py-3">
+                    <div class="relative">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">$</span>
+                      <input 
+                        v-model.number="item.unit_cost"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="input text-sm py-2 w-24 text-right pl-7"
+                        @input="calculateTotals"
+                      />
+                    </div>
+                  </td>
+                  <td class="py-3 text-right">
+                    <span class="text-sm font-medium text-zinc-900">
+                      ${{ (item.quantity * item.unit_cost).toFixed(2) }}
+                    </span>
+                  </td>
+                  <td class="py-3">
+                    <button 
+                      v-if="form.items.length > 1"
+                      type="button"
+                      @click="removeItem(index)"
+                      class="icon-btn icon-btn-danger"
+                    >
+                      <UIcon name="i-lucide-x" class="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Totals -->
+          <div class="border-t border-zinc-200 pt-4 space-y-2">
+            <div class="flex justify-end items-center gap-4">
+              <span class="text-sm text-zinc-500">Subtotal:</span>
+              <span class="text-sm font-medium text-zinc-900 w-28 text-right">${{ subtotal.toFixed(2) }}</span>
             </div>
-            
-            <div>
-              <label for="promotion_amount" class="block text-sm font-medium text-zinc-700 mb-2">Promotion Amount</label>
-              <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+            <div class="flex justify-end items-center gap-4">
+              <span class="text-sm text-zinc-500">Shipping (3%):</span>
+              <span class="text-sm text-zinc-900 w-28 text-right">${{ shippingCost.toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-end items-center gap-4">
+              <span class="text-sm text-zinc-500">Promotion:</span>
+              <div class="relative w-28">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">-$</span>
                 <input 
-                  id="promotion_amount"
-                  v-model.number="form.promotion_amount" 
+                  v-model.number="form.promotion_amount"
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder="0.00"
-                  class="w-full pl-8 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                  class="input text-sm py-1 text-right pl-8"
                 />
               </div>
+            </div>
+            <div class="flex justify-end items-center gap-4 pt-2 border-t border-zinc-200">
+              <span class="text-base font-medium text-zinc-900">Total:</span>
+              <span class="text-xl font-semibold text-amber-600 w-28 text-right">${{ total.toFixed(2) }}</span>
             </div>
           </div>
         </div>
         
-        <!-- Remarks -->
+        <!-- Remarks Card -->
         <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-          <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-            <UIcon name="i-lucide-message-square" class="w-4 h-4 text-zinc-500" />
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-message-square" class="w-4 h-4 text-amber-600" />
+            </div>
             Notes & Remarks
           </h3>
           
-          <div>
-            <label for="truck_remark" class="block text-sm font-medium text-zinc-700 mb-2">Truck Remark</label>
-            <input 
-              id="truck_remark"
-              v-model="form.truck_remark" 
-              type="text"
-              placeholder="Truck or delivery notes"
-              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
-            />
-          </div>
-          
-          <div>
-            <label for="overall_remark" class="block text-sm font-medium text-zinc-700 mb-2">Overall Remark</label>
-            <textarea 
-              id="overall_remark"
-              v-model="form.overall_remark" 
-              rows="3"
-              placeholder="Additional notes or comments"
-              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
-            ></textarea>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="form-group">
+              <label class="input-label">Truck Remark</label>
+              <input 
+                v-model="form.truck_remark" 
+                type="text"
+                placeholder="e.g. give DO"
+                class="input"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label class="input-label">Overall Remark</label>
+              <input 
+                v-model="form.overall_remark" 
+                type="text"
+                placeholder="e.g. give latest expiry"
+                class="input"
+              />
+            </div>
           </div>
         </div>
         
         <!-- Error Message -->
-        <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+        <div 
+          v-if="error" 
+          class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl"
+        >
           <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
           <p class="text-sm text-red-700">{{ error }}</p>
         </div>
@@ -164,16 +260,16 @@
         <div class="flex items-center gap-3 pt-4">
           <button 
             type="submit" 
-            class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
-            :disabled="loading"
+            class="btn-primary" 
+            :disabled="loading || !isFormValid"
           >
             <UIcon v-if="loading" name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
             <UIcon v-else name="i-lucide-check" class="w-4 h-4" />
-            {{ loading ? 'Creating...' : 'Create PO' }}
+            {{ loading ? 'Creating...' : 'Create Purchase Order' }}
           </button>
           <NuxtLink 
             to="/purchase-orders" 
-            class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-xl hover:bg-zinc-200 transition-colors no-underline"
+            class="btn-secondary no-underline"
           >
             Cancel
           </NuxtLink>
@@ -184,29 +280,93 @@
 </template>
 
 <script setup lang="ts">
-import type { PurchaseOrder } from '~/types';
+import type { PurchaseOrderFormData } from '~/types';
 
-const { createPurchaseOrder, loading, error } = usePurchaseOrders();
+const { createPurchaseOrder, loading, error, generatePONumber, fetchPurchaseOrders } = usePurchaseOrders();
 const { suppliers, fetchSuppliers } = useSuppliers();
+const { products, fetchProducts } = useProducts();
 const router = useRouter();
 
-const form = ref<PurchaseOrder>({
+const form = ref<PurchaseOrderFormData>({
   po_number: '',
-  supplier_id: undefined,
-  order_date: new Date().toISOString().split('T')[0],
+  supplier_id: 0,
+  order_date: new Date().toISOString().split('T')[0] ?? '',
   eta_date: '',
-  status: 'Pending',
+  items: [{ product_id: 0, quantity: 0, unit_cost: 0 }],
+  promotion_amount: 0,
   truck_remark: '',
   overall_remark: '',
-  promotion_amount: 0,
 });
 
-onMounted(() => {
-  fetchSuppliers();
+// Computed values
+const subtotal = computed(() => {
+  return form.value.items.reduce((sum, item) => sum + (item.quantity * item.unit_cost), 0);
+});
+
+const shippingCost = computed(() => {
+  return subtotal.value * 0.03;
+});
+
+const total = computed(() => {
+  return subtotal.value + shippingCost.value - (form.value.promotion_amount || 0);
+});
+
+const isFormValid = computed(() => {
+  return form.value.po_number && 
+         form.value.supplier_id && 
+         form.value.items.some(item => item.product_id > 0 && item.quantity > 0);
+});
+
+// Methods
+const addItem = () => {
+  form.value.items.push({ product_id: 0, quantity: 0, unit_cost: 0 });
+};
+
+const removeItem = (index: number) => {
+  form.value.items.splice(index, 1);
+};
+
+const onSupplierChange = () => {
+  // Could filter products by supplier here
+};
+
+const onProductChange = (index: number) => {
+  const item = form.value.items[index];
+  if (item) {
+    const product = products.value.find(p => p.product_id === item.product_id);
+    if (product) {
+      item.unit_cost = product.cost_price;
+    }
+  }
+};
+
+const getProductDescription = (productId: number) => {
+  const product = products.value.find(p => p.product_id === productId);
+  return product?.description || '-';
+};
+
+const calculateTotals = () => {
+  // Computed properties handle this
+};
+
+onMounted(async () => {
+  await Promise.all([fetchSuppliers(), fetchProducts(), fetchPurchaseOrders()]);
+  form.value.po_number = generatePONumber();
 });
 
 const handleSubmit = async () => {
-  const result = await createPurchaseOrder(form.value);
+  // Filter out empty items
+  const validItems = form.value.items.filter(item => item.product_id > 0 && item.quantity > 0);
+  
+  if (validItems.length === 0) {
+    return;
+  }
+  
+  const result = await createPurchaseOrder({
+    ...form.value,
+    items: validItems,
+  });
+  
   if (result) {
     router.push('/purchase-orders');
   }

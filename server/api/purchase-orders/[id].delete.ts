@@ -20,6 +20,8 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  // Delete items first (cascade should handle this, but explicit is better)
+  execute('DELETE FROM PurchaseOrderItems WHERE po_id = ?', [id]);
   execute('DELETE FROM PurchaseOrders WHERE po_id = ?', [id]);
   
   return { success: true, message: 'Purchase order deleted successfully' };

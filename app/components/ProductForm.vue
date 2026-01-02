@@ -1,20 +1,12 @@
 <template>
-  <div class="max-w-2xl">
-    <!-- Header -->
-    <div class="mb-8">
-      <NuxtLink to="/products" class="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors no-underline mb-4">
-        <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
-        Back to Products
-      </NuxtLink>
-      <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">{{ isEdit ? 'Edit Product' : 'Add Product' }}</h1>
-      <p class="mt-1 text-zinc-500">{{ isEdit ? 'Update product information' : 'Add a new product to your inventory' }}</p>
-    </div>
-    
+  <div class="w-full">
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- SKU & Product Name -->
       <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-          <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-500" />
+        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-3">
+          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
+            <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
+          </div>
           Basic Information
         </h3>
         
@@ -26,7 +18,7 @@
               v-model="form.sku" 
               type="text"
               placeholder="e.g. BEV001"
-              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
             />
           </div>
           
@@ -40,7 +32,7 @@
               type="text" 
               required
               placeholder="Enter product name"
-              class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+              class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
             />
           </div>
         </div>
@@ -52,15 +44,17 @@
             v-model="form.description" 
             rows="3"
             placeholder="Enter product description"
-            class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
+            class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 resize-none"
           ></textarea>
         </div>
       </div>
       
       <!-- Pricing -->
       <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-          <UIcon name="i-lucide-banknote" class="w-4 h-4 text-zinc-500" />
+        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-3">
+          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
+            <UIcon name="i-lucide-banknote" class="w-4 h-4 text-amber-600" />
+          </div>
           Pricing
         </h3>
         
@@ -70,7 +64,7 @@
               Cost Price <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">$</span>
               <input 
                 id="cost_price"
                 v-model.number="form.cost_price" 
@@ -79,7 +73,7 @@
                 min="0"
                 required
                 placeholder="0.00"
-                class="w-full pl-8 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                class="w-full pl-8 pr-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
               />
             </div>
           </div>
@@ -89,7 +83,7 @@
               Selling Price <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">$</span>
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">$</span>
               <input 
                 id="selling_price"
                 v-model.number="form.selling_price" 
@@ -98,23 +92,34 @@
                 min="0"
                 required
                 placeholder="0.00"
-                class="w-full pl-8 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                class="w-full pl-8 pr-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
               />
             </div>
           </div>
         </div>
         
         <!-- Profit Preview -->
-        <div v-if="form.cost_price && form.selling_price" class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-          <span class="text-sm font-medium text-emerald-700">Profit Margin</span>
-          <span class="text-xl font-bold text-emerald-600">${{ (form.selling_price - form.cost_price).toFixed(2) }}</span>
+        <div v-if="form.cost_price && form.selling_price" 
+          :class="[
+            'flex items-center justify-between p-4 border rounded-xl',
+            profitMargin >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'
+          ]"
+        >
+          <span :class="['text-sm font-medium', profitMargin >= 0 ? 'text-emerald-700' : 'text-red-700']">
+            Profit Margin
+          </span>
+          <span :class="['text-xl font-semibold', profitMargin >= 0 ? 'text-emerald-600' : 'text-red-600']">
+            {{ profitMargin >= 0 ? '+' : '' }}${{ profitMargin.toFixed(2) }}
+          </span>
         </div>
       </div>
       
       <!-- Supplier -->
       <div class="bg-white border border-zinc-200 rounded-xl p-6 space-y-5">
-        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2">
-          <UIcon name="i-lucide-building-2" class="w-4 h-4 text-zinc-500" />
+        <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-3">
+          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
+            <UIcon name="i-lucide-building-2" class="w-4 h-4 text-amber-600" />
+          </div>
           Supplier
         </h3>
         
@@ -123,7 +128,7 @@
           <select 
             id="supplier_id"
             v-model="form.supplier_id"
-            class="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
+            class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 appearance-none cursor-pointer"
           >
             <option :value="undefined">-- Select Supplier --</option>
             <option v-for="supplier in suppliers" :key="supplier.supplier_id" :value="supplier.supplier_id">
@@ -135,15 +140,15 @@
       
       <!-- Error Message -->
       <div v-if="error" class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 flex-shrink-0" />
+        <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-red-500 shrink-0" />
         <p class="text-sm text-red-700">{{ error }}</p>
       </div>
       
       <!-- Actions -->
-      <div class="flex items-center gap-3 pt-4">
+      <div class="flex flex-col sm:flex-row items-center gap-3 pt-4">
         <button 
           type="submit" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 text-white text-sm font-medium rounded-xl hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed" 
           :disabled="loading"
         >
           <UIcon v-if="loading" name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
@@ -152,7 +157,7 @@
         </button>
         <NuxtLink 
           to="/products" 
-          class="inline-flex items-center gap-2 px-6 py-3 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-xl hover:bg-zinc-200 transition-colors no-underline"
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-zinc-100 text-zinc-700 text-sm font-medium rounded-xl hover:bg-zinc-200 no-underline"
         >
           Cancel
         </NuxtLink>
@@ -183,6 +188,11 @@ const form = ref<Product>({
   cost_price: props.product?.cost_price || 0,
   selling_price: props.product?.selling_price || 0,
   supplier_id: props.product?.supplier_id,
+});
+
+// Computed profit margin with proper color logic
+const profitMargin = computed(() => {
+  return (form.value.selling_price || 0) - (form.value.cost_price || 0);
 });
 
 onMounted(() => {
