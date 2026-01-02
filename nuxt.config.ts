@@ -55,16 +55,95 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      htmlAttrs: {
+        style: 'background-color: #ffffff;'
+      },
+      bodyAttrs: {
+        style: 'background-color: #ffffff; margin: 0;'
+      },
+      style: [
+        {
+          innerHTML: `
+            /* CRITICAL: Hide everything until app is ready */
+            html, body {
+              background-color: #ffffff !important;
+              margin: 0;
+              padding: 0;
+            }
+            
+            /* Hide Nuxt app content until hydrated */
+            #__nuxt:not(.app-ready) > *:not(#app-loading) {
+              visibility: hidden !important;
+            }
+            
+            /* Loading Screen Styles - Critical */
+            #app-loading {
+              position: fixed;
+              inset: 0;
+              z-index: 99999;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              background: #ffffff;
+              transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+            #app-loading.hide {
+              opacity: 0;
+              visibility: hidden;
+              pointer-events: none;
+            }
+            .loading-spinner {
+              width: 40px;
+              height: 40px;
+              border: 3px solid #e4e4e7;
+              border-top-color: #f59e0b;
+              border-radius: 50%;
+              animation: spin 0.8s linear infinite;
+            }
+            .loading-text {
+              margin-top: 16px;
+              font-family: 'Inter', system-ui, -apple-system, sans-serif;
+              font-size: 14px;
+              color: #71717a;
+            }
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `,
+          tagPosition: 'head'
+        }
+      ],
       script: [
         {
           innerHTML: `(function(){
+            // Set background immediately
+            document.documentElement.style.backgroundColor = '#ffffff';
+            document.body.style.backgroundColor = '#ffffff';
+            
+            // Create loading screen immediately before anything else renders
+            if(!document.getElementById('app-loading')){
+              var loader = document.createElement('div');
+              loader.id = 'app-loading';
+              loader.innerHTML = '<div class="loading-spinner"></div><div class="loading-text">Loading...</div>';
+              if(document.body.firstChild){
+                document.body.insertBefore(loader, document.body.firstChild);
+              } else {
+                document.body.appendChild(loader);
+              }
+            }
+            
             document.documentElement.classList.remove('dark');
             localStorage.removeItem('theme');
-            // Auth redirect - runs before Vue hydrates
-            if(window.location.pathname !== '/login'){
+            
+            // Auth redirect - runs IMMEDIATELY before Vue hydrates
+            // Always redirect to login first unless already on login page
+            var path = window.location.pathname;
+            if(path !== '/login'){
               var isAuth = localStorage.getItem('isAuthenticated');
               var expiry = localStorage.getItem('tokenExpiry');
               var shouldRedirect = false;
+              
               if(!isAuth){
                 shouldRedirect = true;
               } else if(expiry){
@@ -77,12 +156,14 @@ export default defineNuxtConfig({
                 localStorage.removeItem('isAuthenticated');
                 shouldRedirect = true;
               }
+              
               if(shouldRedirect){
                 window.location.replace('/login');
               }
             }
           })();`,
           type: 'text/javascript',
+          tagPosition: 'bodyOpen'
         }
       ],
       link: [
@@ -100,6 +181,20 @@ export default defineNuxtConfig({
           href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'
         }
       ]
+    }
+  },
+  
+  // Vite configuration to suppress warnings and optimize build
+  vite: {
+    build: {
+      // Suppress chunk size warnings
+      chunkSizeWarningLimit: 1000,
+      // Disable sourcemaps in production
+      sourcemap: false,
+    },
+    // Suppress Tailwind sourcemap warnings
+    css: {
+      devSourcemap: false
     }
   },
   

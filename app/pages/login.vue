@@ -184,6 +184,20 @@ definePageMeta({
 
 const router = useRouter();
 
+// Check if already authenticated - redirect to dashboard
+if (import.meta.client) {
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
+  const tokenExpiry = localStorage.getItem('tokenExpiry');
+  
+  if (isAuthenticated && tokenExpiry) {
+    const expiryTime = parseInt(tokenExpiry);
+    if (Date.now() < expiryTime) {
+      // User is authenticated and token is valid, redirect to dashboard
+      navigateTo('/', { replace: true });
+    }
+  }
+}
+
 const form = ref({
   email: '',
   password: '',
