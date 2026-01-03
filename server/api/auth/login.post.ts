@@ -73,6 +73,7 @@ export default defineEventHandler(async (event) => {
   
   // Verify password using bcrypt (with fallback for plain text)
   const isValidPassword = await verifyPassword(body.password, user.password_hash);
+  
   if (!isValidPassword) {
     throw createError({
       statusCode: 401,

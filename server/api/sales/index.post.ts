@@ -26,18 +26,19 @@ export default defineEventHandler(async (event) => {
   if (isProduction()) {
     const supabase = getSupabase();
     
-    // Insert sale record
+    // Insert sale record - Supabase uses sale_number instead of invoice_number
     const { data: sale, error: saleError } = await supabase
       .from('sales')
       .insert({
-        invoice_number: body.invoice_number,
+        sale_number: body.invoice_number, // Map to Supabase column name
         customer_id: body.customer_id || null,
-        customer_name: body.customer_name || null,
         sale_date: body.sale_date || new Date().toISOString().split('T')[0],
-        product_id: body.items[0].product_id,
-        unit_price: body.items[0].unit_price,
-        quantity: body.items.reduce((sum, item) => sum + item.quantity, 0),
+        subtotal: subtotal,
+        discount_percent: body.discount_percent || 0,
+        discount_amount: body.discount_amount || 0,
         total_amount: totalAmount,
+        payment_method: body.payment_method || 'Cash',
+        status: 'Completed',
         notes: body.notes || null
       })
       .select()

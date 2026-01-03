@@ -157,14 +157,20 @@
         
         <!-- Demo Credentials -->
         <div class="mt-6 sm:mt-8 p-3 sm:p-4 bg-zinc-50 border border-zinc-100 rounded-lg">
-          <p class="text-[10px] sm:text-xs text-zinc-400 mb-1.5 sm:mb-2 uppercase tracking-wide font-medium">Demo Account</p>
-          <div class="space-y-1">
-            <p class="text-xs sm:text-sm text-zinc-600">
-              <span class="text-zinc-400">Email:</span> admin@bevflow.com
-            </p>
-            <p class="text-xs sm:text-sm text-zinc-600">
-              <span class="text-zinc-400">Password:</span> admin123
-            </p>
+          <p class="text-[10px] sm:text-xs text-zinc-400 mb-2 sm:mb-3 uppercase tracking-wide font-medium">Demo Accounts</p>
+          <div class="space-y-2 text-xs sm:text-sm">
+            <div class="flex items-center justify-between text-zinc-600">
+              <span class="text-zinc-400">Admin:</span>
+              <span>admin@bevflow.com / admin123</span>
+            </div>
+            <div class="flex items-center justify-between text-zinc-600">
+              <span class="text-zinc-400">Manager:</span>
+              <span>manager@bevflow.com / manager123</span>
+            </div>
+            <div class="flex items-center justify-between text-zinc-600">
+              <span class="text-zinc-400">Staff:</span>
+              <span>staff@bevflow.com / staff123</span>
+            </div>
           </div>
         </div>
         
@@ -213,19 +219,41 @@ const error = ref('');
 // Cookies for SSR auth
 const authCookie = useCookie('isAuthenticated', { maxAge: 60 * 60 * 24 * 7 });
 const expiryCookie = useCookie('tokenExpiry', { maxAge: 60 * 60 * 24 * 7 });
+const userIdCookie = useCookie('userId', { maxAge: 60 * 60 * 24 * 7 });
+const userRoleCookie = useCookie('userRole', { maxAge: 60 * 60 * 24 * 7 });
 
 const handleLogin = async () => {
   loading.value = true;
   error.value = '';
   
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Call the actual login API
+    const response = await $fetch<{ 
+      success: boolean; 
+      user: { 
+        user_id: number; 
+        full_name: string; 
+        email: string; 
+        role: string;
+        username: string;
+      } 
+    }>('/api/auth/login', {
+      method: 'POST',
+      body: {
+        email: form.value.email,
+        password: form.value.password
+      }
+    });
     
-    // Demo validation
-    if (form.value.email === 'admin@bevflow.com' && form.value.password === 'admin123') {
+    if (response.success && response.user) {
       // Set authenticated flag in localStorage
       localStorage.setItem('isAuthenticated', 'true');
+      
+      // Store user info
+      localStorage.setItem('userId', response.user.user_id.toString());
+      localStorage.setItem('userEmail', response.user.email);
+      localStorage.setItem('userName', response.user.full_name || response.user.username);
+      localStorage.setItem('userRole', response.user.role);
       
       // Set token expiry time
       const expiryTime = Date.now() + AUTH_CONFIG.TOKEN_EXPIRY_MS;
@@ -234,13 +262,22 @@ const handleLogin = async () => {
       // Also set cookies for SSR
       authCookie.value = 'true';
       expiryCookie.value = expiryTime.toString();
+      userIdCookie.value = response.user.user_id.toString();
+      userRoleCookie.value = response.user.role;
       
       router.push('/');
     } else {
       error.value = 'Invalid email or password. Please try again.';
     }
-  } catch (e) {
-    error.value = 'An error occurred. Please try again.';
+  } catch (e: any) {
+    // Handle API error response
+    if (e?.data?.message) {
+      error.value = e.data.message;
+    } else if (e?.statusMessage) {
+      error.value = e.statusMessage;
+    } else {
+      error.value = 'Invalid email or password. Please try again.';
+    }
   } finally {
     loading.value = false;
   }

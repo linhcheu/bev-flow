@@ -48,11 +48,6 @@ export default defineEventHandler(async (event) => {
       .from('sales')
       .select(`
         *,
-        products (
-          product_id,
-          product_name,
-          sku
-        ),
         customers (
           customer_id,
           customer_name
@@ -78,53 +73,37 @@ export default defineEventHandler(async (event) => {
       `)
       .eq('sale_id', id);
     
-    const items: SaleItem[] = (itemRows && itemRows.length > 0)
-      ? itemRows.map((item: any) => ({
-          item_id: item.item_id,
-          sale_id: item.sale_id,
-          product_id: item.product_id,
-          quantity: item.quantity,
-          unit_price: Number(item.unit_price),
-          amount: Number(item.amount),
-          product: {
-            product_id: item.product_id,
-            product_name: item.products?.product_name || '',
-            sku: item.products?.sku || ''
-          }
-        }))
-      : [{
-          product_id: sale.product_id,
-          quantity: sale.quantity,
-          unit_price: Number(sale.unit_price),
-          amount: Number(sale.total_amount),
-          product: {
-            product_id: sale.product_id,
-            product_name: sale.products?.product_name || '',
-            sku: sale.products?.sku || ''
-          }
-        }];
+    const items: SaleItem[] = (itemRows || []).map((item: any) => ({
+      item_id: item.item_id,
+      sale_id: item.sale_id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: Number(item.unit_price),
+      amount: Number(item.amount),
+      product: {
+        product_id: item.product_id,
+        product_name: item.products?.product_name || '',
+        sku: item.products?.sku || ''
+      }
+    }));
     
     const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
     
     return {
       sale_id: sale.sale_id,
-      invoice_number: sale.invoice_number,
+      invoice_number: sale.sale_number || sale.invoice_number, // Supabase uses sale_number
       customer_id: sale.customer_id || undefined,
-      customer_name: sale.customer_name || sale.customers?.customer_name || undefined,
+      customer_name: sale.customers?.customer_name || undefined,
       sale_date: sale.sale_date,
-      product_id: sale.product_id,
-      unit_price: Number(sale.unit_price),
-      quantity: sale.quantity,
-      subtotal,
+      subtotal: Number(sale.subtotal) || subtotal,
+      discount_percent: Number(sale.discount_percent || 0),
+      discount_amount: Number(sale.discount_amount || 0),
       total_amount: Number(sale.total_amount),
+      payment_method: sale.payment_method || 'Cash',
+      status: sale.status || 'Completed',
       notes: sale.notes || undefined,
       created_at: sale.created_at,
       items,
-      product: {
-        product_id: sale.product_id,
-        product_name: sale.products?.product_name || '',
-        sku: sale.products?.sku || ''
-      },
       customer: sale.customer_id ? {
         customer_id: sale.customer_id,
         customer_name: sale.customers?.customer_name || ''

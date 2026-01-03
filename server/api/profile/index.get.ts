@@ -3,8 +3,9 @@ import { queryOne, isProduction, getSupabase } from '~/server/utils/db';
 
 export default defineEventHandler(async (event) => {
   try {
-    // Get user_id from session/token (for now, use admin user as seed data)
-    const userId = 1; // Admin user from seed data
+    // Get user_id from cookie (set during login)
+    const userIdCookie = getCookie(event, 'userId');
+    const userId = userIdCookie ? parseInt(userIdCookie) : 1;
 
     // Production: Use Supabase
     if (isProduction()) {

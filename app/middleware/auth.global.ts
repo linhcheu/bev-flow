@@ -38,11 +38,15 @@ export default defineNuxtRouteMiddleware((to) => {
   // Sync localStorage to cookies for SSR
   const authCookie = useCookie('isAuthenticated', { maxAge: 60 * 60 * 24 * 7 }); // 7 days
   const expiryCookie = useCookie('tokenExpiry', { maxAge: 60 * 60 * 24 * 7 });
+  const userIdCookie = useCookie('userId', { maxAge: 60 * 60 * 24 * 7 });
+  const userRoleCookie = useCookie('userRole', { maxAge: 60 * 60 * 24 * 7 });
   
   // If not authenticated, redirect to login immediately
   if (!isAuthenticated) {
     authCookie.value = null;
     expiryCookie.value = null;
+    userIdCookie.value = null;
+    userRoleCookie.value = null;
     return navigateTo('/login', { replace: true });
   }
   
@@ -55,19 +59,29 @@ export default defineNuxtRouteMiddleware((to) => {
       // Token expired - clear auth data and redirect to login
       localStorage.removeItem('isAuthenticated');
       localStorage.removeItem('tokenExpiry');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userRole');
       authCookie.value = null;
       expiryCookie.value = null;
+      userIdCookie.value = null;
+      userRoleCookie.value = null;
       return navigateTo('/login', { replace: true });
     }
     
     // Sync to cookies for SSR
     authCookie.value = isAuthenticated;
     expiryCookie.value = tokenExpiry;
+    userIdCookie.value = localStorage.getItem('userId');
+    userRoleCookie.value = localStorage.getItem('userRole');
   } else {
     // No expiry set - treat as expired
     localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
     authCookie.value = null;
     expiryCookie.value = null;
+    userIdCookie.value = null;
+    userRoleCookie.value = null;
     return navigateTo('/login', { replace: true });
   }
 });

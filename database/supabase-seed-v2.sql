@@ -37,14 +37,14 @@ ALTER SEQUENCE forecasts_forecast_id_seq RESTART WITH 1;
 
 INSERT INTO users (username, email, password_hash, full_name, role, phone, location, is_active) VALUES
 -- System Administrator (Full Access)
-('admin', 'admin@bevflow.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'System Admin', 'admin', '+855 12 345 678', 'Phnom Penh, Cambodia', true),
+('admin', 'admin@bevflow.com', '$2b$10$ZjGifeTrHVvJxWPYtfvVTe89eJGNiFDDemTmt.suIapufZX7CrD/e', 'System Admin', 'admin', '+855 12 345 678', 'Phnom Penh, Cambodia', true),
 -- Manager (No backup/restore, no user management)
-('manager', 'manager@bevflow.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Store Manager', 'manager', '+855 12 456 789', 'Phnom Penh, Cambodia', true),
+('manager', 'manager@bevflow.com', '$2b$10$whAJ/DlE.x6ysLo7mQ.IcOmTzSSpu0.qvHV2DB7FHyaqf5xO6Gnle', 'Store Manager', 'manager', '+855 12 456 789', 'Phnom Penh, Cambodia', true),
 -- Staff (No forecasts, no export, basic access)
-('staff', 'staff@bevflow.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Staff User', 'user', '+855 12 567 890', 'Phnom Penh, Cambodia', true),
--- Additional staff for testing
-('sophea', 'sophea@bevflow.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Sophea Chan', 'user', '+855 12 678 901', 'Siem Reap, Cambodia', true),
-('dara', 'dara@bevflow.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Dara Sok', 'user', '+855 12 789 012', 'Battambang, Cambodia', true);
+('staff', 'staff@bevflow.com', '$2b$10$rAK58JgMX/R7RZW9ToXsSuJHGeCyjhClBN8XLniefzQCfWq9sIpI2', 'Staff User', 'user', '+855 12 567 890', 'Phnom Penh, Cambodia', true),
+-- Additional staff for testing (password: staff123)
+('sophea', 'sophea@bevflow.com', '$2b$10$rAK58JgMX/R7RZW9ToXsSuJHGeCyjhClBN8XLniefzQCfWq9sIpI2', 'Sophea Chan', 'user', '+855 12 678 901', 'Siem Reap, Cambodia', true),
+('dara', 'dara@bevflow.com', '$2b$10$rAK58JgMX/R7RZW9ToXsSuJHGeCyjhClBN8XLniefzQCfWq9sIpI2', 'Dara Sok', 'user', '+855 12 789 012', 'Battambang, Cambodia', true);
 
 -- ==============================================
 -- SUPPLIERS

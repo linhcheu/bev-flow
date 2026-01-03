@@ -35,15 +35,11 @@ export default defineEventHandler(async () => {
   if (isProduction()) {
     const supabase = getSupabase();
     
+    // Fetch sales with customer info
     const { data: sales, error } = await supabase
       .from('sales')
       .select(`
         *,
-        products (
-          product_id,
-          product_name,
-          sku
-        ),
         customers (
           customer_id,
           customer_name
@@ -56,8 +52,8 @@ export default defineEventHandler(async () => {
       throw createError({ statusCode: 500, message: 'Failed to fetch sales' });
     }
     
-    // Get all sale items
-    const { data: allItems } = await supabase
+    // Get all sale items with product info
+    const { data: allItems, error: itemsError } = await supabase
       .from('saleitems')
       .select(`
         *,
@@ -67,6 +63,10 @@ export default defineEventHandler(async () => {
           sku
         )
       `);
+    
+    if (itemsError) {
+      console.error('Error fetching sale items:', itemsError);
+    }
     
     // Group items by sale_id
     const itemsBySale = new Map<number, SaleItem[]>();
@@ -92,37 +92,23 @@ export default defineEventHandler(async () => {
       const items = itemsBySale.get(s.sale_id) || [];
       const subtotal = items.length > 0 
         ? items.reduce((sum, item) => sum + item.amount, 0)
-        : Number(s.total_amount);
+        : Number(s.subtotal || s.total_amount);
       
       return {
         sale_id: s.sale_id,
-        invoice_number: s.invoice_number,
+        invoice_number: s.sale_number || s.invoice_number, // Supabase uses sale_number
         customer_id: s.customer_id || undefined,
-        customer_name: s.customer_name || s.customers?.customer_name || undefined,
+        customer_name: s.customers?.customer_name || undefined,
         sale_date: s.sale_date,
-        product_id: s.product_id,
-        unit_price: Number(s.unit_price),
-        quantity: s.quantity,
         subtotal,
+        discount_percent: Number(s.discount_percent || 0),
+        discount_amount: Number(s.discount_amount || 0),
         total_amount: Number(s.total_amount),
+        payment_method: s.payment_method || 'Cash',
+        status: s.status || 'Completed',
         notes: s.notes || undefined,
         created_at: s.created_at,
-        items: items.length > 0 ? items : [{
-          product_id: s.product_id,
-          quantity: s.quantity,
-          unit_price: Number(s.unit_price),
-          amount: Number(s.total_amount),
-          product: {
-            product_id: s.product_id,
-            product_name: s.products?.product_name || '',
-            sku: s.products?.sku || ''
-          }
-        }],
-        product: {
-          product_id: s.product_id,
-          product_name: s.products?.product_name || '',
-          sku: s.products?.sku || ''
-        },
+        items,
         customer: s.customer_id ? {
           customer_id: s.customer_id,
           customer_name: s.customers?.customer_name || ''
