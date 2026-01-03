@@ -72,10 +72,18 @@ export default defineEventHandler(async (event) => {
         .eq('po_id', id);
       
       for (const item of (items || [])) {
-        await supabase.rpc('increment_stock', {
-          p_product_id: item.product_id,
-          p_quantity: item.quantity
-        });
+        const { data: product } = await supabase
+          .from('products')
+          .select('current_stock')
+          .eq('product_id', item.product_id)
+          .single();
+        
+        if (product) {
+          await supabase
+            .from('products')
+            .update({ current_stock: (product.current_stock || 0) + item.quantity })
+            .eq('product_id', item.product_id);
+        }
       }
     }
     

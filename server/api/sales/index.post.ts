@@ -60,16 +60,19 @@ export default defineEventHandler(async (event) => {
     
     await supabase.from('saleitems').insert(saleItemsData);
     
-    // Update product stock using RPC or direct update
+    // Update product stock - deduct quantities
     for (const item of body.items) {
-      try {
-        await supabase.rpc('decrement_stock', { 
-          p_product_id: item.product_id, 
-          p_quantity: item.quantity 
-        });
-      } catch {
-        // If RPC doesn't exist, skip - stock will need manual update
-        console.warn('decrement_stock RPC not available');
+      const { data: product } = await supabase
+        .from('products')
+        .select('current_stock')
+        .eq('product_id', item.product_id)
+        .single();
+      
+      if (product) {
+        await supabase
+          .from('products')
+          .update({ current_stock: Math.max(0, (product.current_stock || 0) - item.quantity) })
+          .eq('product_id', item.product_id);
       }
     }
     

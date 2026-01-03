@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
         )
       `)
       .eq('product_id', id)
+      .eq('is_active', true)
       .single();
     
     if (error || !product) {
@@ -54,7 +55,7 @@ export default defineEventHandler(async (event) => {
       s.company_name as supplier_name
     FROM Products p
     LEFT JOIN Suppliers s ON p.supplier_id = s.supplier_id
-    WHERE p.product_id = ?
+    WHERE p.product_id = ? AND p.is_active = 1
   `, [id]);
   
   if (!product) {

@@ -20,6 +20,7 @@ export default defineEventHandler(async () => {
           company_name
         )
       `)
+      .eq('is_active', true)
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -45,6 +46,7 @@ export default defineEventHandler(async () => {
       s.company_name as supplier_name
     FROM Products p
     LEFT JOIN Suppliers s ON p.supplier_id = s.supplier_id
+    WHERE p.is_active = 1
     ORDER BY p.created_at DESC
   `);
   

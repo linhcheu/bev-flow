@@ -15,14 +15,14 @@ export default defineEventHandler(async (event) => {
   if (isProduction()) {
     const supabase = getSupabase();
     
-    // Get the sale
-    const { data: sale } = await supabase
+    // Check if sale exists
+    const { data: sale, error: saleError } = await supabase
       .from('sales')
-      .select('product_id, quantity')
+      .select('sale_id')
       .eq('sale_id', id)
       .single();
     
-    if (!sale) {
+    if (saleError || !sale) {
       throw createError({ statusCode: 404, message: 'Sale not found' });
     }
     
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       .select('product_id, quantity')
       .eq('sale_id', id);
     
-    // Restore stock
+    // Restore stock for each item
     if (saleItems && saleItems.length > 0) {
       for (const item of saleItems) {
         const { data: product } = await supabase
@@ -44,28 +44,25 @@ export default defineEventHandler(async (event) => {
         if (product) {
           await supabase
             .from('products')
-            .update({ current_stock: product.current_stock + item.quantity })
+            .update({ current_stock: (product.current_stock || 0) + item.quantity })
             .eq('product_id', item.product_id);
         }
       }
-    } else if (sale.product_id) {
-      const { data: product } = await supabase
-        .from('products')
-        .select('current_stock')
-        .eq('product_id', sale.product_id)
-        .single();
-      
-      if (product) {
-        await supabase
-          .from('products')
-          .update({ current_stock: product.current_stock + sale.quantity })
-          .eq('product_id', sale.product_id);
-      }
     }
     
-    // Delete items and sale
+    // Delete items first (cascade should handle, but explicit is safer)
     await supabase.from('saleitems').delete().eq('sale_id', id);
-    await supabase.from('sales').delete().eq('sale_id', id);
+    
+    // Delete the sale
+    const { error: deleteError } = await supabase
+      .from('sales')
+      .delete()
+      .eq('sale_id', id);
+    
+    if (deleteError) {
+      console.error('Error deleting sale:', deleteError);
+      throw createError({ statusCode: 500, message: 'Failed to delete sale' });
+    }
     
     return { success: true, message: 'Sale deleted successfully' };
   }

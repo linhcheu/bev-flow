@@ -439,18 +439,8 @@ const { products, fetchProducts } = useProducts();
 
 const loading = ref(true);
 
-// Default to last 1 year
-const getDefaultDateRange = (): { from: string; to: string } => {
-  const today = new Date();
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(today.getFullYear() - 1);
-  return {
-    from: oneYearAgo.toISOString().split('T')[0] || '',
-    to: today.toISOString().split('T')[0] || ''
-  };
-};
-
-const dateRange = ref<{ from: string | null; to: string | null }>(getDefaultDateRange());
+// Default to "All" - no date filtering
+const dateRange = ref<{ from: string | null; to: string | null }>({ from: null, to: null });
 
 const donutColors = ['#10b981', '#6366f1', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
 

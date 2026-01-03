@@ -54,44 +54,43 @@ export default defineEventHandler(async (event) => {
     
     // Restore stock from old items
     for (const oldItem of (oldItems || [])) {
-      await supabase.rpc('increment_stock', {
-        p_product_id: oldItem.product_id,
-        p_quantity: oldItem.quantity
-      });
-    }
-    
-    // Also restore from old main record if no items existed
-    if ((!oldItems || oldItems.length === 0) && existing.product_id) {
-      await supabase.rpc('increment_stock', {
-        p_product_id: existing.product_id,
-        p_quantity: existing.quantity
-      });
+      const { data: product } = await supabase
+        .from('products')
+        .select('current_stock')
+        .eq('product_id', oldItem.product_id)
+        .single();
+      
+      if (product) {
+        await supabase
+          .from('products')
+          .update({ current_stock: (product.current_stock || 0) + oldItem.quantity })
+          .eq('product_id', oldItem.product_id);
+      }
     }
     
     // Delete old sale items
     await supabase.from('saleitems').delete().eq('sale_id', id);
     
-    // Get first item for backwards compatibility
-    const firstItem = itemsArray[0] || {
-      product_id: existing.product_id,
-      quantity: existing.quantity,
-      unit_price: existing.unit_price
-    };
-    
-    // Update main sale record
-    await supabase
+    // Update main sale record - Supabase uses sale_number not invoice_number
+    const { error: updateError } = await supabase
       .from('sales')
       .update({
-        invoice_number,
-        customer_name: customer_name || null,
+        sale_number: invoice_number,
+        customer_id: body.customer_id || null,
         sale_date,
-        product_id: firstItem.product_id,
-        unit_price: firstItem.unit_price,
-        quantity: firstItem.quantity,
+        subtotal,
+        discount_percent: body.discount_percent || 0,
+        discount_amount: body.discount_amount || 0,
         total_amount,
+        payment_method: body.payment_method || 'Cash',
         notes: notes || null
       })
       .eq('sale_id', id);
+    
+    if (updateError) {
+      console.error('Error updating sale:', updateError);
+      throw createError({ statusCode: 500, message: 'Failed to update sale' });
+    }
     
     // Insert new items and update stock
     for (const item of itemsArray) {
@@ -105,10 +104,18 @@ export default defineEventHandler(async (event) => {
       });
       
       // Deduct stock for new items
-      await supabase.rpc('decrement_stock', {
-        p_product_id: item.product_id,
-        p_quantity: item.quantity
-      });
+      const { data: product } = await supabase
+        .from('products')
+        .select('current_stock')
+        .eq('product_id', item.product_id)
+        .single();
+      
+      if (product) {
+        await supabase
+          .from('products')
+          .update({ current_stock: Math.max(0, (product.current_stock || 0) - item.quantity) })
+          .eq('product_id', item.product_id);
+      }
     }
     
     // Get updated items
@@ -125,7 +132,6 @@ export default defineEventHandler(async (event) => {
       .from('sales')
       .select(`
         *,
-        products (product_id, product_name, sku),
         customers (customer_id, customer_name)
       `)
       .eq('sale_id', id)
@@ -147,28 +153,24 @@ export default defineEventHandler(async (event) => {
     
     return {
       sale_id: updated?.sale_id,
-      invoice_number: updated?.invoice_number,
+      invoice_number: updated?.sale_number, // Map back from Supabase column
       customer_id: updated?.customer_id || undefined,
-      customer_name: updated?.customer_name || updated?.customers?.customer_name || undefined,
+      customer_name: updated?.customers?.customer_name || undefined,
       sale_date: updated?.sale_date,
-      product_id: updated?.product_id,
-      unit_price: Number(updated?.unit_price),
-      quantity: updated?.quantity,
       subtotal,
+      discount_percent: Number(updated?.discount_percent || 0),
+      discount_amount: Number(updated?.discount_amount || 0),
       total_amount: Number(updated?.total_amount),
+      payment_method: updated?.payment_method,
+      status: updated?.status,
       notes: updated?.notes || undefined,
       created_at: updated?.created_at,
       items: resultItems,
-      product: updated?.product_id ? {
-        product_id: updated.product_id,
-        product_name: updated.products?.product_name || '',
-        sku: updated.products?.sku || ''
-      } : null,
       customer: updated?.customer_id ? {
         customer_id: updated.customer_id,
         customer_name: updated.customers?.customer_name || ''
       } : undefined
-    };
+    } as Sale;
   }
   
   // Development: Use SQLite

@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
       .from('suppliers')
       .select('*')
       .eq('supplier_id', id)
+      .eq('is_active', true)
       .single();
     
     if (error || !supplier) {
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
   }
   
   // Development: Use SQLite
-  const supplier = queryOne<Supplier>('SELECT * FROM Suppliers WHERE supplier_id = ?', [id]);
+  const supplier = queryOne<Supplier>('SELECT * FROM Suppliers WHERE supplier_id = ? AND is_active = 1', [id]);
   
   if (!supplier) {
     throw createError({
