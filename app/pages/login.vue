@@ -1,88 +1,88 @@
 <template>
-  <div class="min-h-screen bg-zinc-50 flex">
-    <!-- Left Side - Branding -->
-    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-zinc-100 via-zinc-50 to-white relative overflow-hidden">
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 opacity-5">
-        <div class="absolute top-0 left-0 w-full h-full" 
-          style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
-        </div>
-      </div>
+  <div class="login-container">
+    <!-- Left Side - Branding (Hidden on mobile/tablet, visible on large screens) -->
+    <div class="login-branding">
+      <!-- Subtle Background -->
+      <div class="absolute inset-0 bg-gradient-to-br from-zinc-50 via-white to-zinc-50"></div>
       
       <!-- Content -->
-      <div class="relative z-10 flex flex-col justify-center px-16">
-        <div class="mb-12">
-          <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-amber-500/20">
-            <UIcon name="i-lucide-wine" class="w-8 h-8 text-zinc-900" />
+      <div class="relative z-10 flex flex-col justify-center h-full px-8 lg:px-12 xl:px-16 py-12">
+        <!-- Logo -->
+        <div class="mb-8 xl:mb-12">
+          <div class="w-16 h-16 xl:w-20 xl:h-20 rounded-2xl overflow-hidden border border-zinc-200 shadow-sm mb-6">
+            <img src="/images/logo-1.png" alt="BEV Flow Logo" class="w-full h-full object-cover" />
           </div>
-          <h1 class="text-5xl font-bold text-zinc-900 mb-4 tracking-tight">BEV Flow</h1>
-          <p class="text-xl text-zinc-600 font-light">Streamline your beverage inventory management</p>
+          <h1 class="text-3xl xl:text-4xl 2xl:text-5xl font-semibold text-zinc-900 mb-3 tracking-tight">BEV Flow</h1>
+          <p class="text-base xl:text-lg text-zinc-500 font-normal">Beverage Inventory Management System</p>
         </div>
                                     
-        <div class="space-y-6">
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
-              <UIcon name="i-lucide-package" class="w-5 h-5 text-amber-600" />
+        <!-- Features -->
+        <div class="space-y-4 xl:space-y-5">
+          <div class="flex items-center gap-3 xl:gap-4">
+            <div class="w-9 h-9 xl:w-10 xl:h-10 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-package" class="w-4 h-4 xl:w-5 xl:h-5 text-zinc-600" />
             </div>
             <div>
-              <p class="text-zinc-900 font-medium">Product Management</p>
-              <p class="text-sm text-zinc-500">Track inventory in real-time</p>
+              <p class="text-zinc-800 font-medium text-sm xl:text-base">Inventory Tracking</p>
+              <p class="text-xs xl:text-sm text-zinc-500">Real-time stock management</p>
             </div>
           </div>
           
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
-              <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-amber-600" />
+          <div class="flex items-center gap-3 xl:gap-4">
+            <div class="w-9 h-9 xl:w-10 xl:h-10 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-trending-up" class="w-4 h-4 xl:w-5 xl:h-5 text-zinc-600" />
             </div>
             <div>
-              <p class="text-zinc-900 font-medium">Sales Analytics</p>
-              <p class="text-sm text-zinc-500">Gain insights from your data</p>
+              <p class="text-zinc-800 font-medium text-sm xl:text-base">Sales Analytics</p>
+              <p class="text-xs xl:text-sm text-zinc-500">Data-driven insights</p>
             </div>
           </div>
           
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
-              <UIcon name="i-lucide-bar-chart-3" class="w-5 h-5 text-amber-600" />
+          <div class="flex items-center gap-3 xl:gap-4">
+            <div class="w-9 h-9 xl:w-10 xl:h-10 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-bar-chart-3" class="w-4 h-4 xl:w-5 xl:h-5 text-zinc-600" />
             </div>
             <div>
-              <p class="text-zinc-900 font-medium">Smart Forecasting</p>
-              <p class="text-sm text-zinc-500">AI-powered demand prediction</p>
+              <p class="text-zinc-800 font-medium text-sm xl:text-base">Smart Forecasting</p>
+              <p class="text-xs xl:text-sm text-zinc-500">AI-powered predictions</p>
             </div>
           </div>
         </div>
+        
+        <!-- Footer on branding side -->
+        <div class="mt-auto pt-8 xl:pt-12">
+          <p class="text-xs text-zinc-400">© 2026 BEV Flow. All rights reserved.</p>
+        </div>
       </div>
-      
-      <!-- Decorative Elements -->
-      <div class="absolute bottom-0 left-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
-      <div class="absolute top-20 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl"></div>
     </div>
     
     <!-- Right Side - Login Form -->
-    <div class="flex-1 flex items-center justify-center px-6 py-12 lg:px-8">
-      <div class="w-full max-w-md">
-        <!-- Mobile Logo -->
-        <div class="lg:hidden mb-10 text-center">
-          <div class="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <UIcon name="i-lucide-wine" class="w-7 h-7 text-zinc-900" />
+    <div class="login-form-container">
+      <div class="login-form-wrapper">
+        <!-- Logo (visible on mobile/tablet only) -->
+        <div class="login-mobile-header">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border border-zinc-200 shadow-sm mx-auto mb-3">
+            <img src="/images/logo-1.png" alt="BEV Flow Logo" class="w-full h-full object-cover" />
           </div>
-          <h1 class="text-2xl font-bold text-zinc-900">BEV Flow</h1>
+          <h1 class="text-xl sm:text-2xl font-semibold text-zinc-900">BEV Flow</h1>
+          <p class="text-xs sm:text-sm text-zinc-500 mt-1">Inventory Management</p>
         </div>
         
         <!-- Form Header -->
-        <div class="mb-10">
-          <h2 class="text-3xl font-bold text-zinc-900 tracking-tight">Welcome back</h2>
-          <p class="mt-2 text-zinc-500">Sign in to your account to continue</p>
+        <div class="mb-6 sm:mb-8 text-center lg:text-left">
+          <h2 class="text-xl sm:text-2xl lg:text-3xl font-semibold text-zinc-900 tracking-tight">Welcome back</h2>
+          <p class="mt-1.5 sm:mt-2 text-sm text-zinc-500">Sign in to continue</p>
         </div>
         
         <!-- Login Form -->
-        <form @submit.prevent="handleLogin" class="space-y-6">
+        <form @submit.prevent="handleLogin" class="space-y-4 sm:space-y-5">
           <div>
-            <label for="email" class="block text-sm font-medium text-zinc-700 mb-2">
-              Email address
+            <label for="email" class="block text-sm font-medium text-zinc-700 mb-1.5 sm:mb-2">
+              Email
             </label>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <UIcon name="i-lucide-mail" class="w-5 h-5 text-zinc-400" />
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
+                <UIcon name="i-lucide-mail" class="w-4 h-4 text-zinc-400" />
               </div>
               <input
                 id="email"
@@ -90,19 +90,19 @@
                 type="email"
                 autocomplete="email"
                 required
-                placeholder="Enter your email"
-                class="w-full pl-12 pr-4 py-3.5 bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"
+                placeholder="you@example.com"
+                class="login-input !pl-11"
               />
             </div>
           </div>
           
           <div>
-            <label for="password" class="block text-sm font-medium text-zinc-700 mb-2">
+            <label for="password" class="block text-sm font-medium text-zinc-700 mb-1.5 sm:mb-2">
               Password
             </label>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <UIcon name="i-lucide-lock" class="w-5 h-5 text-zinc-400" />
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
+                <UIcon name="i-lucide-lock" class="w-4 h-4 text-zinc-400" />
               </div>
               <input
                 id="password"
@@ -110,37 +110,37 @@
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="current-password"
                 required
-                placeholder="Enter your password"
-                class="w-full pl-12 pr-12 py-3.5 bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"
+                placeholder="••••••••"
+                class="login-input !pl-11 !pr-11"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600"
+                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors z-10"
               >
-                <UIcon :name="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'" class="w-5 h-5" />
+                <UIcon :name="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'" class="w-4 h-4" />
               </button>
             </div>
           </div>
           
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between text-sm">
             <label class="flex items-center gap-2 cursor-pointer">
               <input 
                 v-model="form.remember" 
                 type="checkbox" 
-                class="w-4 h-4 rounded bg-white border-zinc-300 text-amber-500 focus:ring-amber-500/50 focus:ring-offset-0"
+                class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border-zinc-300 text-amber-500 focus:ring-amber-500/50 focus:ring-offset-0"
               />
-              <span class="text-sm text-zinc-600">Remember me</span>
+              <span class="text-xs sm:text-sm text-zinc-600">Remember me</span>
             </label>
-            <a href="#" class="text-sm text-amber-600 hover:text-amber-500">
+            <a href="#" class="text-xs sm:text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
               Forgot password?
             </a>
           </div>
           
           <!-- Error Message -->
-          <div v-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-            <p class="text-sm text-red-400 flex items-center gap-2">
-              <UIcon name="i-lucide-alert-circle" class="w-4 h-4" />
+          <div v-if="error" class="p-3 sm:p-4 bg-red-50 border border-red-100 rounded-lg">
+            <p class="text-xs sm:text-sm text-red-600 flex items-center gap-2">
+              <UIcon name="i-lucide-alert-circle" class="w-4 h-4 shrink-0" />
               {{ error }}
             </p>
           </div>
@@ -148,27 +148,29 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-900 font-semibold rounded-xl hover:from-amber-400 hover:to-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            class="login-button"
           >
-            <UIcon v-if="loading" name="i-lucide-loader-2" class="w-5 h-5 animate-spin" />
+            <UIcon v-if="loading" name="i-lucide-loader-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
             <span>{{ loading ? 'Signing in...' : 'Sign in' }}</span>
           </button>
         </form>
         
         <!-- Demo Credentials -->
-        <div class="mt-8 p-4 bg-amber-50 border border-amber-100 rounded-xl">
-          <p class="text-xs text-zinc-500 mb-2">Demo credentials:</p>
-          <p class="text-sm text-zinc-700">
-            <span class="text-zinc-500">Email:</span> admin@bevflow.com
-          </p>
-          <p class="text-sm text-zinc-700">
-            <span class="text-zinc-500">Password:</span> admin123
-          </p>
+        <div class="mt-6 sm:mt-8 p-3 sm:p-4 bg-zinc-50 border border-zinc-100 rounded-lg">
+          <p class="text-[10px] sm:text-xs text-zinc-400 mb-1.5 sm:mb-2 uppercase tracking-wide font-medium">Demo Account</p>
+          <div class="space-y-1">
+            <p class="text-xs sm:text-sm text-zinc-600">
+              <span class="text-zinc-400">Email:</span> admin@bevflow.com
+            </p>
+            <p class="text-xs sm:text-sm text-zinc-600">
+              <span class="text-zinc-400">Password:</span> admin123
+            </p>
+          </div>
         </div>
         
-        <!-- Footer -->
-        <p class="mt-8 text-center text-sm text-zinc-500">
-          2024 BEV Flow. All rights reserved.
+        <!-- Footer (Mobile/Tablet) -->
+        <p class="lg:hidden mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-zinc-400">
+          © 2026 BEV Flow. All rights reserved.
         </p>
       </div>
     </div>

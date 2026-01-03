@@ -3,9 +3,14 @@
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-        <div>
-          <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Products</h1>
-          <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500">Manage your product inventory</p>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-package" class="w-5 h-5 text-zinc-600" />
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Products</h1>
+            <p class="text-xs sm:text-sm text-zinc-500">Manage your product inventory</p>
+          </div>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <!-- Export Buttons -->
@@ -149,21 +154,21 @@
                 <div class="flex items-center gap-1 shrink-0">
                   <button 
                     @click="openViewModal(product)" 
-                    class="p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                    class="p-2 sm:p-1.5 text-zinc-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all active:scale-95"
                     title="View"
                   >
                     <UIcon name="i-lucide-eye" class="w-4 h-4" />
                   </button>
                   <NuxtLink 
                     :to="`/products/${product.product_id}/edit`" 
-                    class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors no-underline"
+                    class="p-2 sm:p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all active:scale-95 no-underline"
                     title="Edit"
                   >
                     <UIcon name="i-lucide-pencil" class="w-4 h-4" />
                   </NuxtLink>
                   <button 
                     @click="handleDelete(product.product_id!)" 
-                    class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    class="p-2 sm:p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all active:scale-95"
                     title="Delete"
                   >
                     <UIcon name="i-lucide-trash-2" class="w-4 h-4" />

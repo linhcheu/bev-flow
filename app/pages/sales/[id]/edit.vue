@@ -1,6 +1,6 @@
 <template>
   <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
       <div class="mb-4 sm:mb-6">
         <NuxtLink to="/sales" class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-zinc-500 hover:text-zinc-700 no-underline mb-2 sm:mb-3">
           <UIcon name="i-lucide-arrow-left" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -14,17 +14,17 @@
         <UIcon name="i-lucide-loader-2" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 animate-spin" />
       </div>
       
-      <form v-else-if="sale" @submit.prevent="handleSubmit" class="space-y-6">
+      <form v-else-if="sale" @submit.prevent="handleSubmit" class="space-y-4 sm:space-y-6">
         <!-- Sale Details Card -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-4 sm:p-6 space-y-5">
+        <div class="bg-white border border-zinc-200 rounded-xl p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
           <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-receipt" class="w-4 h-4 text-amber-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-receipt" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
             </div>
             Sale Details
           </h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div class="form-group">
               <label class="input-label">
                 Invoice No. <span class="text-red-500">*</span>
@@ -41,15 +41,11 @@
               <label class="input-label">
                 Sale Date <span class="text-red-500">*</span>
               </label>
-              <div class="relative">
-                <UIcon name="i-lucide-calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
-                <input 
-                  v-model="form.sale_date" 
-                  type="date" 
-                  required
-                  class="input pl-11"
-                />
-              </div>
+              <DatePicker 
+                v-model="form.sale_date"
+                placeholder="Select sale date"
+                :max-date="new Date().toISOString().split('T')[0]"
+              />
             </div>
           </div>
           
@@ -65,26 +61,27 @@
         </div>
         
         <!-- Items Card -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-4 sm:p-6 space-y-5">
+        <div class="bg-white border border-zinc-200 rounded-xl p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
-              <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
+              <div class="w-7 h-7 sm:w-8 sm:h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-package" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
               </div>
               Sale Items
             </h3>
             <button 
               type="button" 
               @click="addItem"
-              class="btn-secondary text-xs"
+              class="btn-secondary text-xs px-2.5 py-1.5 sm:px-3 sm:py-2"
             >
-              <UIcon name="i-lucide-plus" class="w-4 h-4" />
-              Add Item
+              <UIcon name="i-lucide-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span class="hidden sm:inline">Add Item</span>
+              <span class="sm:hidden">Add</span>
             </button>
           </div>
           
-          <!-- Items Table -->
-          <div class="overflow-x-auto">
+          <!-- Desktop Table (hidden on mobile) -->
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full">
               <thead>
                 <tr class="border-b border-zinc-200">
@@ -168,24 +165,103 @@
             </table>
           </div>
           
+          <!-- Mobile Card Layout -->
+          <div class="md:hidden space-y-3">
+            <div 
+              v-for="(item, index) in form.items" 
+              :key="index"
+              class="bg-zinc-50 rounded-lg p-3 space-y-3 border border-zinc-200"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-zinc-500 bg-zinc-200 px-2 py-0.5 rounded">Item {{ index + 1 }}</span>
+                <div class="flex items-center gap-2">
+                  <span 
+                    :class="[
+                      'text-xs px-2 py-0.5 rounded-full',
+                      getProductStock(item.product_id) > 0 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-red-100 text-red-700'
+                    ]"
+                  >
+                    Stock: {{ getProductStock(item.product_id) }}
+                  </span>
+                  <button 
+                    v-if="form.items.length > 1"
+                    type="button"
+                    @click="removeItem(index)"
+                    class="icon-btn icon-btn-danger !p-1"
+                  >
+                    <UIcon name="i-lucide-x" class="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <label class="text-xs text-zinc-500 mb-1 block">Product</label>
+                <select 
+                  v-model="item.product_id"
+                  class="select text-sm py-2 w-full"
+                  @change="onProductChange(index)"
+                >
+                  <option :value="0">-- Select Product --</option>
+                  <option v-for="product in products" :key="product.product_id" :value="product.product_id">
+                    {{ product.product_name }} ({{ product.sku }})
+                  </option>
+                </select>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs text-zinc-500 mb-1 block">Quantity</label>
+                  <input 
+                    v-model.number="item.quantity"
+                    type="number"
+                    min="1"
+                    class="input text-sm py-2 w-full text-center"
+                  />
+                </div>
+                <div>
+                  <label class="text-xs text-zinc-500 mb-1 block">Unit Price</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">$</span>
+                    <input 
+                      v-model.number="item.unit_price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      class="input text-sm py-2 w-full text-right pl-7"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between pt-2 border-t border-zinc-200">
+                <span class="text-xs text-zinc-500">Amount:</span>
+                <span class="text-sm font-semibold text-amber-600">
+                  ${{ (item.quantity * item.unit_price).toFixed(2) }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
           <!-- Totals -->
           <div class="border-t border-zinc-200 pt-4 space-y-2">
-            <div class="flex justify-end items-center gap-4">
+            <div class="flex justify-between sm:justify-end items-center gap-4">
               <span class="text-sm text-zinc-500">Subtotal:</span>
-              <span class="text-sm font-medium text-zinc-900 w-28 text-right">${{ subtotal.toFixed(2) }}</span>
+              <span class="text-sm font-medium text-zinc-900 sm:w-28 text-right">${{ subtotal.toFixed(2) }}</span>
             </div>
-            <div class="flex justify-end items-center gap-4 pt-2 border-t border-zinc-200">
+            <div class="flex justify-between sm:justify-end items-center gap-4 pt-2 border-t border-zinc-200">
               <span class="text-base font-medium text-zinc-900">Total:</span>
-              <span class="text-xl font-semibold text-amber-600 w-28 text-right">${{ subtotal.toFixed(2) }}</span>
+              <span class="text-lg sm:text-xl font-semibold text-amber-600 sm:w-28 text-right">${{ subtotal.toFixed(2) }}</span>
             </div>
           </div>
         </div>
         
         <!-- Notes Card -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-4 sm:p-6 space-y-5">
+        <div class="bg-white border border-zinc-200 rounded-xl p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
           <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
-            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-file-text" class="w-4 h-4 text-amber-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
             </div>
             Notes
           </h3>

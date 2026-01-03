@@ -32,71 +32,71 @@
       
       <!-- Stats Grid -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 lg:mb-8">
-        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+        <div class="bg-white rounded-lg p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
           <div class="flex items-center justify-between mb-2 sm:mb-3">
-            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-package" class="w-4 h-4 text-amber-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-package" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
             </div>
           </div>
-          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.totalProducts }}</p>
+          <p class="text-sm sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.totalProducts }}</p>
           <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Total Products</p>
         </div>
         
-        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+        <div class="bg-white rounded-lg p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
           <div class="flex items-center justify-between mb-2 sm:mb-3">
-            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-building-2" class="w-4 h-4 text-blue-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-building-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
             </div>
           </div>
-          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.totalSuppliers }}</p>
+          <p class="text-sm sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.totalSuppliers }}</p>
           <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Total Suppliers</p>
         </div>
         
-        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+        <div class="bg-white rounded-lg p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
           <div class="flex items-center justify-between mb-2 sm:mb-3">
-            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-purple-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-clipboard-list" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
             </div>
-            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Active</span>
+            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-amber-600 bg-amber-50 px-1 sm:px-1.5 py-0.5 rounded-full">Active</span>
           </div>
-          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.activePOs }}</p>
+          <p class="text-sm sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.activePOs }}</p>
           <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Pending POs</p>
         </div>
         
-        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+        <div class="bg-white rounded-lg p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
           <div class="flex items-center justify-between mb-2 sm:mb-3">
-            <div class="w-8 h-8 bg-cyan-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-shopping-bag" class="w-4 h-4 text-cyan-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-cyan-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-shopping-bag" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-600" />
             </div>
-            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded-full">Today</span>
+            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-zinc-500 bg-zinc-100 px-1 sm:px-1.5 py-0.5 rounded-full">Today</span>
           </div>
-          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.todayOrders || 0 }}</p>
+          <p class="text-sm sm:text-lg md:text-xl font-semibold text-zinc-900">{{ stats.todayOrders || 0 }}</p>
           <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Today's Orders</p>
         </div>
         
-        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
+        <div class="bg-white rounded-lg p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors">
           <div class="flex items-center justify-between mb-2 sm:mb-3">
-            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-trending-up" class="w-4 h-4 text-emerald-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-trending-up" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
             </div>
-            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded-full">Today</span>
+            <span class="text-[9px] sm:text-[10px] md:text-xs font-medium text-zinc-500 bg-zinc-100 px-1 sm:px-1.5 py-0.5 rounded-full">Today</span>
           </div>
-          <p :class="['text-base sm:text-lg md:text-xl font-semibold', getSalesColorClass(stats.todaySales)]">
+          <p :class="['text-sm sm:text-lg md:text-xl font-semibold', getSalesColorClass(stats.todaySales)]">
             ${{ formatNumber(stats.todaySales) }}
           </p>
           <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Today's Sales</p>
         </div>
         
-        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors col-span-2 sm:col-span-1">
+        <div class="bg-white rounded-lg p-3 sm:p-4 border border-zinc-200 hover:border-zinc-300 transition-colors col-span-2 sm:col-span-1">
           <div class="flex items-center justify-between mb-2 sm:mb-3">
-            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-wallet" class="w-4 h-4 text-green-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-green-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-wallet" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" />
             </div>
-            <span :class="['text-[9px] sm:text-[10px] md:text-xs font-medium px-1.5 py-0.5 rounded-full', getProfitBadgeClass(stats.todayProfit)]">
+            <span :class="['text-[9px] sm:text-[10px] md:text-xs font-medium px-1 sm:px-1.5 py-0.5 rounded-full', getProfitBadgeClass(stats.todayProfit)]">
               Today
             </span>
           </div>
-          <p :class="['text-base sm:text-lg md:text-xl font-semibold', getProfitColorClass(stats.todayProfit)]">
+          <p :class="['text-sm sm:text-lg md:text-xl font-semibold', getProfitColorClass(stats.todayProfit)]">
             {{ stats.todayProfit >= 0 ? '+' : '' }}${{ formatNumber(stats.todayProfit) }}
           </p>
           <p class="text-[9px] sm:text-[10px] md:text-xs text-zinc-500 mt-0.5 sm:mt-1">Today's Profit</p>
@@ -104,7 +104,7 @@
       </div>
 
       <!-- Sales Trend Chart -->
-      <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 lg:mb-8 border border-zinc-200">
+      <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 lg:mb-8 border border-zinc-200">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
@@ -188,7 +188,7 @@
       <!-- Charts Section -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 lg:mb-8">
         <!-- Sales by Category Chart -->
-        <div class="lg:col-span-2 bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+        <div class="lg:col-span-2 bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
           <div class="flex items-center gap-3 mb-3 sm:mb-4 md:mb-6">
             <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-pie-chart" class="w-4 h-4 text-purple-600" />
@@ -255,7 +255,7 @@
         <!-- Top Products & Stock Alerts -->
         <div class="space-y-3 sm:space-y-4 md:space-y-6">
           <!-- Top Products -->
-          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+          <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
             <div class="flex items-center gap-3 mb-3 sm:mb-4">
               <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
                 <UIcon name="i-lucide-trophy" class="w-4 h-4 text-amber-600" />
@@ -284,7 +284,7 @@
           </div>
 
           <!-- Low Stock Alerts -->
-          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+          <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
             <div class="flex items-center gap-3 mb-3 sm:mb-4">
               <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
                 <UIcon name="i-lucide-alert-triangle" class="w-4 h-4 text-red-600" />
@@ -316,7 +316,7 @@
       </div>
 
       <!-- Quick Actions -->
-      <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 border border-zinc-200">
+      <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
         <div class="flex items-center gap-3 mb-4">
           <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
             <UIcon name="i-lucide-zap" class="w-4 h-4 text-indigo-600" />
@@ -378,41 +378,42 @@
     >
       {{ tooltip.text }}
     </div>
+    
+    <!-- Loading Overlay -->
+    <div 
+      v-if="isLoading && !isInitialized"
+      class="fixed inset-0 bg-white/80 backdrop-blur-sm z-40 flex items-center justify-center"
+    >
+      <div class="flex flex-col items-center gap-3">
+        <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
+        <p class="text-sm text-zinc-600">Loading dashboard...</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 
-// Auth check is handled by the global middleware
-// No need to duplicate it here
-
-interface DashboardStats {
-  totalProducts: number;
-  totalSuppliers: number;
-  activePOs: number;
-  todaySales: number;
-  todayProfit: number;
-  todayOrders: number;
-  lowStockProducts?: { product_id: number; product_name: string; current_stock: number; min_stock_level: number }[];
-  recentSales?: any[];
-  analytics?: {
-    totalRevenue: number;
-    topProducts: { name: string; type: string; sold: number }[];
-    categories: { name: string; percentage: number; color: string; revenue: number }[];
-    hourlySalesData: { hour: string; total: number }[];
-  };
-}
-
-const stats = ref<DashboardStats>({
-  totalProducts: 0,
-  totalSuppliers: 0,
-  activePOs: 0,
-  todaySales: 0,
-  todayProfit: 0,
-  todayOrders: 0,
-  lowStockProducts: [],
-});
+// Use the centralized dashboard composable for fast cached data
+const {
+  stats,
+  isLoading,
+  isInitialized,
+  fetchStats,
+  refresh,
+  chartSegments,
+  maxHourlyValue,
+  hourlyChartData,
+  trendLinePath,
+  trendAreaPath,
+  displayTopProducts,
+  formatNumber,
+  formatChartValue,
+  getProfitColorClass,
+  getProfitBadgeClass,
+  getSalesColorClass,
+} = useDashboard();
 
 // Today's formatted date
 const todayFormatted = computed(() => {
@@ -440,131 +441,29 @@ const hideTooltip = () => {
   tooltip.value.show = false;
 };
 
-// Analytics Data for charts
-const analytics = ref({
-  totalRevenue: 0,
-  topProducts: [] as { name: string; type: string; sold: number }[],
-  categories: [] as { name: string; percentage: number; color: string }[],
-  hourlySalesData: [] as { hour: string; total: number }[],
-});
+// Analytics computed from stats (for backward compatibility in template)
+const analytics = computed(() => stats.value.analytics);
 
-// Default category colors for display
-const defaultCategories = [
-  { name: 'No Data', percentage: 100, color: '#e4e4e7' }
-];
-
-// Calculate chart segments for donut chart
-const chartSegments = computed(() => {
-  const cats = analytics.value.categories.length > 0 ? analytics.value.categories : defaultCategories;
-  let cumulativePercentage = 0;
-  return cats.map((category) => {
-    const segment = {
-      category: category.name,
-      percentage: category.percentage,
-      color: category.color,
-      offset: -cumulativePercentage * 4.4,
-    };
-    cumulativePercentage += category.percentage;
-    return segment;
-  });
-});
-
-// Hourly trend chart data (changed from monthly)
-const maxHourlyValue = computed(() => {
-  if (analytics.value.hourlySalesData.length === 0) return 1000;
-  return Math.max(...analytics.value.hourlySalesData.map(d => d.total)) * 1.2;
-});
-
-const hourlyChartData = computed(() => {
-  const data = analytics.value.hourlySalesData;
-  if (data.length === 0) return [];
-  
-  const chartWidth = 720;
-  const chartHeight = 160;
-  const startX = 80;
-  const spacing = data.length > 1 ? chartWidth / (data.length - 1) : chartWidth;
-  
-  return data.map((d, i) => ({
-    x: startX + (i * spacing),
-    y: 190 - (d.total / maxHourlyValue.value) * chartHeight,
-    value: d.total,
-    label: d.hour
-  }));
-});
-
-const trendLinePath = computed(() => {
-  if (hourlyChartData.value.length === 0) return '';
-  return hourlyChartData.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-});
-
-const trendAreaPath = computed(() => {
-  if (hourlyChartData.value.length === 0) return '';
-  const points = hourlyChartData.value;
-  const firstX = points[0]?.x || 80;
-  const lastX = points[points.length - 1]?.x || 760;
-  return `${trendLinePath.value} L ${lastX} 190 L ${firstX} 190 Z`;
-});
-
-// Default top products if none available
-const displayTopProducts = computed(() => {
-  if (analytics.value.topProducts.length > 0) {
-    return analytics.value.topProducts.slice(0, 5);
-  }
-  return [{ name: 'No sales today', type: 'N/A', sold: 0 }];
-});
+// Auto-refresh interval (every 60 seconds when page is visible)
+let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
 onMounted(async () => {
-  try {
-    const response = await $fetch<DashboardStats>('/api/dashboard/stats');
-    stats.value = response;
-    
-    // Update analytics from API response
-    if (response.analytics) {
-      analytics.value.totalRevenue = response.analytics.totalRevenue;
-      analytics.value.topProducts = response.analytics.topProducts;
-      analytics.value.categories = response.analytics.categories;
-      analytics.value.hourlySalesData = response.analytics.hourlySalesData || [];
+  // Fetch data immediately (uses cache if available)
+  await fetchStats();
+  
+  // Set up auto-refresh every 60 seconds
+  refreshInterval = setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      fetchStats(true); // Force refresh
     }
-  } catch (error) {
-    console.error('Failed to fetch dashboard stats:', error);
-  }
+  }, 60000);
 });
 
-// Helper functions
-const formatNumber = (num: number) => {
-  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
-
-const formatChartValue = (value: number) => {
-  if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
-  if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
-  return value.toFixed(0);
-};
-
-const formatMonthLabel = (month: string) => {
-  const parts = month.split('-');
-  const m = parts[1] || '01';
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return months[parseInt(m) - 1] || month;
-};
-
-// Profit color classes
-const getProfitColorClass = (profit: number) => {
-  if (profit > 0) return 'text-emerald-600';
-  if (profit < 0) return 'text-red-600';
-  return 'text-zinc-600';
-};
-
-const getProfitBadgeClass = (profit: number) => {
-  if (profit > 0) return 'text-emerald-600 bg-emerald-50';
-  if (profit < 0) return 'text-red-600 bg-red-50';
-  return 'text-zinc-600 bg-zinc-50';
-};
-
-const getSalesColorClass = (sales: number) => {
-  if (sales > 0) return 'text-emerald-600';
-  return 'text-zinc-900';
-};
+onUnmounted(() => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+});
 
 // Export functions
 const handleExportExcel = () => {

@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-zinc-50">
+  <div class="min-h-screen min-h-dvh bg-white">
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-// Auth layout setup
+// Auth layout - minimal wrapper for authentication pages
 </script>

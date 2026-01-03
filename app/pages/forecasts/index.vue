@@ -3,9 +3,14 @@
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-        <div>
-          <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Sales Forecasts</h1>
-          <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500">AI-powered sales predictions for inventory planning</p>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-zinc-600" />
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Sales Forecasts</h1>
+            <p class="text-xs sm:text-sm text-zinc-500">AI-powered sales predictions for inventory planning</p>
+          </div>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <button 
@@ -409,6 +414,11 @@
 
 <script setup lang="ts">
 import type { Forecast } from '~/types';
+
+// Apply permission middleware for this page
+definePageMeta({
+  middleware: ['permission']
+});
 
 const { forecasts, loading, error, fetchForecasts, createForecast, deleteForecast } = useForecasts();
 const { products, fetchProducts } = useProducts();

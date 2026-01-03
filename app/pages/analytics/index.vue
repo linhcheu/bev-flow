@@ -40,57 +40,57 @@
 
       <div v-else>
         <!-- KPI Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
           <!-- Total Revenue -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-trending-up" class="w-4 h-4 text-emerald-600" />
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-trending-up" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
               </div>
-              <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Revenue</span>
+              <span class="text-[10px] sm:text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 sm:px-2 py-0.5 rounded-full">Revenue</span>
             </div>
-            <p class="text-xl md:text-2xl font-semibold text-zinc-900">${{ formatNumber(totalRevenue) }}</p>
-            <p class="text-xs text-zinc-500 mt-1">Total sales revenue</p>
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-zinc-900 truncate">${{ formatNumber(totalRevenue) }}</p>
+            <p class="text-[10px] sm:text-xs text-zinc-500 mt-0.5 sm:mt-1 truncate">Total sales revenue</p>
           </div>
 
           <!-- Total Costs -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-receipt" class="w-4 h-4 text-blue-600" />
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-receipt" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
               </div>
-              <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Costs</span>
+              <span class="text-[10px] sm:text-xs font-medium text-blue-600 bg-blue-50 px-1.5 sm:px-2 py-0.5 rounded-full">Costs</span>
             </div>
-            <p class="text-xl md:text-2xl font-semibold text-zinc-900">${{ formatNumber(totalPOValue) }}</p>
-            <p class="text-xs text-zinc-500 mt-1">Purchase order costs</p>
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-zinc-900 truncate">${{ formatNumber(totalPOValue) }}</p>
+            <p class="text-[10px] sm:text-xs text-zinc-500 mt-0.5 sm:mt-1 truncate">Purchase order costs</p>
           </div>
 
           <!-- Net Profit -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-wallet" class="w-4 h-4 text-purple-600" />
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-purple-50 rounded-lg flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-wallet" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
               </div>
-              <span :class="['text-xs font-medium px-2 py-0.5 rounded-full', grossProfit >= 0 ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50']">
+              <span :class="['text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 rounded-full', grossProfit >= 0 ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50']">
                 {{ grossProfit >= 0 ? 'Profit' : 'Loss' }}
               </span>
             </div>
-            <p :class="['text-xl md:text-2xl font-semibold', grossProfit >= 0 ? 'text-emerald-600' : 'text-red-600']">
+            <p :class="['text-base sm:text-lg md:text-xl lg:text-2xl font-semibold truncate', grossProfit >= 0 ? 'text-emerald-600' : 'text-red-600']">
               {{ grossProfit >= 0 ? '' : '-' }}${{ formatNumber(Math.abs(grossProfit)) }}
             </p>
-            <p class="text-xs text-zinc-500 mt-1">{{ profitMargin }}% margin</p>
+            <p class="text-[10px] sm:text-xs text-zinc-500 mt-0.5 sm:mt-1 truncate">{{ profitMargin }}% margin</p>
           </div>
 
           <!-- Inventory Value -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-warehouse" class="w-4 h-4 text-amber-600" />
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-warehouse" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
               </div>
-              <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Inventory</span>
+              <span class="text-[10px] sm:text-xs font-medium text-amber-600 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-full">Inventory</span>
             </div>
-            <p class="text-xl md:text-2xl font-semibold text-zinc-900">${{ formatNumber(totalInventoryValue) }}</p>
-            <p class="text-xs text-zinc-500 mt-1">{{ formatNumber(totalStockUnits) }} units in stock</p>
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-zinc-900 truncate">${{ formatNumber(totalInventoryValue) }}</p>
+            <p class="text-[10px] sm:text-xs text-zinc-500 mt-0.5 sm:mt-1 truncate">{{ formatNumber(totalStockUnits) }} units</p>
           </div>
         </div>
 
@@ -701,7 +701,13 @@ onMounted(async () => {
 const handleExportExcel = () => {
   const { exportToExcel } = useExport();
   
+  // Format date range for display
+  const fromDate = dateRange.value.from ? new Date(dateRange.value.from).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'All time';
+  const toDate = dateRange.value.to ? new Date(dateRange.value.to).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Present';
+  const dateRangeText = dateRange.value.from || dateRange.value.to ? `${fromDate} - ${toDate}` : 'All time';
+  
   const analyticsData = [
+    { metric: 'Date Range', value: dateRangeText },
     { metric: 'Total Revenue', value: totalRevenue.value },
     { metric: 'Total PO Costs', value: totalPOValue.value },
     { metric: 'Gross Profit', value: grossProfit.value },
@@ -716,13 +722,27 @@ const handleExportExcel = () => {
     { header: 'Value', key: 'value', width: 15 },
   ];
   
-  exportToExcel(analyticsData, columns, 'analytics_summary');
+  exportToExcel(analyticsData, columns, 'analytics_summary', {
+    title: 'Analytics Summary',
+    summary: {
+      'Period': dateRangeText,
+      'Revenue': `$${formatNumber(totalRevenue.value)}`,
+      'Profit': `$${formatNumber(grossProfit.value)}`,
+      'Sales': filteredSales.value.length,
+    }
+  });
 };
 
 const handleExportPDF = () => {
   const { exportToPDF } = useExport();
   
+  // Format date range for display
+  const fromDate = dateRange.value.from ? new Date(dateRange.value.from).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'All time';
+  const toDate = dateRange.value.to ? new Date(dateRange.value.to).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Present';
+  const dateRangeText = dateRange.value.from || dateRange.value.to ? `${fromDate} - ${toDate}` : 'All time';
+  
   const analyticsData = [
+    { metric: 'Date Range', value: dateRangeText },
     { metric: 'Total Revenue', value: `$${formatNumber(totalRevenue.value)}` },
     { metric: 'Total PO Costs', value: `$${formatNumber(totalPOValue.value)}` },
     { metric: 'Gross Profit', value: `$${formatNumber(grossProfit.value)}` },
@@ -737,6 +757,13 @@ const handleExportPDF = () => {
     { header: 'Value', key: 'value' },
   ];
   
-  exportToPDF(analyticsData, columns, 'Analytics Report', 'analytics');
+  exportToPDF(analyticsData, columns, `Analytics Report (${dateRangeText})`, 'analytics', {
+    summary: {
+      'Period': dateRangeText,
+      'Revenue': `$${formatNumber(totalRevenue.value)}`,
+      'Profit': `$${formatNumber(grossProfit.value)}`,
+      'Sales': filteredSales.value.length,
+    }
+  });
 };
 </script>

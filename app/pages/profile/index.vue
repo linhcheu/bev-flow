@@ -3,8 +3,15 @@
     <div class="max-w-3xl mx-auto">
       <!-- Header -->
       <div class="mb-4 sm:mb-6 lg:mb-8">
-        <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Profile</h1>
-        <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500">Manage your account settings and preferences</p>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-user-circle" class="w-5 h-5 text-zinc-600" />
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Profile</h1>
+            <p class="text-xs sm:text-sm text-zinc-500">Manage your account settings and preferences</p>
+          </div>
+        </div>
       </div>
 
       <!-- Profile Content -->
@@ -28,8 +35,16 @@
             </div>
             <div class="flex-1">
               <h2 class="text-base sm:text-lg font-semibold text-zinc-900">{{ profile.name }}</h2>
-              <p class="text-xs sm:text-sm text-zinc-500 mb-2 sm:mb-3">{{ profile.role }}</p>
-              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 md:gap-4">
+              <span :class="[
+                'inline-flex items-center gap-1 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-md mb-2',
+                profile.role === 'System Administrator' ? 'bg-amber-100 text-amber-700' :
+                profile.role === 'Manager' ? 'bg-blue-100 text-blue-700' :
+                'bg-zinc-100 text-zinc-700'
+              ]">
+                <UIcon :name="profile.role === 'System Administrator' ? 'i-lucide-shield' : profile.role === 'Manager' ? 'i-lucide-briefcase' : 'i-lucide-user'" class="w-3 h-3" />
+                {{ profile.role }}
+              </span>
+              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 md:gap-4 mt-2">
                 <span class="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-zinc-500 bg-zinc-50 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md">
                   <UIcon name="i-lucide-shield-check" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500" />
                   Active
@@ -96,7 +111,12 @@
             </div>
             <div class="flex items-center justify-between py-1.5 sm:py-2">
               <span class="text-xs sm:text-sm text-zinc-500">Account Type</span>
-              <span class="text-xs sm:text-sm font-medium text-amber-600">Administrator</span>
+              <span :class="[
+                'text-xs sm:text-sm font-medium px-2 py-0.5 rounded-md',
+                profile.role === 'System Administrator' ? 'bg-amber-100 text-amber-700' :
+                profile.role === 'Manager' ? 'bg-blue-100 text-blue-700' :
+                'bg-zinc-100 text-zinc-700'
+              ]">{{ profile.role }}</span>
             </div>
           </div>
         </div>

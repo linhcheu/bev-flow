@@ -26,39 +26,48 @@ const db = new Database(dbPath);
 db.pragma('foreign_keys = ON');
 db.pragma('journal_mode = WAL');
 
-// Read and execute schema
-const schemaPath = join(rootDir, 'database', 'schema.sql');
-const schema = readFileSync(schemaPath, 'utf-8');
-
-console.log('📝 Executing schema...');
-
-try {
-  db.exec(schema);
-  console.log('✅ Database initialized successfully!');
-} catch (e) {
-  console.log('⚠️ Some errors occurred, trying statement by statement...');
+// Function to execute SQL file
+const executeSqlFile = (filePath: string, description: string) => {
+  console.log(`📝 Executing ${description}...`);
+  const sql = readFileSync(filePath, 'utf-8');
   
-  // Parse and execute statements
-  const lines = schema.split('\n');
-  let statement = '';
-  
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('--')) continue;
+  try {
+    db.exec(sql);
+    console.log(`✅ ${description} completed successfully!`);
+  } catch (e) {
+    console.log(`⚠️ Some errors in ${description}, trying statement by statement...`);
     
-    statement += line + '\n';
+    const lines = sql.split('\n');
+    let statement = '';
     
-    if (trimmed.endsWith(';')) {
-      try {
-        db.exec(statement);
-      } catch (err) {
-        console.warn('  ⚠️', (err as Error).message.substring(0, 80));
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('--')) continue;
+      
+      statement += line + '\n';
+      
+      if (trimmed.endsWith(';')) {
+        try {
+          db.exec(statement);
+        } catch (err) {
+          console.warn('  ⚠️', (err as Error).message.substring(0, 80));
+        }
+        statement = '';
       }
-      statement = '';
     }
+    
+    console.log(`✅ ${description} complete (with warnings)`);
   }
-  
-  console.log('✅ Database initialization complete (with warnings)');
+};
+
+// Execute schema
+const schemaPath = join(rootDir, 'database', 'schema.sql');
+executeSqlFile(schemaPath, 'Schema');
+
+// Execute seed data
+const seedPath = join(rootDir, 'database', 'seed-data.sql');
+if (existsSync(seedPath)) {
+  executeSqlFile(seedPath, 'Seed data');
 }
 
 // Verify tables
@@ -69,11 +78,28 @@ console.log('\n📋 Created tables:', tables.map((t: any) => t.name).join(', '))
 const userCount = db.prepare('SELECT COUNT(*) as count FROM Users').get() as { count: number };
 const productCount = db.prepare('SELECT COUNT(*) as count FROM Products').get() as { count: number };
 const supplierCount = db.prepare('SELECT COUNT(*) as count FROM Suppliers').get() as { count: number };
+const customerCount = db.prepare('SELECT COUNT(*) as count FROM Customers').get() as { count: number };
+const poCount = db.prepare('SELECT COUNT(*) as count FROM PurchaseOrders').get() as { count: number };
+const saleCount = db.prepare('SELECT COUNT(*) as count FROM Sales').get() as { count: number };
 
-console.log(`\n📊 Sample data loaded:
+console.log(`\n📊 Data loaded:
   - Users: ${userCount.count}
   - Products: ${productCount.count}
   - Suppliers: ${supplierCount.count}
+  - Customers: ${customerCount.count}
+  - Purchase Orders: ${poCount.count}
+  - Sales: ${saleCount.count}
+`);
+
+// Show test accounts
+console.log(`\n🔐 Test Accounts:
+  ┌─────────────────────────────────────────────────────────┐
+  │ Role                │ Email                │ Password   │
+  ├─────────────────────────────────────────────────────────┤
+  │ System Admin        │ admin@bevflow.com    │ admin123   │
+  │ Manager             │ manager@bevflow.com  │ manager123 │
+  │ Staff               │ staff@bevflow.com    │ staff123   │
+  └─────────────────────────────────────────────────────────┘
 `);
 
 db.close();

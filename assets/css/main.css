@@ -11,6 +11,8 @@
 /* ===== BASE STYLES ===== */
 html {
   color-scheme: light;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -19,10 +21,37 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff;
   color: #18181b;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 * {
   font-family: 'Inter', sans-serif;
+}
+
+/* Touch-friendly styling for mobile */
+@media (pointer: coarse) {
+  button, 
+  a, 
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: auto;
+    min-width: auto;
+  }
+}
+
+/* Prevent text size adjustment on orientation change */
+@media screen and (orientation: landscape) {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 }
 
 /* Custom Scrollbar */
@@ -176,6 +205,71 @@ body {
   transform: scale(0.95);
 }
 
+/* ===== ACTION BUTTON STYLES (View, Edit, Delete icons) ===== */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  color: #71717a;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+@media (min-width: 640px) {
+  .action-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0.375rem;
+  }
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.action-btn-view {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: #71717a;
+  transition: all 0.2s;
+}
+.action-btn-view:hover {
+  background-color: #fef3c7;
+  color: #d97706;
+  transform: translateY(-1px);
+}
+
+.action-btn-edit {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: #71717a;
+  transition: all 0.2s;
+}
+.action-btn-edit:hover {
+  background-color: #dbeafe;
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.action-btn-delete {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: #71717a;
+  transition: all 0.2s;
+}
+.action-btn-delete:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+  transform: translateY(-1px);
+}
+
 /* ===== INPUT STYLES ===== */
 .input {
   width: 100%;
@@ -224,6 +318,85 @@ body {
 .input:focus {
   border-color: #f59e0b !important;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Date Input Specific Styles - Make them look like clickable buttons */
+input[type="date"].input {
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  position: relative;
+}
+
+/* Date input wrapper button styling */
+.date-input-wrapper {
+  position: relative;
+  display: block;
+}
+
+.date-input-wrapper .date-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2.75rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 0.5rem 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  pointer-events: none;
+  transition: all 0.2s;
+}
+
+.date-input-wrapper:hover .date-btn {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.date-input-wrapper input[type="date"] {
+  padding-left: 3.5rem !important;
+}
+
+/* Fallback for inputs with group hover */
+.group:hover .date-btn-icon {
+  background-color: #fef3c7;
+}
+
+.group:hover .date-btn-icon .icon {
+  color: #d97706;
+}
+
+input[type="date"].input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s;
+  filter: invert(0.4);
+  padding: 6px;
+  border-radius: 4px;
+  margin-right: -4px;
+}
+
+input[type="date"].input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: rgba(245, 158, 11, 0.15);
+  filter: invert(0.35) sepia(1) saturate(20) hue-rotate(12deg);
+}
+
+.dark input[type="date"].input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
+.dark input[type="date"].input::-webkit-calendar-picker-indicator:hover {
+  filter: invert(0.9) sepia(1) saturate(15) hue-rotate(12deg);
+}
+
+/* Date input hover state for better mobile UX */
+input[type="date"].input:hover,
+input[type="date"].input:focus {
+  border-color: #f59e0b !important;
+  background-color: #fffbeb !important;
 }
 
 .input-label {
@@ -524,4 +697,384 @@ body {
 
 .dark .page-subtitle {
   color: #a1a1aa;
+}
+/* ===== LOGIN PAGE STYLES ===== */
+.login-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  background-color: #ffffff;
+}
+
+.login-branding {
+  display: none;
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid #e4e4e7;
+}
+
+@media (min-width: 1024px) {
+  .login-branding {
+    display: flex;
+    width: 45%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .login-branding {
+    width: 50%;
+  }
+}
+
+.login-form-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: #ffffff;
+}
+
+@media (min-width: 640px) {
+  .login-form-container {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .login-form-container {
+    padding: 3rem;
+  }
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 360px;
+}
+
+@media (min-width: 640px) {
+  .login-form-wrapper {
+    max-width: 400px;
+  }
+}
+
+.login-mobile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .login-mobile-header {
+    margin-bottom: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .login-mobile-header {
+    display: none;
+  }
+}
+
+.login-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #d4d4d8;
+  border-radius: 0.5rem;
+  color: #18181b;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .login-input {
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+  }
+}
+
+.login-input::placeholder {
+  color: #a1a1aa;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.login-input:hover:not(:focus) {
+  border-color: #a1a1aa;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: #f59e0b;
+  color: #18181b;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .login-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9375rem;
+  }
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #d97706;
+}
+
+.login-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+}
+
+.login-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== RESPONSIVE UTILITIES ===== */
+@media (max-width: 359px) {
+  .login-form-wrapper {
+    max-width: 100%;
+  }
+  
+  .login-input {
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+}
+
+/* Safe area support for mobile */
+@supports (padding: max(0px)) {
+  .login-container {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Tablet landscape optimizations */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+  .login-form-container {
+    padding: 1.5rem 3rem;
+  }
+  
+  .login-mobile-header {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* iPad specific */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .login-form-wrapper {
+    max-width: 420px;
+  }
+}
+
+/* ===== GLOBAL RESPONSIVE ENHANCEMENTS ===== */
+
+/* Container max-widths for different screen sizes */
+.container-responsive {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Better button touch targets on mobile */
+@media (max-width: 640px) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .btn-ghost {
+    min-height: 44px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+}
+
+/* Better form inputs on mobile */
+@media (max-width: 640px) {
+  .input,
+  .select {
+    min-height: 44px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* Smooth transitions for responsive layouts */
+@media (prefers-reduced-motion: no-preference) {
+  .smooth-resize {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Better focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+/* Card responsive adjustments */
+@media (max-width: 640px) {
+  .card {
+    border-radius: 0.5rem;
+  }
+}
+
+/* Table responsive wrapper */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Full-width on small screens */
+@media (max-width: 640px) {
+  .full-width-mobile {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Stack elements on mobile */
+@media (max-width: 640px) {
+  .stack-mobile {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .stack-mobile > * {
+    width: 100%;
+  }
+}
+
+/* Text truncation utility */
+.truncate-responsive {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .truncate-responsive {
+    white-space: normal;
+    text-overflow: clip;
+    overflow: visible;
+  }
+}
+
+/* Padding adjustments for different devices */
+@media (max-width: 375px) {
+  .p-responsive {
+    padding: 0.5rem !important;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 640px) {
+  .p-responsive {
+    padding: 0.75rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .p-responsive {
+    padding: 1rem !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .p-responsive {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Gap adjustments for grids */
+@media (max-width: 640px) {
+  .gap-responsive {
+    gap: 0.5rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .gap-responsive {
+    gap: 0.75rem !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .gap-responsive {
+    gap: 1rem !important;
+  }
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    background-color: white !important;
+  }
+  
+  .card {
+    border: 1px solid #e4e4e7 !important;
+    box-shadow: none !important;
+  }
 }

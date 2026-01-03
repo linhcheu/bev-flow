@@ -1,6 +1,6 @@
 <template>
   <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-zinc-50">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-5xl mx-auto">
       <!-- Back Button & Actions -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
         <NuxtLink 

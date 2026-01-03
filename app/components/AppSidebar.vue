@@ -33,43 +33,55 @@
       <div class="space-y-1">
         <p v-if="isExpanded" class="px-3 mb-2 text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Menu</p>
         
-        <NuxtLink 
-          v-for="item in mainMenuItems" 
-          :key="item.path"
-          :to="item.path" 
-          :class="[
-            'flex items-center gap-3 px-3 py-2 rounded-lg text-sm no-underline transition-colors',
-            isActive(item.path) 
-              ? 'bg-zinc-100 text-zinc-900 font-medium' 
-              : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50',
-            !isExpanded && 'justify-center'
-          ]"
-          :title="!isExpanded ? item.label : undefined"
-          @click="closeMobileSidebar"
-        >
-          <UIcon 
-            :name="item.icon" 
-            :class="['w-[18px] h-[18px] shrink-0', isActive(item.path) ? 'text-zinc-700' : 'text-zinc-400']" 
-          />
-          <span v-if="isExpanded">{{ item.label }}</span>
-        </NuxtLink>
+        <template v-for="item in mainMenuItems" :key="item.path">
+          <NuxtLink 
+            v-if="!item.requiresPermission || canAccess(item.requiresPermission)"
+            :to="item.path" 
+            :class="[
+              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm no-underline transition-colors',
+              isActive(item.path) 
+                ? 'bg-zinc-100 text-zinc-900 font-medium' 
+                : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50',
+              !isExpanded && 'justify-center'
+            ]"
+            :title="!isExpanded ? item.label : undefined"
+            @click="closeMobileSidebar"
+          >
+            <UIcon 
+              :name="item.icon" 
+              :class="['w-[18px] h-[18px] shrink-0', isActive(item.path) ? 'text-zinc-700' : 'text-zinc-400']" 
+            />
+            <span v-if="isExpanded">{{ item.label }}</span>
+          </NuxtLink>
+        </template>
       </div>
     </nav>
     
     <!-- Bottom Section -->
-    <div class="px-3 py-4 border-t border-zinc-100 space-y-2">
-      <!-- Expand/Collapse Toggle (Desktop) -->
+    <div class="px-3 py-4 border-t border-zinc-100 space-y-3">
+      <!-- Expand/Collapse Toggle (Desktop) - Gen Z Aesthetic -->
       <button 
         @click="toggleSidebar"
         :class="[
-          'hidden lg:flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-          'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50',
+          'hidden lg:flex w-full items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-300',
+          'group relative overflow-hidden',
+          isExpanded 
+            ? 'bg-gradient-to-r from-zinc-100 to-zinc-50 hover:from-zinc-200 hover:to-zinc-100' 
+            : 'bg-zinc-100 hover:bg-zinc-200',
           !isExpanded && 'justify-center'
         ]"
         :title="isExpanded ? 'Collapse sidebar' : 'Expand sidebar'"
       >
-        <UIcon :name="isExpanded ? 'i-lucide-panel-left-close' : 'i-lucide-panel-left-open'" class="w-[18px] h-[18px]" />
-        <span v-if="isExpanded" class="text-xs">{{ isExpanded ? 'Collapse' : 'Expand' }}</span>
+        <div :class="[
+          'w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300',
+          'bg-white shadow-sm group-hover:shadow group-hover:scale-105',
+          isExpanded ? 'rotate-0' : 'rotate-180'
+        ]">
+          <UIcon name="i-lucide-chevron-left" class="w-4 h-4 text-zinc-600" />
+        </div>
+        <span v-if="isExpanded" class="text-xs font-medium text-zinc-600 group-hover:text-zinc-800 transition-colors">
+          Minimize
+        </span>
       </button>
       
       <!-- User Section -->
@@ -103,11 +115,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-
 const route = useRoute();
 const router = useRouter();
 const { isExpanded, isMobileOpen, toggleSidebar, closeMobileSidebar } = useSidebar();
+const { permissions, fetchUserRole, canAccess } = usePermissions();
 
 // User data
 const userName = ref('Admin');
@@ -116,6 +127,7 @@ const userEmail = ref('admin@bevflow.com');
 interface ProfileData {
   name: string;
   email: string;
+  role: string;
 }
 
 // Fetch user profile
@@ -131,16 +143,31 @@ const fetchUserProfile = async () => {
 
 onMounted(() => {
   fetchUserProfile();
+  fetchUserRole();
 });
 
-const mainMenuItems = [
+// Permission keys for menu items
+type PermissionKey = 'canManageUsers' | 'canChangeRoles' | 'canBackupRestore' | 'canForecast' | 
+  'canManageProducts' | 'canManageSales' | 'canManagePurchaseOrders' | 'canManageSuppliers' | 
+  'canViewAnalytics' | 'canExportData';
+
+interface MenuItem {
+  path: string;
+  label: string;
+  icon: string;
+  requiresPermission?: PermissionKey;
+}
+
+const mainMenuItems: MenuItem[] = [
   { path: '/', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },
   { path: '/analytics', label: 'Analytics', icon: 'i-lucide-bar-chart-2' },
   { path: '/products', label: 'Products', icon: 'i-lucide-package' },
   { path: '/suppliers', label: 'Suppliers', icon: 'i-lucide-building-2' },
   { path: '/purchase-orders', label: 'Orders', icon: 'i-lucide-clipboard-list' },
   { path: '/sales', label: 'Sales', icon: 'i-lucide-receipt' },
-  { path: '/forecasts', label: 'Forecasts', icon: 'i-lucide-trending-up' },
+  { path: '/forecasts', label: 'Forecasts', icon: 'i-lucide-trending-up', requiresPermission: 'canForecast' },
+  { path: '/users', label: 'Users', icon: 'i-lucide-users', requiresPermission: 'canManageUsers' },
+  { path: '/backup', label: 'Backup', icon: 'i-lucide-database', requiresPermission: 'canBackupRestore' },
   { path: '/profile', label: 'Profile', icon: 'i-lucide-user-circle' },
 ];
 
