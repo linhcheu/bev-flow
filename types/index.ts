@@ -106,8 +106,11 @@ export interface Sale {
   quantity?: number;
   items?: SaleItem[];
   subtotal?: number;
+  discount_percent?: number;
   discount_amount?: number;
   total_amount?: number;
+  payment_method?: string;
+  status?: string;
   notes?: string;
   created_at?: string;
 }
@@ -250,7 +253,9 @@ export interface SaleFormData {
   customer_name?: string;
   sale_date: string;
   items: SaleItemFormData[];
+  discount_percent?: number;
   discount_amount?: number;
+  payment_method?: string;
   notes?: string;
 }
 
