@@ -172,63 +172,61 @@ INSERT INTO purchaseorders (po_number, supplier_id, order_date, eta_date, subtot
 
 -- ==============================================
 -- PURCHASE ORDER ITEMS (Sample - first 50)
+-- Each PO's items must match the supplier's products
 -- ==============================================
 INSERT INTO purchaseorderitems (po_id, product_id, quantity, unit_cost, amount) VALUES
-(1, 6, 80, 15.00, 1200.00),
-(1, 15, 50, 13.50, 675.00),
-(1, 7, 120, 16.50, 1980.00),
--- PO-2: Supplier 2 (Mean Mean) - Products 2,3,4
-(2, 2, 70, 12.00, 840.00),
--- PO-3: Supplier 5 (Mesa Saang) - Product 10
-(3, 10, 130, 28.00, 3640.00),
-(3, 10, 90, 28.00, 2520.00),
--- PO-4: Supplier 3 (AMK) - Product 5
-(4, 5, 120, 15.00, 1800.00),
-(4, 5, 50, 15.00, 750.00),
--- PO-5: Supplier 4 (Jae Ka) - Products 6,7,8,9
-(5, 6, 50, 18.00, 900.00),
-(5, 8, 80, 24.00, 1920.00),
--- PO-6: Supplier 2 (Mean Mean) - Products 2,3,4
-(6, 2, 90, 12.00, 1080.00),
-(6, 3, 60, 14.00, 840.00),
-(6, 4, 110, 20.00, 2200.00),
--- PO-7: Supplier 1 (Bou Yong) - Product 1
-(7, 1, 100, 25.00, 2500.00),
--- PO-8: Supplier 4 (Jae Ka) - Products 6,7,8,9
-(8, 9, 90, 26.00, 2340.00),
--- PO-9: Supplier 5 (Mesa Saang) - Product 10
-(9, 10, 60, 28.00, 1680.00),
--- PO-10: Supplier 5 (Mesa Saang) - Product 10
-(10, 10, 100, 28.00, 2800.00),
-(10, 10, 130, 28.00, 3640.00),
--- PO-11: Supplier 1 (Bou Yong) - Product 1
-(11, 1, 100, 25.00, 2500.00),
--- PO-12: Supplier 2 (Mean Mean) - Products 2,3,4
-(12, 2, 130, 12.00, 1560.00),
-(12, 3, 65, 14.00, 910.00),
--- PO-13: Supplier 3 (AMK) - Product 5
-(13, 5, 180, 15.00, 2700.00),
-(13, 5, 175, 15.00, 2625.00),
--- PO-14: Supplier 4 (Jae Ka) - Products 6,7,8,9
-(14, 6, 90, 18.00, 1620.00),
-(14, 7, 80, 22.00, 1760.00),
-(14, 8, 20, 24.00, 480.00),
-(14, 9, 10, 26.00, 260.00);
+-- PO-1: Supplier 3 (AMK) - Product 5 only
+(1, 5, 257, 15.00, 3855.00),
+-- PO-2: Supplier 5 (Mesa Saang) - Product 10
+(2, 10, 26, 28.00, 735.00),
+-- PO-3: Supplier 4 (Jae Ka) - Products 6,7,8,9
+(3, 6, 100, 18.00, 1800.00),
+(3, 7, 60, 22.00, 1320.00),
+(3, 8, 35, 24.00, 840.00),
+-- PO-4: Supplier 5 (Mesa Saang) - Product 10
+(4, 10, 85, 28.00, 2380.00),
+-- PO-5: Supplier 2 (Mean Mean) - Products 2,3,4
+(5, 2, 100, 12.00, 1200.00),
+(5, 3, 70, 14.00, 980.00),
+(5, 4, 29, 20.00, 580.00),
+-- PO-6: Supplier 5 (Mesa Saang) - Product 10
+(6, 10, 111, 28.00, 3115.00),
+-- PO-7: Supplier 3 (AMK) - Product 5
+(7, 5, 108, 15.00, 1620.00),
+-- PO-8: Supplier 2 (Mean Mean) - Products 2,3,4
+(8, 2, 80, 12.00, 960.00),
+(8, 3, 60, 14.00, 840.00),
+-- PO-9: Supplier 4 (Jae Ka) - Products 6,7,8,9
+(9, 6, 60, 18.00, 1080.00),
+-- PO-10: Supplier 4 (Jae Ka) - Products 6,7,8,9
+(10, 6, 150, 18.00, 2700.00),
+(10, 7, 100, 22.00, 2200.00),
+(10, 8, 50, 24.00, 1200.00),
+-- PO-11: Supplier 4 (Jae Ka) - Products 6,7,8,9
+(11, 7, 80, 22.00, 1760.00),
+(11, 9, 30, 26.00, 780.00),
+-- PO-12: Supplier 5 (Mesa Saang) - Product 10
+(12, 10, 81, 28.00, 2275.00),
+-- PO-13: Supplier 5 (Mesa Saang) - Product 10
+(13, 10, 155, 28.00, 4340.00),
+-- PO-14: Supplier 3 (AMK) - Product 5
+(14, 5, 207, 15.00, 3110.00);
 
 -- ==============================================
 -- FORECASTS (Updated for 10 products)
+-- Schema v2: predicted_demand, confidence_score, recommended_order
 -- ==============================================
-INSERT INTO forecasts (product_id, forecast_date, predicted_quantity, confidence_level, notes) VALUES
-(1, '2026-01-15', 85, 0.78, 'ABC Extra Stout - Based on 12-month trend analysis'),
-(2, '2026-01-15', 150, 0.92, 'Anchor Beer - High volume, consistent demand'),
-(3, '2026-01-15', 95, 0.81, 'Anchor Smooth - Growing preference'),
-(4, '2026-01-15', 70, 0.75, 'Anchor Bottle - Moderate demand'),
-(5, '2026-01-15', 180, 0.85, 'Cambodia Lite - Strong demand'),
-(6, '2026-01-15', 200, 0.88, 'Tiger Lager Can - Top seller'),
-(7, '2026-01-15', 180, 0.86, 'Tiger Crystal - Premium segment'),
-(8, '2026-01-15', 90, 0.79, 'Tiger Lager Bottle - Steady'),
-(9, '2026-01-15', 85, 0.77, 'Tiger Crystal Bottle - Premium'),
-(10, '2026-01-15', 60, 0.73, 'Heineken Bottle - Niche premium');
+INSERT INTO forecasts (product_id, forecast_date, predicted_demand, confidence_score, recommended_order, notes) VALUES
+(1, '2026-01-15', 85, 0.78, 20, 'ABC Extra Stout - Based on 12-month trend analysis'),
+(2, '2026-01-15', 150, 0.92, 50, 'Anchor Beer - High volume, consistent demand'),
+(3, '2026-01-15', 95, 0.81, 30, 'Anchor Smooth - Growing preference'),
+(4, '2026-01-15', 70, 0.75, 20, 'Anchor Bottle - Moderate demand'),
+(5, '2026-01-15', 180, 0.85, 80, 'Cambodia Lite - Strong demand'),
+(6, '2026-01-15', 200, 0.88, 100, 'Tiger Lager Can - Top seller'),
+(7, '2026-01-15', 180, 0.86, 80, 'Tiger Crystal - Premium segment'),
+(8, '2026-01-15', 90, 0.79, 30, 'Tiger Lager Bottle - Steady'),
+(9, '2026-01-15', 85, 0.77, 25, 'Tiger Crystal Bottle - Premium'),
+(10, '2026-01-15', 60, 0.73, 15, 'Heineken Bottle - Niche premium');
 
 -- ==============================================
 -- SALES DATA NOTE
@@ -239,18 +237,19 @@ INSERT INTO forecasts (product_id, forecast_date, predicted_quantity, confidence
 -- 2. Use pg_dump/pg_restore for full migration
 -- 3. Run a script to insert in batches
 --
--- Sample sales for testing (10 records) - Updated product IDs
-INSERT INTO sales (invoice_number, customer_id, customer_name, sale_date, product_id, unit_price, quantity, total_amount, notes) VALUES
-('INV-0001', 1, 'Walk-in Customer', '2025-01-05', 2, 55.00, 5, 275.00, NULL),
-('INV-0002', 2, 'VIP Room 1', '2025-01-05', 6, 65.00, 3, 195.00, NULL),
-('INV-0003', 1, 'Walk-in Customer', '2025-01-06', 2, 55.00, 10, 550.00, NULL),
-('INV-0004', 3, 'VIP Room 2', '2025-01-06', 7, 69.00, 4, 276.00, NULL),
-('INV-0005', 4, 'Mr. Vichet', '2025-01-07', 5, 59.00, 8, 472.00, NULL),
-('INV-0006', 1, 'Walk-in Customer', '2025-01-07', 2, 55.00, 12, 660.00, NULL),
-('INV-0007', 5, 'Ms. Sreyleak', '2025-01-08', 6, 65.00, 5, 325.00, 'Birthday party'),
-('INV-0008', 1, 'Walk-in Customer', '2025-01-08', 1, 85.00, 6, 510.00, NULL),
-('INV-0009', 6, 'Mr. Bunna', '2025-01-09', 2, 55.00, 20, 1100.00, 'Corporate event'),
-('INV-0010', 1, 'Walk-in Customer', '2025-01-09', 5, 59.00, 4, 236.00, NULL);
+-- Sample sales for testing (10 records) - Schema v2 format
+-- sale_number (not invoice_number), no product_id/quantity/unit_price in sales table
+INSERT INTO sales (sale_number, customer_id, sale_date, subtotal, discount_percent, discount_amount, total_amount, payment_method, status, notes) VALUES
+('SALE-0001', 1, '2025-01-05', 275.00, 0, 0, 275.00, 'Cash', 'Completed', NULL),
+('SALE-0002', 2, '2025-01-05', 195.00, 0, 0, 195.00, 'Cash', 'Completed', NULL),
+('SALE-0003', 1, '2025-01-06', 550.00, 0, 0, 550.00, 'Cash', 'Completed', NULL),
+('SALE-0004', 3, '2025-01-06', 276.00, 0, 0, 276.00, 'Cash', 'Completed', NULL),
+('SALE-0005', 4, '2025-01-07', 472.00, 0, 0, 472.00, 'Cash', 'Completed', NULL),
+('SALE-0006', 1, '2025-01-07', 660.00, 0, 0, 660.00, 'Cash', 'Completed', NULL),
+('SALE-0007', 5, '2025-01-08', 325.00, 0, 0, 325.00, 'Cash', 'Completed', 'Birthday party'),
+('SALE-0008', 1, '2025-01-08', 510.00, 0, 0, 510.00, 'Cash', 'Completed', NULL),
+('SALE-0009', 6, '2025-01-09', 1100.00, 0, 0, 1100.00, 'Cash', 'Completed', 'Corporate event'),
+('SALE-0010', 1, '2025-01-09', 236.00, 0, 0, 236.00, 'Cash', 'Completed', NULL);
 
 -- Sample sale items - Updated product IDs and prices
 INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
@@ -266,7 +265,7 @@ INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (10, 5, 4, 59.00, 236.00);
 
 -- ==============================================
--- DONE!
+-- DONE! (Compatible with supabase-schema-v2.sql)
 -- ==============================================
 -- After running this, your Supabase database will have:
 -- ✅ 3 users (admin, manager, staff)
@@ -275,8 +274,12 @@ INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 -- ✅ 7 customers
 -- ✅ 84 purchase orders (with promotion_text column)
 -- ✅ Sample PO items (linked to correct products per supplier)
--- ✅ 10 forecasts
--- ✅ 10 sample sales (for testing)
+-- ✅ 10 forecasts (using predicted_demand, confidence_score, recommended_order)
+-- ✅ 10 sample sales (using sale_number, with items in saleitems table)
+--
+-- Schema v2 changes applied:
+-- - Sales: sale_number (not invoice_number), items in saleitems table
+-- - Forecasts: predicted_demand, confidence_score, recommended_order
 --
 -- Supplier-Product mapping:
 -- Supplier 1 (Depo Bou Yong): A001 (ABC Extra Stout)
