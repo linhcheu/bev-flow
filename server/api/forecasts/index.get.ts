@@ -65,15 +65,15 @@ export default defineEventHandler(async () => {
         const forecastDate = new Date(today);
         forecastDate.setDate(today.getDate() + daysAhead);
         
-        const predictedQuantity = Math.round(10 + Math.random() * 20);
-        const confidence = Number((0.7 + Math.random() * 0.2).toFixed(2));
+        const predictedDemand = Math.round(10 + Math.random() * 20);
+        const confidenceScore = Number((0.7 + Math.random() * 0.2).toFixed(2));
         
         forecasts.push({
           forecast_id: index * 4 + intervalIndex + 1,
           product_id: product.product_id,
           forecast_date: forecastDate.toISOString().split('T')[0],
-          predicted_quantity: predictedQuantity,
-          confidence_level: confidence,
+          predicted_demand: predictedDemand,
+          confidence_score: confidenceScore,
           product: {
             product_id: product.product_id,
             product_name: product.product_name,
@@ -150,19 +150,19 @@ export default defineEventHandler(async () => {
       const baseQuantity = Math.round(product.avg_quantity || 10);
       const variance = Math.random() * 0.3 - 0.15; // -15% to +15% variance
       const growthFactor = 1 + (intervalIndex * 0.05); // Slight growth over time
-      const predictedQuantity = Math.round(baseQuantity * (1 + variance) * growthFactor);
+      const predictedDemand = Math.round(baseQuantity * (1 + variance) * growthFactor);
       
       // Calculate confidence based on sales history
       const baseConfidence = product.sales_count > 10 ? 0.9 : product.sales_count > 5 ? 0.8 : 0.7;
       const confidenceVariance = Math.random() * 0.1 - 0.05;
-      const confidence = Math.min(0.98, Math.max(0.65, baseConfidence + confidenceVariance));
+      const confidenceScore = Math.min(0.98, Math.max(0.65, baseConfidence + confidenceVariance));
       
       forecasts.push({
         forecast_id: index * 4 + intervalIndex + 1,
         product_id: product.product_id,
         forecast_date: forecastDate.toISOString().split('T')[0],
-        predicted_quantity: predictedQuantity,
-        confidence_level: Number(confidence.toFixed(2)),
+        predicted_demand: predictedDemand,
+        confidence_score: Number(confidenceScore.toFixed(2)),
         product: {
           product_id: product.product_id,
           product_name: product.product_name,

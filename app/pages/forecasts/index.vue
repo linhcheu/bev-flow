@@ -143,7 +143,7 @@
               <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex-1 min-w-0">
                   <h3 class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ forecast.product?.product_name }}</h3>
-                  <p class="text-xs text-zinc-500 mt-0.5">{{ formatPeriod(forecast.forecast_period) }}</p>
+                  <p class="text-xs text-zinc-500 mt-0.5">{{ formatPeriod(forecast.forecast_date) }}</p>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
                   <button 
@@ -165,12 +165,12 @@
               <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="bg-white rounded-lg p-2">
                   <p class="text-[10px] text-zinc-500 mb-0.5">Predicted</p>
-                  <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ forecast.predicted_quantity }}</p>
+                  <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ forecast.predicted_demand }}</p>
                 </div>
                 <div class="bg-white rounded-lg p-2">
                   <p class="text-[10px] text-zinc-500 mb-0.5">Confidence</p>
                   <p :class="['text-xs sm:text-sm font-medium', getConfidenceColor(forecast.confidence_score)]">
-                    {{ forecast.confidence_score }}%
+                    {{ Math.round((forecast.confidence_score || 0) * 100) }}%
                   </p>
                 </div>
                 <div class="bg-white rounded-lg p-2">
@@ -242,13 +242,13 @@
                     <p class="text-xs text-zinc-500">{{ forecast.product?.sku }}</p>
                   </div>
                 </td>
-                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatPeriod(forecast.forecast_period) }}</td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatPeriod(forecast.forecast_date) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-center">
-                  <span class="text-sm font-medium text-zinc-900">{{ forecast.predicted_quantity }}</span>
+                  <span class="text-sm font-medium text-zinc-900">{{ forecast.predicted_demand }}</span>
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-center">
                   <span :class="['inline-flex items-center px-2 py-0.5 rounded text-xs font-medium', getConfidenceBadge(forecast.confidence_score)]">
-                    {{ forecast.confidence_score }}%
+                    {{ Math.round((forecast.confidence_score || 0) * 100) }}%
                   </span>
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-center text-sm text-zinc-600">{{ forecast.product?.current_stock || 0 }}</td>
@@ -336,7 +336,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <h2 class="text-lg font-semibold text-zinc-900">AI Sales Forecast</h2>
-                <p class="text-sm text-zinc-500">{{ formatPeriod(selectedForecast?.forecast_period) }}</p>
+                <p class="text-sm text-zinc-500">{{ formatPeriod(selectedForecast?.forecast_date) }}</p>
               </div>
               <button 
                 @click="closeViewModal" 
@@ -356,12 +356,12 @@
             <!-- Stats Grid -->
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div class="bg-amber-50 rounded-lg p-4 text-center">
-                <p class="text-xs text-amber-600 mb-1">Predicted Quantity</p>
-                <p class="text-2xl font-bold text-amber-700">{{ selectedForecast?.predicted_quantity }}</p>
+                <p class="text-xs text-amber-600 mb-1">Predicted Demand</p>
+                <p class="text-2xl font-bold text-amber-700">{{ selectedForecast?.predicted_demand }}</p>
               </div>
               <div class="bg-blue-50 rounded-lg p-4 text-center">
                 <p class="text-xs text-blue-600 mb-1">Confidence Score</p>
-                <p class="text-2xl font-bold text-blue-700">{{ selectedForecast?.confidence_score }}%</p>
+                <p class="text-2xl font-bold text-blue-700">{{ Math.round((selectedForecast?.confidence_score || 0) * 100) }}%</p>
               </div>
               <div class="bg-zinc-50 rounded-lg p-4 text-center">
                 <p class="text-xs text-zinc-500 mb-1">Current Stock</p>
@@ -430,11 +430,11 @@ const confidenceFilter = ref('all');
 const sortBy = ref('period-desc');
 const generating = ref(false);
 
-// Get available periods
+// Get available periods (dates)
 const availablePeriods = computed(() => {
   const periods = new Set<string>();
   forecasts.value.forEach(f => {
-    if (f.forecast_period) periods.add(f.forecast_period);
+    if (f.forecast_date) periods.add(f.forecast_date);
   });
   return Array.from(periods).sort().reverse();
 });
@@ -455,13 +455,13 @@ const filteredForecasts = computed(() => {
   
   // Period filter
   if (periodFilter.value !== 'all') {
-    result = result.filter(f => f.forecast_period === periodFilter.value);
+    result = result.filter(f => f.forecast_date === periodFilter.value);
   }
   
-  // Confidence filter
+  // Confidence filter (now uses 0-1 scale)
   if (confidenceFilter.value !== 'all') {
     result = result.filter(f => {
-      const score = f.confidence_score || 0;
+      const score = (f.confidence_score || 0) * 100; // Convert to percentage for comparison
       switch (confidenceFilter.value) {
         case 'high': return score > 80;
         case 'medium': return score >= 50 && score <= 80;
@@ -474,10 +474,10 @@ const filteredForecasts = computed(() => {
   // Sorting
   result.sort((a, b) => {
     switch (sortBy.value) {
-      case 'period-asc': return (a.forecast_period || '').localeCompare(b.forecast_period || '');
-      case 'period-desc': return (b.forecast_period || '').localeCompare(a.forecast_period || '');
-      case 'qty-asc': return (a.predicted_quantity || 0) - (b.predicted_quantity || 0);
-      case 'qty-desc': return (b.predicted_quantity || 0) - (a.predicted_quantity || 0);
+      case 'period-asc': return (a.forecast_date || '').localeCompare(b.forecast_date || '');
+      case 'period-desc': return (b.forecast_date || '').localeCompare(a.forecast_date || '');
+      case 'qty-asc': return (a.predicted_demand || 0) - (b.predicted_demand || 0);
+      case 'qty-desc': return (b.predicted_demand || 0) - (a.predicted_demand || 0);
       case 'confidence-desc': return (b.confidence_score || 0) - (a.confidence_score || 0);
       default: return 0;
     }
@@ -507,17 +507,17 @@ onMounted(async () => {
 });
 
 const totalPredictedQty = computed(() => {
-  return forecasts.value.reduce((sum, f) => sum + (f.predicted_quantity || 0), 0);
+  return forecasts.value.reduce((sum, f) => sum + (f.predicted_demand || 0), 0);
 });
 
 const avgConfidence = computed(() => {
   if (forecasts.value.length === 0) return 0;
   const total = forecasts.value.reduce((sum, f) => sum + (f.confidence_score || 0), 0);
-  return Math.round(total / forecasts.value.length);
+  return Math.round((total / forecasts.value.length) * 100);
 });
 
 const uniquePeriods = computed(() => {
-  return new Set(forecasts.value.map(f => f.forecast_period)).size;
+  return new Set(forecasts.value.map(f => f.forecast_date)).size;
 });
 
 const formatPeriod = (period?: string) => {
@@ -532,21 +532,23 @@ const formatPeriod = (period?: string) => {
 
 const getConfidenceColor = (score?: number) => {
   if (!score) return 'text-zinc-600';
-  if (score > 80) return 'text-emerald-600';
-  if (score >= 50) return 'text-amber-600';
+  const percent = score * 100; // Convert from 0-1 to 0-100
+  if (percent > 80) return 'text-emerald-600';
+  if (percent >= 50) return 'text-amber-600';
   return 'text-red-600';
 };
 
 const getConfidenceBadge = (score?: number) => {
   if (!score) return 'bg-zinc-50 text-zinc-700';
-  if (score > 80) return 'bg-emerald-50 text-emerald-700';
-  if (score >= 50) return 'bg-amber-50 text-amber-700';
+  const percent = score * 100; // Convert from 0-1 to 0-100
+  if (percent > 80) return 'bg-emerald-50 text-emerald-700';
+  if (percent >= 50) return 'bg-amber-50 text-amber-700';
   return 'bg-red-50 text-red-700';
 };
 
 const needsRestock = (forecast: Forecast) => {
   const currentStock = forecast.product?.current_stock || 0;
-  const predicted = forecast.predicted_quantity || 0;
+  const predicted = forecast.predicted_demand || 0;
   return currentStock < predicted;
 };
 
@@ -555,7 +557,7 @@ const generateForecasts = async () => {
   try {
     const now = new Date();
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    const period = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}`;
+    const forecastDate = nextMonth.toISOString().split('T')[0];
     
     for (const product of products.value) {
       const predictedQty = Math.floor(Math.random() * 100) + 20;
@@ -563,9 +565,9 @@ const generateForecasts = async () => {
       
       await createForecast({
         product_id: product.product_id!,
-        forecast_period: period,
-        predicted_quantity: predictedQty,
-        confidence_score: confidence,
+        forecast_date: forecastDate,
+        predicted_demand: predictedQty,
+        confidence_score: confidence / 100,
       });
     }
     
@@ -600,12 +602,13 @@ const closeViewModal = () => {
 const getRecommendation = (forecast: Forecast) => {
   if (!forecast) return '';
   const currentStock = forecast.product?.current_stock || 0;
-  const predicted = forecast.predicted_quantity || 0;
+  const predicted = forecast.predicted_demand || 0;
   const minLevel = forecast.product?.min_stock_level || 10;
+  const confidencePercent = Math.round((forecast.confidence_score || 0) * 100);
   
   if (predicted > currentStock) {
     const reorderQty = predicted - currentStock + minLevel;
-    return `Based on the ${forecast.confidence_score}% confidence forecast, consider ordering ${reorderQty} units to meet predicted demand and maintain safety stock.`;
+    return `Based on the ${confidencePercent}% confidence forecast, consider ordering ${reorderQty} units to meet predicted demand and maintain safety stock.`;
   }
   return `Current stock levels appear sufficient. Monitor sales trends and re-forecast before the period ends.`;
 };
@@ -620,9 +623,9 @@ const handleExportExcel = () => {
   const { exportToExcel } = useExport();
   const columns = [
     { header: 'Product', key: 'product_name', width: 25 },
-    { header: 'Forecast Period', key: 'forecast_period', width: 15 },
-    { header: 'Predicted Qty', key: 'predicted_quantity', width: 15 },
-    { header: 'Confidence %', key: 'confidence_score', width: 12 },
+    { header: 'Forecast Date', key: 'forecast_date', width: 15 },
+    { header: 'Predicted Demand', key: 'predicted_demand', width: 15 },
+    { header: 'Confidence %', key: 'confidence_percent', width: 12 },
     { header: 'Current Stock', key: 'current_stock', width: 12 },
     { header: 'Needs Restock', key: 'needs_restock', width: 12 },
   ];
@@ -631,6 +634,7 @@ const handleExportExcel = () => {
     ...f,
     product_name: f.product?.product_name || 'N/A',
     current_stock: f.product?.current_stock || 0,
+    confidence_percent: Math.round((f.confidence_score || 0) * 100),
     needs_restock: needsRestock(f) ? 'Yes' : 'No',
   }));
   
@@ -641,9 +645,9 @@ const handleExportPDF = () => {
   const { exportToPDF } = useExport();
   const columns = [
     { header: 'Product', key: 'product_name' },
-    { header: 'Period', key: 'forecast_period' },
-    { header: 'Predicted', key: 'predicted_quantity' },
-    { header: 'Confidence', key: 'confidence_score' },
+    { header: 'Date', key: 'forecast_date' },
+    { header: 'Predicted', key: 'predicted_demand' },
+    { header: 'Confidence', key: 'confidence_percent' },
     { header: 'Stock', key: 'current_stock' },
   ];
   
@@ -651,7 +655,7 @@ const handleExportPDF = () => {
     ...f,
     product_name: f.product?.product_name || 'N/A',
     current_stock: f.product?.current_stock || 0,
-    confidence_score: `${f.confidence_score}%`,
+    confidence_percent: `${Math.round((f.confidence_score || 0) * 100)}%`,
   }));
   
   exportToPDF(data, columns, 'Sales Forecasts Report', 'forecasts');

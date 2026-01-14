@@ -24,11 +24,11 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div class="form-group">
               <label class="input-label">
-                Invoice No. <span class="text-red-500">*</span>
+                Sale No. <span class="text-red-500">*</span>
               </label>
               <div class="relative">
                 <input 
-                  v-model="form.invoice_number" 
+                  v-model="form.sale_number" 
                   type="text"
                   required
                   placeholder="Auto-generated"
@@ -65,28 +65,17 @@
           </h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-            <div class="form-group">
+            <div class="form-group md:col-span-2">
               <label class="input-label">Select Customer (Optional)</label>
               <select 
                 v-model="form.customer_id"
                 class="select"
-                @change="onCustomerChange"
               >
                 <option :value="undefined">-- Walk-in Customer --</option>
                 <option v-for="customer in customers" :key="customer.customer_id" :value="customer.customer_id">
                   {{ customer.customer_name }}
                 </option>
               </select>
-            </div>
-            
-            <div class="form-group">
-              <label class="input-label">Or Enter Customer Name</label>
-              <input 
-                v-model="form.customer_name" 
-                type="text"
-                placeholder="Walk-in customer name (optional)"
-                class="input"
-              />
             </div>
           </div>
         </div>
@@ -405,15 +394,14 @@
 <script setup lang="ts">
 import type { SaleFormData, SaleItemFormData } from '~/types';
 
-const { createSale, loading, error, generateInvoiceNumber, fetchSales } = useSales();
+const { createSale, loading, error, generateSaleNumber, fetchSales } = useSales();
 const { products, fetchProducts } = useProducts();
 const { customers, fetchCustomers } = useCustomers();
 const router = useRouter();
 
 const form = ref<SaleFormData>({
-  invoice_number: '',
+  sale_number: '',
   customer_id: undefined,
-  customer_name: '',
   sale_date: new Date().toISOString().split('T')[0] ?? '',
   items: [{ product_id: 0, quantity: 1, unit_price: 0 }],
   notes: '',
@@ -474,7 +462,7 @@ const itemsWithStockIssues = computed<StockIssue[]>(() => {
 });
 
 const isFormValid = computed(() => {
-  return form.value.invoice_number && 
+  return form.value.sale_number && 
          form.value.items.some(item => item.product_id > 0 && item.quantity > 0 && item.unit_price > 0) &&
          !hasStockIssues.value;
 });
@@ -485,15 +473,6 @@ const addItem = () => {
 
 const removeItem = (index: number) => {
   form.value.items.splice(index, 1);
-};
-
-const onCustomerChange = () => {
-  if (form.value.customer_id) {
-    const customer = customers.value.find(c => c.customer_id === form.value.customer_id);
-    if (customer) {
-      form.value.customer_name = customer.customer_name;
-    }
-  }
 };
 
 const onProductChange = (index: number) => {
@@ -530,7 +509,7 @@ const exceedsStock = (productId: number, quantity: number) => {
 
 onMounted(async () => {
   await Promise.all([fetchProducts(), fetchCustomers(), fetchSales()]);
-  form.value.invoice_number = generateInvoiceNumber();
+  form.value.sale_number = generateSaleNumber();
 });
 
 const handleSubmit = async () => {

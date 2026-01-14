@@ -27,13 +27,14 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div class="form-group">
               <label class="input-label">
-                Invoice No. <span class="text-red-500">*</span>
+                Sale No. <span class="text-red-500">*</span>
               </label>
               <input 
-                v-model="form.invoice_number" 
+                v-model="form.sale_number" 
                 type="text" 
                 required
-                class="input"
+                class="input bg-zinc-50"
+                readonly
               />
             </div>
             
@@ -50,12 +51,12 @@
           </div>
           
           <div class="form-group">
-            <label class="input-label">Customer Name</label>
+            <label class="input-label">Customer</label>
             <input 
-              v-model="form.customer_name" 
+              :value="sale?.customer?.customer_name || 'Walk-in Customer'" 
               type="text"
-              placeholder="Enter customer name"
-              class="input"
+              class="input bg-zinc-50"
+              readonly
             />
           </div>
         </div>
@@ -329,8 +330,8 @@ const submitting = ref(false);
 const id = Number(route.params.id);
 
 const form = ref<SaleFormData>({
-  invoice_number: '',
-  customer_name: '',
+  sale_number: '',
+  customer_id: undefined,
   sale_date: '',
   items: [{ product_id: 0, quantity: 1, unit_price: 0 }],
   notes: '',
@@ -341,7 +342,7 @@ const subtotal = computed(() => {
 });
 
 const isFormValid = computed(() => {
-  return form.value.invoice_number && 
+  return form.value.sale_number && 
          form.value.items.some(item => item.product_id > 0 && item.quantity > 0 && item.unit_price > 0);
 });
 
@@ -378,14 +379,14 @@ onMounted(async () => {
       quantity: item.quantity ?? 1,
       unit_price: item.unit_price ?? 0
     })) || [{
-      product_id: sale.value.product_id ?? 0,
-      quantity: sale.value.quantity ?? 1,
-      unit_price: sale.value.unit_price ?? 0
+      product_id: 0,
+      quantity: 1,
+      unit_price: 0
     }];
     
     form.value = {
-      invoice_number: sale.value.invoice_number,
-      customer_name: sale.value.customer_name || '',
+      sale_number: sale.value.sale_number,
+      customer_id: sale.value.customer_id,
       sale_date: sale.value.sale_date?.split('T')[0] || '',
       items: saleItems,
       notes: sale.value.notes || '',

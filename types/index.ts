@@ -96,24 +96,20 @@ export interface PurchaseOrder {
 
 export interface Sale {
   sale_id?: number;
-  invoice_number: string;
+  sale_number: string;
   customer_id?: number;
   customer?: Partial<Customer> | null;
-  customer_name?: string;
   sale_date: string;
-  product_id?: number;
-  product?: Partial<Product> | null;
-  unit_price?: number;
-  quantity?: number;
   items?: SaleItem[];
   subtotal?: number;
   discount_percent?: number;
   discount_amount?: number;
   total_amount?: number;
   payment_method?: string;
-  status?: string;
+  status?: 'Pending' | 'Completed' | 'Cancelled' | 'Refunded';
   notes?: string;
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface SaleItem {
@@ -184,10 +180,9 @@ export interface Forecast {
   product_id: number;
   product?: Partial<Product> | null;
   forecast_date: string;
-  forecast_period?: string;
-  predicted_quantity: number;
-  confidence_level?: number;
+  predicted_demand: number;
   confidence_score?: number;
+  recommended_order?: number;
   notes?: string;
   created_at?: string;
 }
@@ -250,9 +245,8 @@ export interface PurchaseOrderItemFormData {
 }
 
 export interface SaleFormData {
-  invoice_number: string;
+  sale_number: string;
   customer_id?: number;
-  customer_name?: string;
   sale_date: string;
   items: SaleItemFormData[];
   discount_percent?: number;

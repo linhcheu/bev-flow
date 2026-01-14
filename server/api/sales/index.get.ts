@@ -96,9 +96,8 @@ export default defineEventHandler(async () => {
       
       return {
         sale_id: s.sale_id,
-        invoice_number: s.sale_number || s.invoice_number, // Supabase uses sale_number
+        sale_number: s.sale_number,
         customer_id: s.customer_id || undefined,
-        customer_name: s.customers?.customer_name || undefined,
         sale_date: s.sale_date,
         subtotal,
         discount_percent: Number(s.discount_percent || 0),
@@ -108,6 +107,7 @@ export default defineEventHandler(async () => {
         status: s.status || 'Completed',
         notes: s.notes || undefined,
         created_at: s.created_at,
+        updated_at: s.updated_at,
         items,
         customer: s.customer_id ? {
           customer_id: s.customer_id,
@@ -164,17 +164,19 @@ export default defineEventHandler(async () => {
       ? items.reduce((sum, item) => sum + item.amount, 0)
       : Number(s.total_amount);
     
+    // Map old SQLite schema to new Sale type
+    // SQLite uses invoice_number, new schema uses sale_number
     return {
       sale_id: s.sale_id,
-      invoice_number: s.invoice_number,
+      sale_number: s.invoice_number, // Map invoice_number to sale_number
       customer_id: s.customer_id || undefined,
-      customer_name: s.customer_name || s.db_customer_name || undefined,
       sale_date: s.sale_date,
-      product_id: s.product_id,
-      unit_price: Number(s.unit_price),
-      quantity: s.quantity,
       subtotal,
+      discount_percent: 0,
+      discount_amount: 0,
       total_amount: Number(s.total_amount),
+      payment_method: 'Cash',
+      status: 'Completed',
       notes: s.notes || undefined,
       created_at: s.created_at,
       items: items.length > 0 ? items : [{
@@ -188,14 +190,9 @@ export default defineEventHandler(async () => {
           sku: s.sku
         }
       }],
-      product: {
-        product_id: s.product_id,
-        product_name: s.product_name,
-        sku: s.sku
-      },
       customer: s.customer_id ? {
         customer_id: s.customer_id,
-        customer_name: s.db_customer_name || ''
+        customer_name: s.db_customer_name || s.customer_name || ''
       } : undefined
     };
   });

@@ -513,19 +513,19 @@ export const useReceiptExport = () => {
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(113, 113, 122);
-    doc.text('Invoice:', 8, y + 3);
+    doc.text('Sale No:', 8, y + 3);
     doc.text('Date:', 8, y + 8);
     doc.text('Customer:', 8, y + 13);
     
     doc.setTextColor(39, 39, 42);
     doc.setFont('helvetica', 'bold');
-    doc.text(sale.invoice_number, pageWidth - 8, y + 3, { align: 'right' });
+    doc.text(sale.sale_number, pageWidth - 8, y + 3, { align: 'right' });
     doc.setFont('helvetica', 'normal');
     const saleDate = new Date(sale.sale_date).toLocaleDateString('en-US', { 
       year: 'numeric', month: 'short', day: 'numeric' 
     });
     doc.text(saleDate, pageWidth - 8, y + 8, { align: 'right' });
-    doc.text(sale.customer_name || 'Walk-in Customer', pageWidth - 8, y + 13, { align: 'right' });
+    doc.text(sale.customer?.customer_name || 'Walk-in Customer', pageWidth - 8, y + 13, { align: 'right' });
     
     y += 22;
 
@@ -622,7 +622,7 @@ export const useReceiptExport = () => {
     const printDate = new Date().toLocaleString('en-US');
     doc.text(`Printed: ${printDate}`, pageWidth / 2, y, { align: 'center' });
 
-    doc.save(`invoice_${sale.invoice_number}.pdf`);
+    doc.save(`sale_${sale.sale_number}.pdf`);
   };
 
   // Export single sale as Excel with professional formatting
@@ -645,13 +645,13 @@ export const useReceiptExport = () => {
       ['Karaoke Inventory Management System'],
       [''],
       ['═══════════════════════════════════════════'],
-      ['SALES INVOICE'],
+      ['SALES RECEIPT'],
       ['═══════════════════════════════════════════'],
       [''],
-      ['Invoice Details'],
-      ['Invoice Number', sale.invoice_number],
+      ['Sale Details'],
+      ['Sale Number', sale.sale_number],
       ['Date', saleDate],
-      ['Customer', sale.customer_name || 'Walk-in Customer'],
+      ['Customer', sale.customer?.customer_name || 'Walk-in Customer'],
       [''],
       ['Items'],
       ['Product', 'SKU', 'Quantity', 'Unit Price', 'Amount'],
@@ -708,7 +708,7 @@ export const useReceiptExport = () => {
     
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Invoice');
-    XLSX.writeFile(wb, `invoice_${sale.invoice_number}.xlsx`);
+    XLSX.writeFile(wb, `sale_${sale.sale_number}.xlsx`);
   };
 
   // Export single product as detail PDF with logo

@@ -13,13 +13,13 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div class="form-group">
             <label class="input-label">
-              Invoice No. <span class="text-red-500">*</span>
+              Sale No. <span class="text-red-500">*</span>
             </label>
             <input 
-              v-model="form.invoice_number" 
+              v-model="form.sale_number" 
               type="text" 
               required
-              placeholder="e.g. INV-0001"
+              placeholder="e.g. SALE-0001"
               class="input"
             />
           </div>
@@ -43,13 +43,16 @@
         </div>
         
         <div class="form-group">
-          <label class="input-label">Customer Name</label>
-          <input 
-            v-model="form.customer_name" 
-            type="text"
-            placeholder="Enter customer name"
+          <label class="input-label">Customer</label>
+          <select 
+            v-model="form.customer_id" 
             class="input"
-          />
+          >
+            <option :value="undefined">Select customer (optional)</option>
+            <option v-for="customer in customers" :key="customer.customer_id" :value="customer.customer_id">
+              {{ customer.customer_name }}
+            </option>
+          </select>
         </div>
       </div>
       
@@ -198,7 +201,7 @@
 </template>
 
 <script setup lang="ts">
-import type { SaleFormData, Product } from '~/types';
+import type { SaleFormData, Product, Customer } from '~/types';
 
 const emit = defineEmits<{
   submit: [sale: SaleFormData];
@@ -206,10 +209,11 @@ const emit = defineEmits<{
 
 const { loading, error } = useSales();
 const { products, fetchProducts } = useProducts();
+const { customers, fetchCustomers } = useCustomers();
 
 const form = ref<SaleFormData>({
-  invoice_number: '',
-  customer_name: '',
+  sale_number: '',
+  customer_id: undefined,
   sale_date: new Date().toISOString().split('T')[0] || '',
   items: [{ product_id: 0, quantity: 1, unit_price: 0 }],
   notes: '',
@@ -220,7 +224,7 @@ const totalAmount = computed(() => {
 });
 
 const isFormValid = computed(() => {
-  return form.value.invoice_number && 
+  return form.value.sale_number && 
          form.value.items.some(item => item.product_id > 0 && item.quantity > 0 && item.unit_price > 0);
 });
 
@@ -244,6 +248,7 @@ const onProductChange = (index: number) => {
 
 onMounted(() => {
   fetchProducts();
+  fetchCustomers();
 });
 
 const handleSubmit = () => {

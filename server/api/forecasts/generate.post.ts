@@ -92,14 +92,18 @@ export default defineEventHandler(async () => {
         notes += `${parseFloat(change) >= 0 ? '+' : ''}${change}% sales trend.`;
       }
       
+      // Calculate recommended order based on stock needs
+      const recommendedOrder = Math.max(0, predictedQuantity - product.current_stock + product.min_stock_level);
+
       // Insert forecast
       const { data: forecast } = await supabase
         .from('forecasts')
         .insert({
           product_id: product.product_id,
           forecast_date: forecastDate.toISOString().split('T')[0],
-          predicted_quantity: predictedQuantity,
-          confidence_level: confidence,
+          predicted_demand: predictedQuantity,
+          confidence_score: confidence,
+          recommended_order: recommendedOrder,
           notes: notes.trim()
         })
         .select()
@@ -110,8 +114,9 @@ export default defineEventHandler(async () => {
           forecast_id: forecast.forecast_id,
           product_id: product.product_id,
           forecast_date: forecastDate.toISOString().split('T')[0],
-          predicted_quantity: predictedQuantity,
-          confidence_level: confidence,
+          predicted_demand: predictedQuantity,
+          confidence_score: confidence,
+          recommended_order: recommendedOrder,
           notes: notes.trim(),
           product: {
             product_id: product.product_id,
@@ -222,8 +227,9 @@ export default defineEventHandler(async () => {
       forecast_id: forecastId as number,
       product_id: stats.product_id,
       forecast_date: forecastDate.toISOString().split('T')[0],
-      predicted_quantity: predictedQuantity,
-      confidence_level: confidence,
+      predicted_demand: predictedQuantity,
+      confidence_score: confidence,
+      recommended_order: Math.max(0, predictedQuantity - (product.current_stock || 0) + (product.min_stock_level || 0)),
       notes: notes.trim(),
       product: {
         product_id: stats.product_id,

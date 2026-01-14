@@ -96,23 +96,26 @@ export const useSales = () => {
     }
   };
 
-  // Generate next invoice number (sequential)
-  const generateInvoiceNumber = () => {
-    // Find the highest existing invoice number
+  // Generate next sale number (sequential)
+  const generateSaleNumber = () => {
+    // Find the highest existing sale number
     let maxNum = 0;
     sales.value.forEach(sale => {
-      const match = sale.invoice_number?.match(/INV-(\d+)/);
+      const match = sale.sale_number?.match(/SALE-(\d+)/);
       if (match && match[1]) {
         const num = parseInt(match[1], 10);
         if (num > maxNum) maxNum = num;
       } else {
-        // Handle old format numbers
-        const num = parseInt(sale.invoice_number || '0', 10);
-        if (num > maxNum) maxNum = num;
+        // Handle old format numbers (INV- prefix)
+        const oldMatch = sale.sale_number?.match(/INV-(\d+)/);
+        if (oldMatch && oldMatch[1]) {
+          const num = parseInt(oldMatch[1], 10);
+          if (num > maxNum) maxNum = num;
+        }
       }
     });
     const nextNum = maxNum + 1;
-    return `INV-${String(nextNum).padStart(4, '0')}`;
+    return `SALE-${String(nextNum).padStart(4, '0')}`;
   };
 
   return {
@@ -124,6 +127,6 @@ export const useSales = () => {
     createSale,
     updateSale,
     deleteSale,
-    generateInvoiceNumber,
+    generateSaleNumber,
   };
 };

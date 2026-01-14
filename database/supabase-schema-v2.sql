@@ -102,6 +102,7 @@ CREATE TABLE purchaseorders (
     shipping_rate DECIMAL(5, 2) DEFAULT 3.00,
     shipping_cost DECIMAL(10, 2) DEFAULT 0,
     promotion_amount DECIMAL(10, 2) DEFAULT 0,
+    promotion_text TEXT,
     total_amount DECIMAL(10, 2) DEFAULT 0,
     status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Ordered', 'Shipped', 'Received', 'Cancelled')),
     truck_remark TEXT,

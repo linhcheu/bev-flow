@@ -11,10 +11,10 @@ interface ProductRow {
 export default defineEventHandler(async (event) => {
   const body = await readBody<SaleFormData>(event);
   
-  if (!body.invoice_number || !body.items || body.items.length === 0) {
+  if (!body.sale_number || !body.items || body.items.length === 0) {
     throw createError({
       statusCode: 400,
-      message: 'Invoice number and at least one item are required'
+      message: 'Sale number and at least one item are required'
     });
   }
   
@@ -26,11 +26,11 @@ export default defineEventHandler(async (event) => {
   if (isProduction()) {
     const supabase = getSupabase();
     
-    // Insert sale record - Supabase uses sale_number instead of invoice_number
+    // Insert sale record
     const { data: sale, error: saleError } = await supabase
       .from('sales')
       .insert({
-        sale_number: body.invoice_number, // Map to Supabase column name
+        sale_number: body.sale_number,
         customer_id: body.customer_id || null,
         sale_date: body.sale_date || new Date().toISOString().split('T')[0],
         subtotal: subtotal,
@@ -101,14 +101,14 @@ export default defineEventHandler(async (event) => {
   }
   
   // Development: Use SQLite
-  // Insert sale record (keeping product_id for backward compatibility, using first item)
+  // Insert sale record - map new field names to old SQLite schema
   execute(`
     INSERT INTO Sales (invoice_number, customer_id, customer_name, sale_date, product_id, unit_price, quantity, total_amount, notes)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
-    body.invoice_number,
+    body.sale_number, // Map sale_number to invoice_number for SQLite
     body.customer_id || null,
-    body.customer_name || null,
+    null, // customer_name is no longer in the form
     body.sale_date || new Date().toISOString().split('T')[0],
     body.items[0].product_id, // For backward compatibility
     body.items[0].unit_price,

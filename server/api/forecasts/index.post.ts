@@ -5,10 +5,10 @@ import type { Forecast } from '~/types';
 export default defineEventHandler(async (event) => {
   const body = await readBody<Partial<Forecast>>(event);
   
-  if (!body.product_id || body.predicted_quantity === undefined || !body.forecast_date) {
+  if (!body.product_id || body.predicted_demand === undefined || !body.forecast_date) {
     throw createError({
       statusCode: 400,
-      message: 'Product ID, predicted quantity, and forecast date are required'
+      message: 'Product ID, predicted demand, and forecast date are required'
     });
   }
   
@@ -21,8 +21,9 @@ export default defineEventHandler(async (event) => {
       .insert({
         product_id: body.product_id,
         forecast_date: body.forecast_date,
-        predicted_quantity: body.predicted_quantity,
-        confidence_level: body.confidence_level || 0.8,
+        predicted_demand: body.predicted_demand,
+        confidence_score: body.confidence_score || 0.8,
+        recommended_order: body.recommended_order || 0,
         notes: body.notes || null
       })
       .select()
@@ -36,15 +37,15 @@ export default defineEventHandler(async (event) => {
     return forecast;
   }
   
-  // Development: Use SQLite
+  // Development: Use SQLite (keep old column names for backward compatibility)
   execute(`
     INSERT INTO Forecasts (product_id, forecast_date, predicted_quantity, confidence_level, notes)
     VALUES (?, ?, ?, ?, ?)
   `, [
     body.product_id,
     body.forecast_date,
-    body.predicted_quantity,
-    body.confidence_level || 0.8,
+    body.predicted_demand,
+    body.confidence_score || 0.8,
     body.notes || null
   ]);
   

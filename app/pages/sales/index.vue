@@ -137,11 +137,11 @@
               <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex-1 min-w-0">
                   <span class="inline-flex items-center px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] sm:text-xs font-medium rounded mb-1.5">
-                    {{ sale.invoice_number }}
+                    {{ sale.sale_number }}
                   </span>
                   <h3 v-if="sale.items && sale.items.length > 1" class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ sale.items.length }} items</h3>
-                  <h3 v-else class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ sale.product?.product_name || sale.items?.[0]?.product?.product_name }}</h3>
-                  <p class="text-xs text-zinc-500 mt-0.5">{{ sale.customer_name || 'Walk-in Customer' }}</p>
+                  <h3 v-else class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ sale.items?.[0]?.product?.product_name || '-' }}</h3>
+                  <p class="text-xs text-zinc-500 mt-0.5">{{ sale.customer?.customer_name || 'Walk-in Customer' }}</p>
                 </div>
                 <div class="flex items-center gap-0.5 sm:gap-1 shrink-0">
                   <button 
@@ -172,7 +172,7 @@
                   <UIcon name="i-lucide-calendar" class="w-3 h-3" />
                   {{ formatDate(sale.sale_date) }}
                 </span>
-                <span>SKU: {{ sale.product?.sku }}</span>
+                <span v-if="sale.items?.[0]?.product?.sku">SKU: {{ sale.items[0].product.sku }}</span>
               </div>
               <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="bg-white rounded-lg p-2">
@@ -248,23 +248,26 @@
               <tr v-for="sale in paginatedItems" :key="sale.sale_id" class="hover:bg-zinc-50 transition-colors">
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <span class="inline-flex items-center px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded">
-                    {{ sale.invoice_number }}
+                    {{ sale.sale_number }}
                   </span>
                 </td>
-                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-900">{{ sale.customer_name || 'Walk-in' }}</td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-900">{{ sale.customer?.customer_name || 'Walk-in' }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatDate(sale.sale_date) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <div v-if="sale.items && sale.items.length > 1">
                     <p class="text-sm font-medium text-zinc-900">{{ sale.items.length }} items</p>
                     <p class="text-xs text-zinc-500">{{ sale.items.map(i => i.product?.product_name).slice(0, 2).join(', ') }}{{ sale.items.length > 2 ? '...' : '' }}</p>
                   </div>
+                  <div v-else-if="sale.items?.[0]">
+                    <p class="text-sm font-medium text-zinc-900">{{ sale.items[0].product?.product_name }}</p>
+                    <p class="text-xs text-zinc-500">{{ sale.items[0].product?.sku }}</p>
+                  </div>
                   <div v-else>
-                    <p class="text-sm font-medium text-zinc-900">{{ sale.product?.product_name || sale.items?.[0]?.product?.product_name }}</p>
-                    <p class="text-xs text-zinc-500">{{ sale.product?.sku || sale.items?.[0]?.product?.sku }}</p>
+                    <p class="text-sm font-medium text-zinc-900">No items</p>
                   </div>
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 text-right">{{ getTotalQuantity(sale) }}</td>
-                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 text-right">${{ Number(sale.unit_price).toFixed(2) }}</td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 text-right">${{ getAverageUnitPrice(sale).toFixed(2) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-right">
                   <span class="text-sm font-medium text-emerald-600">${{ Number(sale.total_amount).toFixed(2) }}</span>
                 </td>
@@ -347,10 +350,10 @@
               <p class="text-xs text-zinc-500">Karaoke Inventory System</p>
             </div>
             
-            <!-- Invoice Info -->
+            <!-- Sale Info -->
             <div class="text-center mb-4">
               <span class="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded-full">
-                {{ selectedSale?.invoice_number }}
+                {{ selectedSale?.sale_number }}
               </span>
             </div>
             
@@ -361,7 +364,7 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-zinc-500">Customer:</span>
-                <span class="font-medium">{{ selectedSale?.customer_name || 'Walk-in Customer' }}</span>
+                <span class="font-medium">{{ selectedSale?.customer?.customer_name || 'Walk-in Customer' }}</span>
               </div>
             </div>
             
@@ -379,17 +382,21 @@
                 </div>
               </div>
               <!-- Single item fallback -->
-              <div v-else>
+              <div v-else-if="selectedSale?.items?.[0]">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex-1">
-                    <p class="font-medium text-zinc-900">{{ selectedSale?.product?.product_name }}</p>
-                    <p class="text-xs text-zinc-500">SKU: {{ selectedSale?.product?.sku }}</p>
+                    <p class="font-medium text-zinc-900">{{ selectedSale.items[0].product?.product_name }}</p>
+                    <p class="text-xs text-zinc-500">SKU: {{ selectedSale.items[0].product?.sku }}</p>
                   </div>
                 </div>
                 <div class="flex justify-between text-sm">
-                  <span class="text-zinc-500">{{ selectedSale?.quantity }} × ${{ Number(selectedSale?.unit_price || 0).toFixed(2) }}</span>
+                  <span class="text-zinc-500">{{ selectedSale.items[0].quantity }} × ${{ Number(selectedSale.items[0].unit_price || 0).toFixed(2) }}</span>
                   <span class="font-medium">${{ Number(selectedSale?.total_amount || 0).toFixed(2) }}</span>
                 </div>
+              </div>
+              <!-- No items fallback -->
+              <div v-else class="text-center py-4 text-zinc-500">
+                <p>No items in this sale</p>
               </div>
             </div>
             
@@ -459,7 +466,9 @@ const sortBy = ref('date-desc');
 const uniqueProducts = computed(() => {
   const products = new Set<string>();
   sales.value.forEach(s => {
-    if (s.product?.product_name) products.add(s.product.product_name);
+    s.items?.forEach(item => {
+      if (item.product?.product_name) products.add(item.product.product_name);
+    });
   });
   return Array.from(products).sort();
 });
@@ -474,9 +483,9 @@ const filteredSales = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     result = result.filter(s => 
-      s.invoice_number?.toLowerCase().includes(query) ||
-      s.customer_name?.toLowerCase().includes(query) ||
-      s.product?.product_name?.toLowerCase().includes(query)
+      s.sale_number?.toLowerCase().includes(query) ||
+      s.customer?.customer_name?.toLowerCase().includes(query) ||
+      s.items?.some(item => item.product?.product_name?.toLowerCase().includes(query))
     );
   }
   
@@ -492,7 +501,7 @@ const filteredSales = computed(() => {
   
   // Product filter
   if (productFilter.value !== 'all') {
-    result = result.filter(s => s.product?.product_name === productFilter.value);
+    result = result.filter(s => s.items?.some(item => item.product?.product_name === productFilter.value));
   }
   
   // Sorting
@@ -542,7 +551,18 @@ const getTotalQuantity = (sale: Sale) => {
   if (sale.items && sale.items.length > 0) {
     return sale.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
   }
-  return sale.quantity || 0;
+  return 0;
+};
+
+// Helper to get average unit price
+const getAverageUnitPrice = (sale: Sale) => {
+  if (sale.items && sale.items.length > 0) {
+    const totalQty = getTotalQuantity(sale);
+    if (totalQty === 0) return 0;
+    const totalValue = sale.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.unit_price || 0), 0);
+    return totalValue / totalQty;
+  }
+  return 0;
 };
 
 const avgSale = computed(() => {
@@ -591,18 +611,19 @@ const exportReceiptExcel = (sale: Sale) => {
 const handleExportExcel = () => {
   const { exportToExcel } = useExport();
   const columns = [
-    { header: 'Invoice #', key: 'invoice_number', width: 15 },
+    { header: 'Sale #', key: 'sale_number', width: 15 },
     { header: 'Date', key: 'sale_date', width: 12 },
     { header: 'Customer', key: 'customer_name', width: 20 },
-    { header: 'Product', key: 'product_name', width: 25 },
-    { header: 'Quantity', key: 'quantity', width: 10 },
-    { header: 'Unit Price', key: 'unit_price', width: 12 },
+    { header: 'Items', key: 'item_count', width: 10 },
+    { header: 'Subtotal', key: 'subtotal', width: 12 },
+    { header: 'Discount', key: 'discount_amount', width: 12 },
     { header: 'Total', key: 'total_amount', width: 12 },
   ];
   
   const data = filteredSales.value.map(s => ({
     ...s,
-    product_name: s.product?.product_name || 'N/A',
+    customer_name: s.customer?.customer_name || 'Walk-in',
+    item_count: s.items?.length || 0,
   }));
   
   exportToExcel(data, columns, 'sales');
@@ -611,17 +632,17 @@ const handleExportExcel = () => {
 const handleExportPDF = () => {
   const { exportToPDF } = useExport();
   const columns = [
-    { header: 'Invoice', key: 'invoice_number' },
+    { header: 'Sale #', key: 'sale_number' },
     { header: 'Date', key: 'sale_date' },
     { header: 'Customer', key: 'customer_name' },
-    { header: 'Product', key: 'product_name' },
-    { header: 'Qty', key: 'quantity' },
+    { header: 'Items', key: 'item_count' },
     { header: 'Total', key: 'total_amount' },
   ];
   
   const data = filteredSales.value.map(s => ({
     ...s,
-    product_name: s.product?.product_name || 'N/A',
+    customer_name: s.customer?.customer_name || 'Walk-in',
+    item_count: s.items?.length || 0,
   }));
   
   exportToPDF(data, columns, 'Sales Report', 'sales');
