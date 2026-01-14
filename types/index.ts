@@ -81,6 +81,7 @@ export interface PurchaseOrder {
   shipping_rate?: number;
   shipping_cost?: number;
   promotion_amount?: number;
+  promotion_text?: string;
   total_amount?: number;
   status: POStatus;
   truck_remark?: string;
@@ -233,6 +234,7 @@ export interface PurchaseOrderFormData {
   eta_date?: string;
   items: PurchaseOrderItemFormData[];
   promotion_amount?: number;
+  promotion_text?: string;
   truck_remark?: string;
   overall_remark?: string;
   third_party_agent?: string;

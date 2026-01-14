@@ -95,6 +95,7 @@ export default defineEventHandler(async (event) => {
         status: 'Pending',
         truck_remark: body.truck_remark || null,
         overall_remark: body.overall_remark || null,
+        promotion_text: body.promotion_text || null,
         third_party_agent: body.third_party_agent || null,
         agent_phone: body.agent_phone || null,
         agent_email: body.agent_email || null,
@@ -154,11 +155,11 @@ export default defineEventHandler(async (event) => {
   execute(`
     INSERT INTO PurchaseOrders (
       po_number, supplier_id, order_date, eta_date, 
-      subtotal, shipping_rate, shipping_cost, promotion_amount, total_amount,
+      subtotal, shipping_rate, shipping_cost, promotion_amount, promotion_text, total_amount,
       status, truck_remark, overall_remark,
       third_party_agent, agent_phone, agent_email, agent_address
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     poNumber,
     body.supplier_id,
@@ -168,6 +169,7 @@ export default defineEventHandler(async (event) => {
     shippingRate,
     shippingCost,
     promotionAmount,
+    body.promotion_text || null,
     totalAmount,
     'Pending',
     body.truck_remark || null,

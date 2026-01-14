@@ -58,6 +58,44 @@
             </div>
           </div>
           
+          <!-- Supplier Information Display -->
+          <div v-if="selectedSupplier" class="bg-teal-50 border border-teal-200 rounded-lg p-4 space-y-3">
+            <h4 class="text-sm font-medium text-teal-800 flex items-center gap-2">
+              <UIcon name="i-lucide-building-2" class="w-4 h-4" />
+              Supplier Information
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <div>
+                <span class="text-teal-600 text-xs block">Company Name</span>
+                <span class="font-medium text-teal-900">{{ selectedSupplier.company_name }}</span>
+              </div>
+              <div>
+                <span class="text-teal-600 text-xs block">Contact Person</span>
+                <span class="font-medium text-teal-900">{{ selectedSupplier.contact_person || '-' }}</span>
+              </div>
+              <div>
+                <span class="text-teal-600 text-xs block">Sale Agent</span>
+                <span class="font-medium text-teal-900">{{ selectedSupplier.sale_agent || '-' }}</span>
+              </div>
+              <div>
+                <span class="text-teal-600 text-xs block">Phone</span>
+                <span class="font-medium text-teal-900">{{ selectedSupplier.phone || '-' }}</span>
+              </div>
+              <div>
+                <span class="text-teal-600 text-xs block">Email</span>
+                <span class="font-medium text-teal-900">{{ selectedSupplier.email || '-' }}</span>
+              </div>
+              <div class="sm:col-span-2 md:col-span-3">
+                <span class="text-teal-600 text-xs block">Address</span>
+                <span class="font-medium text-teal-900">{{ selectedSupplier.address || '-' }}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-teal-600">
+              <UIcon name="i-lucide-clock" class="w-3.5 h-3.5" />
+              Lead Time: {{ selectedSupplier.lead_time_days || 7 }} days
+            </div>
+          </div>
+          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div class="form-group">
               <label class="input-label">
@@ -126,9 +164,10 @@
                       v-model="item.product_id"
                       class="select text-sm py-2"
                       @change="onProductChange(index)"
+                      :disabled="!form.supplier_id"
                     >
                       <option :value="0">-- Select --</option>
-                      <option v-for="product in products" :key="product.product_id" :value="product.product_id">
+                      <option v-for="product in filteredProducts" :key="product.product_id" :value="product.product_id">
                         {{ product.product_name }}
                       </option>
                     </select>
@@ -203,9 +242,10 @@
                   v-model="item.product_id"
                   class="select text-sm py-2 w-full"
                   @change="onProductChange(index)"
+                  :disabled="!form.supplier_id"
                 >
                   <option :value="0">-- Select Product --</option>
-                  <option v-for="product in products" :key="product.product_id" :value="product.product_id">
+                  <option v-for="product in filteredProducts" :key="product.product_id" :value="product.product_id">
                     {{ product.product_name }}
                   </option>
                 </select>
@@ -273,6 +313,16 @@
                   class="input text-sm py-1 text-right pl-8"
                 />
               </div>
+            </div>
+            <!-- Promotion Text/Description -->
+            <div class="flex flex-col sm:flex-row justify-between sm:justify-end items-start sm:items-center gap-2 sm:gap-4">
+              <span class="text-sm text-zinc-500">Promotion Details:</span>
+              <input 
+                v-model="form.promotion_text"
+                type="text"
+                placeholder="e.g. Free 2 cases, discount on next order..."
+                class="input text-sm py-1 w-full sm:w-64"
+              />
             </div>
             <div class="flex justify-between sm:justify-end items-center gap-4 pt-2 border-t border-zinc-200">
               <span class="text-base font-medium text-zinc-900">Total:</span>
@@ -360,8 +410,21 @@ const form = ref<PurchaseOrderFormData>({
   eta_date: '',
   items: [{ product_id: 0, quantity: 0, unit_cost: 0 }],
   promotion_amount: 0,
+  promotion_text: '',
   truck_remark: '',
   overall_remark: '',
+});
+
+// Get selected supplier details
+const selectedSupplier = computed(() => {
+  if (!form.value.supplier_id) return null;
+  return suppliers.value.find(s => s.supplier_id === form.value.supplier_id) || null;
+});
+
+// Filter products by selected supplier
+const filteredProducts = computed(() => {
+  if (!form.value.supplier_id) return [];
+  return products.value.filter(p => p.supplier_id === form.value.supplier_id);
 });
 
 // Computed values
@@ -393,13 +456,14 @@ const removeItem = (index: number) => {
 };
 
 const onSupplierChange = () => {
-  // Could filter products by supplier here
+  // Clear items when supplier changes since products are filtered by supplier
+  form.value.items = [{ product_id: 0, quantity: 0, unit_cost: 0 }];
 };
 
 const onProductChange = (index: number) => {
   const item = form.value.items[index];
   if (item) {
-    const product = products.value.find(p => p.product_id === item.product_id);
+    const product = filteredProducts.value.find(p => p.product_id === item.product_id);
     if (product) {
       item.unit_cost = product.cost_price;
     }
@@ -407,7 +471,7 @@ const onProductChange = (index: number) => {
 };
 
 const getProductDescription = (productId: number) => {
-  const product = products.value.find(p => p.product_id === productId);
+  const product = filteredProducts.value.find(p => p.product_id === productId);
   return product?.description || '-';
 };
 

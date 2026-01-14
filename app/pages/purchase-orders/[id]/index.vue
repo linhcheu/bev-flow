@@ -229,6 +229,9 @@
               <span class="text-zinc-500">Promotion</span>
               <span class="font-medium text-emerald-600">-${{ Number(order.promotion_amount).toFixed(2) }}</span>
             </div>
+            <div v-if="order.promotion_text" class="text-xs text-emerald-600 italic text-right">
+              {{ order.promotion_text }}
+            </div>
             <div class="flex items-center justify-between pt-3 border-t border-zinc-300">
               <span class="text-base font-semibold text-zinc-900">Total</span>
               <span class="text-xl font-bold text-amber-600">${{ Number(order.total_amount || 0).toFixed(2) }}</span>
@@ -414,8 +417,11 @@ const generatePrintHTML = () => {
           <div>
             <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #888; text-transform: uppercase;">Supplier</h3>
             <p style="margin: 5px 0; font-weight: 600;">${order.value.supplier?.company_name || ''}</p>
-            <p style="margin: 5px 0;">${order.value.supplier?.contact_person || ''}</p>
-            <p style="margin: 5px 0;">${order.value.supplier?.phone || ''}</p>
+            <p style="margin: 5px 0;"><strong>Contact:</strong> ${order.value.supplier?.contact_person || '-'}</p>
+            <p style="margin: 5px 0;"><strong>Sale Agent:</strong> ${order.value.supplier?.sale_agent || '-'}</p>
+            <p style="margin: 5px 0;"><strong>Phone:</strong> ${order.value.supplier?.phone || '-'}</p>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${order.value.supplier?.email || '-'}</p>
+            <p style="margin: 5px 0;"><strong>Address:</strong> ${order.value.supplier?.address || '-'}</p>
           </div>
         </div>
         
@@ -438,9 +444,17 @@ const generatePrintHTML = () => {
         <div class="totals">
           <div><span>Subtotal</span><span>$${Number(order.value.subtotal || 0).toFixed(2)}</span></div>
           <div><span>Shipping</span><span>$${Number(order.value.shipping_cost || 0).toFixed(2)}</span></div>
-          ${order.value.promotion_amount ? `<div><span>Promotion</span><span>-$${Number(order.value.promotion_amount).toFixed(2)}</span></div>` : ''}
+          ${order.value.promotion_amount ? `<div><span>Promotion</span><span style="color: #10b981;">-$${Number(order.value.promotion_amount).toFixed(2)}</span></div>` : ''}
+          ${order.value.promotion_text ? `<div style="font-size: 11px; color: #10b981; font-style: italic; text-align: right;">${order.value.promotion_text}</div>` : ''}
           <div class="total"><span>Total</span><span style="color: #f59e0b;">$${Number(order.value.total_amount || 0).toFixed(2)}</span></div>
         </div>
+        ${order.value.truck_remark || order.value.overall_remark ? `
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e5e5;">
+          <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #888; text-transform: uppercase;">Remarks</h3>
+          ${order.value.truck_remark ? `<p style="margin: 5px 0;"><strong>Truck:</strong> ${order.value.truck_remark}</p>` : ''}
+          ${order.value.overall_remark ? `<p style="margin: 5px 0;"><strong>Overall:</strong> ${order.value.overall_remark}</p>` : ''}
+        </div>
+        ` : ''}
       </div>
       <div class="footer">
         <p>Thank you for your business!</p>
