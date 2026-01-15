@@ -71,8 +71,15 @@ export default defineEventHandler(async (event) => {
   const shippingRate = 3.00;
   const shippingCost = subtotal * (shippingRate / 100);
   
-  // Calculate total
-  const promotionAmount = body.promotion_amount || 0;
+  // Calculate total with promotion
+  const promotionPercent = body.promotion_percent || 0;
+  let promotionAmount = body.promotion_amount || 0;
+  
+  // If promotion_percent is provided, calculate the amount
+  if (promotionPercent > 0 && promotionAmount === 0) {
+    promotionAmount = (subtotal + shippingCost) * (promotionPercent / 100);
+  }
+  
   const totalAmount = subtotal + shippingCost - promotionAmount;
   
   // Production: Use Supabase
@@ -90,6 +97,7 @@ export default defineEventHandler(async (event) => {
         subtotal,
         shipping_rate: shippingRate,
         shipping_cost: shippingCost,
+        promotion_percent: promotionPercent,
         promotion_amount: promotionAmount,
         total_amount: totalAmount,
         status: 'Pending',
@@ -154,12 +162,12 @@ export default defineEventHandler(async (event) => {
   // Insert purchase order
   execute(`
     INSERT INTO PurchaseOrders (
-      po_number, supplier_id, order_date, eta_date, 
-      subtotal, shipping_rate, shipping_cost, promotion_amount, promotion_text, total_amount,
+      po_number, supplier_id, order_date, eta_date,
+      subtotal, shipping_rate, shipping_cost, promotion_percent, promotion_amount, promotion_text, total_amount,
       status, truck_remark, overall_remark,
       third_party_agent, agent_phone, agent_email, agent_address
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     poNumber,
     body.supplier_id,
@@ -168,6 +176,7 @@ export default defineEventHandler(async (event) => {
     subtotal,
     shippingRate,
     shippingCost,
+    promotionPercent,
     promotionAmount,
     body.promotion_text || null,
     totalAmount,

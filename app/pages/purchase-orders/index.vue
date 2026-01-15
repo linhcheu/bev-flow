@@ -180,14 +180,6 @@
                     <UIcon name="i-lucide-pencil" class="w-4 h-4" />
                   </NuxtLink>
                   <button 
-                    @click="updateStatus(po, 'Received')"
-                    v-if="po.status !== 'Received'"
-                    class="p-2 sm:p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all active:scale-95"
-                    title="Mark Complete"
-                  >
-                    <UIcon name="i-lucide-check-circle" class="w-4 h-4" />
-                  </button>
-                  <button 
                     @click="handleDelete(po.po_id!)" 
                     class="p-2 sm:p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all active:scale-95"
                     title="Delete"
@@ -203,10 +195,14 @@
                 </span>
                 <span>ETA: {{ formatDate(po.eta_date) }}</span>
               </div>
-              <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="bg-white rounded-lg p-2">
                   <p class="text-[10px] text-zinc-500 mb-0.5">Items</p>
                   <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ po.items?.length || 0 }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-2">
+                  <p class="text-[10px] text-zinc-500 mb-0.5">Lead Time</p>
+                  <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ po.supplier?.lead_time_days || 7 }}d</p>
                 </div>
                 <div class="bg-emerald-50 rounded-lg p-2">
                   <p class="text-[10px] text-emerald-600 mb-0.5">Total</p>
@@ -263,6 +259,7 @@
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Supplier</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Order Date</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">ETA</th>
+                <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Lead Time</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Items</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Total</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Status</th>
@@ -286,6 +283,12 @@
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatDate(po.order_date) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatDate(po.eta_date) }}</td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">
+                  <span class="inline-flex items-center gap-1">
+                    <UIcon name="i-lucide-clock" class="w-3.5 h-3.5 text-zinc-400" />
+                    {{ po.supplier?.lead_time_days || 7 }} days
+                  </span>
+                </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-500">{{ po.items?.length || 0 }} items</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <span class="text-sm font-medium text-zinc-900">${{ (po.total_amount || 0).toFixed(2) }}</span>
@@ -312,14 +315,6 @@
                     >
                       <UIcon name="i-lucide-pencil" class="w-4 h-4" />
                     </NuxtLink>
-                    <button 
-                      @click="updateStatus(po, 'Received')"
-                      v-if="po.status !== 'Received'"
-                      class="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
-                      title="Mark Complete"
-                    >
-                      <UIcon name="i-lucide-check-circle" class="w-4 h-4" />
-                    </button>
                     <button 
                       class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Delete"
@@ -497,7 +492,7 @@
 <script setup lang="ts">
 import type { PurchaseOrder } from '~/types';
 
-const { purchaseOrders, loading, error, fetchPurchaseOrders, deletePurchaseOrder, updatePurchaseOrder } = usePurchaseOrders();
+const { purchaseOrders, loading, error, fetchPurchaseOrders, deletePurchaseOrder } = usePurchaseOrders();
 
 // Search and filters
 const searchQuery = ref('');
@@ -611,12 +606,6 @@ const getStatusDotClass = (status?: string) => {
     case 'Shipped': return 'bg-purple-500';
     case 'Received': return 'bg-emerald-500';
     default: return 'bg-zinc-500';
-  }
-};
-
-const updateStatus = async (po: PurchaseOrder, newStatus: string) => {
-  if (confirm(`Mark this PO as ${newStatus}?`)) {
-    await updatePurchaseOrder(po.po_id!, { status: newStatus });
   }
 };
 

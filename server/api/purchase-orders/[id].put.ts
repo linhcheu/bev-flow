@@ -47,7 +47,16 @@ export default defineEventHandler(async (event) => {
       subtotal = body.items.reduce((sum, item) => sum + (item.quantity * item.unit_cost), 0);
       const shippingRate = 3.00;
       shippingCost = subtotal * (shippingRate / 100);
-      const promotionAmount = body.promotion_amount ?? existing.promotion_amount ?? 0;
+      
+      // Handle promotion
+      const promotionPercent = body.promotion_percent ?? existing.promotion_percent ?? 0;
+      let promotionAmount = body.promotion_amount ?? existing.promotion_amount ?? 0;
+      
+      // If promotion_percent is provided and amount is not, calculate amount
+      if (promotionPercent > 0 && body.promotion_amount === undefined) {
+        promotionAmount = (subtotal + shippingCost) * (promotionPercent / 100);
+      }
+      
       totalAmount = subtotal + shippingCost - promotionAmount;
       
       // Delete existing items
@@ -97,6 +106,7 @@ export default defineEventHandler(async (event) => {
         eta_date: body.eta_date || existing.eta_date,
         subtotal,
         shipping_cost: shippingCost,
+        promotion_percent: body.promotion_percent ?? existing.promotion_percent,
         promotion_amount: body.promotion_amount ?? existing.promotion_amount,
         promotion_text: body.promotion_text ?? existing.promotion_text,
         total_amount: totalAmount,
@@ -174,8 +184,15 @@ export default defineEventHandler(async (event) => {
     const shippingRate = 3.00;
     shippingCost = subtotal * (shippingRate / 100);
     
-    // Calculate total
-    const promotionAmount = body.promotion_amount ?? existing.promotion_amount ?? 0;
+    // Handle promotion
+    const promotionPercent = body.promotion_percent ?? existing.promotion_percent ?? 0;
+    let promotionAmount = body.promotion_amount ?? existing.promotion_amount ?? 0;
+    
+    // If promotion_percent is provided and amount is not, calculate amount
+    if (promotionPercent > 0 && body.promotion_amount === undefined) {
+      promotionAmount = (subtotal + shippingCost) * (promotionPercent / 100);
+    }
+    
     totalAmount = subtotal + shippingCost - promotionAmount;
     
     // Delete existing items and insert new ones
@@ -207,6 +224,7 @@ export default defineEventHandler(async (event) => {
       eta_date = COALESCE(?, eta_date),
       subtotal = ?,
       shipping_cost = ?,
+      promotion_percent = COALESCE(?, promotion_percent),
       promotion_amount = COALESCE(?, promotion_amount),
       promotion_text = COALESCE(?, promotion_text),
       total_amount = ?,
@@ -226,6 +244,7 @@ export default defineEventHandler(async (event) => {
     body.eta_date,
     subtotal,
     shippingCost,
+    body.promotion_percent,
     body.promotion_amount,
     body.promotion_text,
     totalAmount,

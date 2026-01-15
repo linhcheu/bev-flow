@@ -166,6 +166,10 @@
                   <UIcon name="i-lucide-map-pin" class="w-3.5 h-3.5" />
                   <span class="truncate">{{ supplier.address }}</span>
                 </div>
+                <div class="flex items-center gap-2 text-amber-600">
+                  <UIcon name="i-lucide-clock" class="w-3.5 h-3.5" />
+                  <span>Lead Time: {{ supplier.lead_time_days || 7 }} days</span>
+                </div>
               </div>
             </div>
           </div>
@@ -217,6 +221,7 @@
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Contact Person</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Email</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Phone</th>
+                <th class="px-4 lg:px-5 py-3 text-center text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Lead Time</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Address</th>
                 <th class="px-4 lg:px-5 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Actions</th>
               </tr>
@@ -234,6 +239,12 @@
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ supplier.contact_person || '-' }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ supplier.email || '-' }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ supplier.phone || '-' }}</td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-center">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded-full">
+                    <UIcon name="i-lucide-clock" class="w-3 h-3" />
+                    {{ supplier.lead_time_days || 7 }}d
+                  </span>
+                </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 max-w-[200px] truncate">{{ supplier.address || '-' }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <div class="flex items-center justify-end gap-1">

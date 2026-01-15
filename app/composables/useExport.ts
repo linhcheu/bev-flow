@@ -430,7 +430,7 @@ export const useExport = () => {
 
 // Professional receipt-style exports for individual items
 export const useReceiptExport = () => {
-  // Export single sale as receipt PDF with multi-item support
+  // Export single sale as professional invoice PDF - A4 format
   const exportSaleReceipt = async (sale: any) => {
     const items = sale.items || [{ 
       product: sale.product, 
@@ -439,190 +439,249 @@ export const useReceiptExport = () => {
       amount: sale.total_amount 
     }];
     
-    // Calculate height based on number of items
-    const baseHeight = 175;
-    const itemHeight = 14;
-    const pageHeight = Math.max(baseHeight + (items.length * itemHeight), 200);
-    
-    const doc = new jsPDF('portrait', 'mm', [80, pageHeight]); // Receipt size
-    const pageWidth = 80;
-    let y = 8;
+    const doc = new jsPDF('portrait', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
 
-    // Light header with amber accent bar
-    doc.setFillColor(255, 255, 255); // white background
-    doc.rect(0, 0, pageWidth, 28, 'F');
-    
-    // Amber accent bar at top
-    doc.setFillColor(245, 158, 11); // amber-500
-    doc.rect(0, 0, pageWidth, 3, 'F');
-    
-    // Try to add logo
+    // === HEADER SECTION ===
     const logoBase64 = await loadLogoAsBase64();
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', 5, 6, 14, 14);
-        doc.setTextColor(39, 39, 42); // zinc-800
-        doc.setFontSize(13);
-        doc.setFont('helvetica', 'bold');
-        doc.text('BEV FLOW', 22, 12);
-        doc.setFontSize(7);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(113, 113, 122); // zinc-500
-        doc.text('Karaoke Inventory System', 22, 17);
+        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
       } catch {
-        doc.setTextColor(39, 39, 42);
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('BEV FLOW', pageWidth / 2, 12, { align: 'center' });
-        doc.setFontSize(7);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(113, 113, 122);
-        doc.text('Karaoke Inventory System', pageWidth / 2, 17, { align: 'center' });
+        // Continue without logo
       }
-    } else {
-      doc.setTextColor(39, 39, 42);
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('BEV FLOW', pageWidth / 2, 12, { align: 'center' });
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(113, 113, 122);
-      doc.text('Karaoke Inventory System', pageWidth / 2, 17, { align: 'center' });
     }
-    
-    // Bottom border line
-    doc.setDrawColor(228, 228, 231);
-    doc.setLineWidth(0.3);
-    doc.line(4, 24, pageWidth - 4, 24);
-    
-    // Invoice badge
-    doc.setFillColor(245, 158, 11); // amber-500
-    doc.roundedRect(pageWidth / 2 - 18, 26, 36, 8, 1, 1, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'bold');
-    doc.text('SALES INVOICE', pageWidth / 2, 31, { align: 'center' });
-    
-    y = 34;
-    doc.setTextColor(63, 63, 70); // zinc-700
 
-    // Invoice details box
-    doc.setFillColor(250, 250, 250);
-    doc.roundedRect(4, y - 2, pageWidth - 8, 18, 2, 2, 'F');
-    
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(113, 113, 122);
-    doc.text('Sale No:', 8, y + 3);
-    doc.text('Date:', 8, y + 8);
-    doc.text('Customer:', 8, y + 13);
-    
-    doc.setTextColor(39, 39, 42);
+    // Title
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text(sale.sale_number, pageWidth - 8, y + 3, { align: 'right' });
+    doc.setTextColor(39, 39, 42);
+    doc.text('Sales Invoice', pageWidth / 2, y + 8, { align: 'center' });
+
+    // Company Information (right side)
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('H2O - KTV, Restaurant, Steam Sauna', pageWidth - margin, y + 4, { align: 'right' });
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(82, 82, 91);
+    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
+
+    y += 30;
+
+    // Divider line
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 5;
+
+    // Invoice Number and Date row
     const saleDate = new Date(sale.sale_date).toLocaleDateString('en-US', { 
       year: 'numeric', month: 'short', day: 'numeric' 
     });
-    doc.text(saleDate, pageWidth - 8, y + 8, { align: 'right' });
-    doc.text(sale.customer?.customer_name || 'Walk-in Customer', pageWidth - 8, y + 13, { align: 'right' });
     
-    y += 22;
-
-    // Items header with subtle styling
-    doc.setDrawColor(228, 228, 231);
-    doc.setLineWidth(0.3);
-    doc.line(4, y, pageWidth - 4, y);
-    y += 4;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('DATE:', margin, y + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(saleDate, margin + 20, y + 5);
     
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6);
-    doc.setTextColor(113, 113, 122);
-    doc.text('ITEM', 6, y);
-    doc.text('QTY', 44, y, { align: 'right' });
-    doc.text('PRICE', 58, y, { align: 'right' });
-    doc.text('AMOUNT', pageWidth - 6, y, { align: 'right' });
-    y += 3;
-    doc.line(4, y, pageWidth - 4, y);
-    y += 5;
-
-    // Items with alternating background
+    doc.text('Invoice No.:', pageWidth - margin - 55, y + 5);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.setTextColor(39, 39, 42);
+    doc.setTextColor(245, 158, 11);
+    doc.text(sale.sale_number || 'N/A', pageWidth - margin - 25, y + 5);
     
-    items.forEach((item: any, index: number) => {
-      if (index % 2 === 0) {
-        doc.setFillColor(250, 250, 250);
-        doc.rect(4, y - 3, pageWidth - 8, 6, 'F');
-      }
-      
-      const productName = item.product?.product_name || 'Product';
-      const truncatedName = productName.length > 20 ? productName.substring(0, 17) + '...' : productName;
-      const amount = item.amount || (item.quantity * item.unit_price);
-      
-      doc.text(truncatedName, 6, y);
-      doc.text(String(item.quantity), 44, y, { align: 'right' });
-      doc.text(`$${Number(item.unit_price).toFixed(2)}`, 58, y, { align: 'right' });
-      doc.text(`$${Number(amount).toFixed(2)}`, pageWidth - 6, y, { align: 'right' });
-      y += 6;
+    y += 12;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    // === CUSTOMER & PAYMENT INFO ===
+    const halfWidth = (pageWidth - margin * 2 - 10) / 2;
+
+    // Customer Info Box
+    doc.setFillColor(240, 253, 244);
+    doc.setDrawColor(34, 197, 94);
+    doc.rect(margin, y, halfWidth, 40, 'FD');
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(22, 101, 52);
+    doc.text('Customer Information', margin + 3, y + 7);
+    
+    let fieldY = y + 14;
+    doc.setFontSize(8);
+    const customerFields = [
+      { label: 'Customer Name', value: sale.customer?.customer_name || 'Walk-in Customer' },
+      { label: 'Phone', value: sale.customer?.phone || '-' },
+      { label: 'Email', value: sale.customer?.email || '-' },
+    ];
+    
+    customerFields.forEach(field => {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text(field.label + ':', margin + 3, fieldY);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      doc.text(field.value, margin + 35, fieldY);
+      fieldY += 8;
     });
 
-    y += 2;
-    doc.setDrawColor(228, 228, 231);
-    doc.line(4, y, pageWidth - 4, y);
-    y += 5;
-
-    // Subtotal if multiple items
-    if (items.length > 1) {
-      doc.setFontSize(8);
-      doc.setTextColor(113, 113, 122);
-      doc.text('Subtotal:', 45, y, { align: 'right' });
-      doc.setTextColor(39, 39, 42);
-      doc.text(`$${Number(sale.subtotal || sale.total_amount).toFixed(2)}`, pageWidth - 6, y, { align: 'right' });
-      y += 6;
-    }
-
-    // Total with highlight
-    doc.setFillColor(245, 158, 11); // amber-500
-    doc.roundedRect(35, y - 3, pageWidth - 39, 10, 2, 2, 'F');
+    // Payment Info Box
+    doc.setFillColor(239, 246, 255);
+    doc.setDrawColor(59, 130, 246);
+    doc.rect(margin + halfWidth + 10, y, halfWidth, 40, 'FD');
+    
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text('TOTAL', 42, y + 3);
-    doc.text(`$${Number(sale.total_amount).toFixed(2)}`, pageWidth - 8, y + 3, { align: 'right' });
-    y += 14;
-
-    // Notes
-    if (sale.notes) {
+    doc.setTextColor(30, 64, 175);
+    doc.text('Payment Information', margin + halfWidth + 13, y + 7);
+    
+    fieldY = y + 14;
+    doc.setFontSize(8);
+    const paymentFields = [
+      { label: 'Payment Method', value: sale.payment_method || 'Cash' },
+      { label: 'Status', value: 'Completed' },
+      { label: 'Created By', value: sale.created_by || 'Admin' },
+    ];
+    
+    paymentFields.forEach(field => {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text(field.label + ':', margin + halfWidth + 13, fieldY);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6);
-      doc.setTextColor(113, 113, 122);
-      doc.text('Notes:', 6, y);
-      y += 3;
-      doc.setTextColor(63, 63, 70);
-      const splitNotes = doc.splitTextToSize(sale.notes, pageWidth - 12);
-      doc.text(splitNotes, 6, y);
-      y += splitNotes.length * 3 + 4;
+      doc.setTextColor(39, 39, 42);
+      doc.text(field.value, margin + halfWidth + 48, fieldY);
+      fieldY += 8;
+    });
+
+    y += 48;
+
+    // === ITEMS TABLE ===
+    const itemsData = items.map((item: any, index: number) => {
+      const amount = item.amount || (item.quantity * item.unit_price);
+      return [
+        String(index + 1),
+        item.product?.product_name || 'Product',
+        item.product?.description || '-',
+        String(item.quantity),
+        `$${Number(item.unit_price).toFixed(2)}`,
+        `$${Number(amount).toFixed(2)}`,
+      ];
+    });
+
+    autoTable(doc, {
+      head: [['No.', 'Product Name', 'Description', 'Qty', 'Unit Price', 'Amount']],
+      body: itemsData,
+      startY: y,
+      margin: { left: margin, right: margin },
+      headStyles: { 
+        fillColor: [39, 39, 42],
+        textColor: [255, 255, 255],
+        fontSize: 9,
+        fontStyle: 'bold',
+        halign: 'center',
+      },
+      styles: { 
+        fontSize: 8, 
+        cellPadding: 3,
+      },
+      columnStyles: {
+        0: { cellWidth: 12, halign: 'center' },
+        1: { cellWidth: 45 },
+        2: { cellWidth: 50 },
+        3: { cellWidth: 18, halign: 'center' },
+        4: { cellWidth: 25, halign: 'right' },
+        5: { cellWidth: 25, halign: 'right' },
+      },
+      alternateRowStyles: { fillColor: [250, 250, 250] },
+    });
+    
+    y = (doc as any).lastAutoTable.finalY + 5;
+
+    // === TOTALS SECTION ===
+    const totalsX = pageWidth - margin - 70;
+    
+    doc.setFillColor(250, 250, 250);
+    doc.rect(totalsX, y, 70, 40, 'F');
+    
+    let totalsY = y + 8;
+    
+    // Subtotal
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(82, 82, 91);
+    doc.text('SUBTOTAL', totalsX + 5, totalsY);
+    doc.setTextColor(39, 39, 42);
+    doc.text(`$${Number(sale.subtotal || sale.total_amount).toFixed(2)}`, totalsX + 65, totalsY, { align: 'right' });
+    totalsY += 8;
+    
+    // Discount if exists
+    if (sale.discount_amount && sale.discount_amount > 0) {
+      doc.setTextColor(82, 82, 91);
+      doc.text('Discount', totalsX + 5, totalsY);
+      doc.setTextColor(34, 197, 94);
+      doc.text(`-$${Number(sale.discount_amount).toFixed(2)}`, totalsX + 65, totalsY, { align: 'right' });
+      totalsY += 8;
+    }
+    
+    // Divider line
+    doc.setDrawColor(200, 200, 200);
+    doc.line(totalsX + 5, totalsY - 2, totalsX + 65, totalsY - 2);
+    totalsY += 6;
+    
+    // Total
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('TOTAL', totalsX + 5, totalsY);
+    doc.setTextColor(245, 158, 11);
+    doc.text(`$${Number(sale.total_amount).toFixed(2)}`, totalsX + 65, totalsY, { align: 'right' });
+
+    // Notes section (left side)
+    if (sale.notes) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text('Notes:', margin, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      const noteLines = doc.splitTextToSize(sale.notes, totalsX - margin - 10);
+      doc.text(noteLines, margin, y + 16);
     }
 
-    // Footer
+    y += 50;
+
+    // === THANK YOU MESSAGE ===
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(245, 158, 11);
+    doc.text('Thank you for your business!', pageWidth / 2, y, { align: 'center' });
+
+    // === FOOTER ===
+    const footerY = pageHeight - 12;
     doc.setDrawColor(228, 228, 231);
     doc.setLineWidth(0.3);
-    doc.line(4, y, pageWidth - 4, y);
-    y += 5;
+    doc.line(margin, footerY - 3, pageWidth - margin, footerY - 3);
     
-    doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
-    doc.setTextColor(113, 113, 122);
-    doc.text('Thank you for your business!', pageWidth / 2, y, { align: 'center' });
-    y += 4;
-    doc.setFontSize(6);
     doc.setTextColor(161, 161, 170);
-    const printDate = new Date().toLocaleString('en-US');
-    doc.text(`Printed: ${printDate}`, pageWidth / 2, y, { align: 'center' });
+    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, footerY);
+    doc.text('BEV Flow - Inventory Management System', pageWidth / 2, footerY, { align: 'center' });
+    doc.text('Page 1 of 1', pageWidth - margin, footerY, { align: 'right' });
 
-    doc.save(`sale_${sale.sale_number}.pdf`);
+    doc.save(`invoice_${sale.sale_number}.pdf`);
   };
 
   // Export single sale as Excel with professional formatting
@@ -715,137 +774,207 @@ export const useReceiptExport = () => {
   const exportProductDetail = async (product: any) => {
     const doc = new jsPDF('portrait', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    let y = 10;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
 
-    // Modern header with logo
-    doc.setFillColor(245, 158, 11); // amber-500
-    doc.rect(0, 0, pageWidth, 45, 'F');
-    
-    // Accent line - darker amber
-    doc.setFillColor(217, 119, 6); // amber-600
-    doc.rect(0, 45, pageWidth, 3, 'F');
-
-    // Try to add logo
+    // === HEADER SECTION ===
     const logoBase64 = await loadLogoAsBase64();
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', 14, 8, 25, 25);
+        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
+    // Title
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('Product Details', logoBase64 ? 45 : 20, 22);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(161, 161, 170);
-    doc.text('BEV Flow - Karaoke Inventory System', logoBase64 ? 45 : 20, 30);
-    
-    y = 60;
     doc.setTextColor(39, 39, 42);
+    doc.text('Product Information Sheet', pageWidth / 2, y + 8, { align: 'center' });
 
-    // Product name with badge
-    doc.setFontSize(20);
+    // Company Information (right side)
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text(product.product_name, 20, y);
+    doc.setTextColor(39, 39, 42);
+    doc.text('H2O - KTV, Restaurant, Steam Sauna', pageWidth - margin, y + 4, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(82, 82, 91);
+    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
+
+    y += 30;
+
+    // Divider
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    // === PRODUCT HEADER ===
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text(product.product_name, margin, y + 5);
     
     // Status badge
     const isLowStock = (product.current_stock || 0) <= (product.min_stock_level || 0);
     if (isLowStock) {
-      doc.setFillColor(254, 202, 202); // red-200
-      doc.roundedRect(pageWidth - 50, y - 8, 35, 10, 2, 2, 'F');
+      doc.setFillColor(254, 202, 202);
+      doc.roundedRect(pageWidth - margin - 35, y - 2, 35, 10, 2, 2, 'F');
       doc.setFontSize(8);
-      doc.setTextColor(153, 27, 27); // red-800
-      doc.text('Low Stock', pageWidth - 33, y - 1, { align: 'center' });
+      doc.setTextColor(153, 27, 27);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Low Stock', pageWidth - margin - 17.5, y + 5, { align: 'center' });
     } else {
-      doc.setFillColor(187, 247, 208); // green-200
-      doc.roundedRect(pageWidth - 45, y - 8, 30, 10, 2, 2, 'F');
+      doc.setFillColor(187, 247, 208);
+      doc.roundedRect(pageWidth - margin - 30, y - 2, 30, 10, 2, 2, 'F');
       doc.setFontSize(8);
-      doc.setTextColor(22, 101, 52); // green-800
-      doc.text('In Stock', pageWidth - 30, y - 1, { align: 'center' });
+      doc.setTextColor(22, 101, 52);
+      doc.setFont('helvetica', 'bold');
+      doc.text('In Stock', pageWidth - margin - 15, y + 5, { align: 'center' });
     }
     
-    y += 8;
-    doc.setFontSize(11);
+    y += 12;
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(113, 113, 122);
-    doc.text(`SKU: ${product.sku || 'N/A'}  •  Category: ${product.category || 'Uncategorized'}`, 20, y);
-    y += 15;
+    doc.text(`SKU: ${product.sku || 'N/A'}  |  Category: ${product.category || 'Uncategorized'}`, margin, y);
+    
+    y += 12;
 
-    // Info cards
-    const cardData: { label: string; value: string; color: [number, number, number] }[] = [
-      { label: 'Cost Price', value: `$${Number(product.cost_price || 0).toFixed(2)}`, color: [113, 113, 122] },
-      { label: 'Selling Price', value: `$${Number(product.selling_price || 0).toFixed(2)}`, color: [39, 39, 42] },
-      { label: 'Profit Margin', value: `$${(Number(product.selling_price || 0) - Number(product.cost_price || 0)).toFixed(2)}`, color: [34, 197, 94] },
+    // === PRICING & STOCK INFO BOXES ===
+    const thirdWidth = (pageWidth - margin * 2 - 20) / 3;
+
+    // Cost Price Box
+    doc.setFillColor(240, 253, 244);
+    doc.setDrawColor(34, 197, 94);
+    doc.rect(margin, y, thirdWidth, 35, 'FD');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(22, 101, 52);
+    doc.text('Cost Price', margin + 5, y + 10);
+    doc.setFontSize(16);
+    doc.text(`$${Number(product.cost_price || 0).toFixed(2)}`, margin + 5, y + 25);
+
+    // Selling Price Box
+    doc.setFillColor(254, 243, 199);
+    doc.setDrawColor(245, 158, 11);
+    doc.rect(margin + thirdWidth + 10, y, thirdWidth, 35, 'FD');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(180, 83, 9);
+    doc.text('Selling Price', margin + thirdWidth + 15, y + 10);
+    doc.setFontSize(16);
+    doc.text(`$${Number(product.selling_price || 0).toFixed(2)}`, margin + thirdWidth + 15, y + 25);
+
+    // Profit Margin Box
+    doc.setFillColor(239, 246, 255);
+    doc.setDrawColor(59, 130, 246);
+    doc.rect(margin + (thirdWidth + 10) * 2, y, thirdWidth, 35, 'FD');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(30, 64, 175);
+    doc.text('Profit Margin', margin + (thirdWidth + 10) * 2 + 5, y + 10);
+    doc.setFontSize(16);
+    const profit = Number(product.selling_price || 0) - Number(product.cost_price || 0);
+    doc.text(`$${profit.toFixed(2)}`, margin + (thirdWidth + 10) * 2 + 5, y + 25);
+
+    y += 45;
+
+    // === STOCK & SUPPLIER DETAILS ===
+    const halfWidth = (pageWidth - margin * 2 - 10) / 2;
+
+    // Stock Information Box
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(margin, y, halfWidth, 50, 'FD');
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('Stock Information', margin + 5, y + 10);
+    
+    let fieldY = y + 20;
+    doc.setFontSize(8);
+    const stockFields = [
+      { label: 'Current Stock', value: String(product.current_stock || 0) },
+      { label: 'Min Stock Level', value: String(product.min_stock_level || 0) },
+      { label: 'Reorder Status', value: isLowStock ? 'Reorder Required' : 'Stock OK' },
     ];
     
-    const cardWidth = (pageWidth - 52) / 3;
-    cardData.forEach((card, index) => {
-      const x = 20 + (index * (cardWidth + 6));
-      doc.setFillColor(250, 250, 250);
-      doc.roundedRect(x, y, cardWidth, 28, 3, 3, 'F');
-      
-      doc.setFontSize(9);
-      doc.setTextColor(113, 113, 122);
-      doc.text(card.label, x + 8, y + 10);
-      
-      doc.setFontSize(16);
+    stockFields.forEach(field => {
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(card.color[0], card.color[1], card.color[2]);
-      doc.text(card.value, x + 8, y + 22);
+      doc.setTextColor(82, 82, 91);
+      doc.text(field.label + ':', margin + 5, fieldY);
       doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      doc.text(field.value, margin + 40, fieldY);
+      fieldY += 9;
     });
 
-    y += 40;
-
-    // Details table
+    // Supplier Information Box
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(margin + halfWidth + 10, y, halfWidth, 50, 'FD');
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
-    const details = [
-      ['Supplier', product.supplier?.company_name || 'N/A'],
-      ['Current Stock', String(product.current_stock || 0)],
-      ['Min Stock Level', String(product.min_stock_level || 0)],
-      ['Status', isLowStock ? 'Low Stock - Reorder Required' : 'Stock Level OK'],
+    doc.text('Supplier Information', margin + halfWidth + 15, y + 10);
+    
+    fieldY = y + 20;
+    doc.setFontSize(8);
+    const supplierFields = [
+      { label: 'Company', value: product.supplier?.company_name || 'N/A' },
+      { label: 'Contact', value: product.supplier?.contact_person || '-' },
+      { label: 'Phone', value: product.supplier?.phone || '-' },
     ];
-
-    autoTable(doc, {
-      body: details,
-      startY: y,
-      theme: 'plain',
-      styles: { fontSize: 11, cellPadding: 6 },
-      columnStyles: {
-        0: { fontStyle: 'bold', cellWidth: 55, textColor: [113, 113, 122] },
-        1: { cellWidth: 110, textColor: [39, 39, 42] },
-      },
+    
+    supplierFields.forEach(field => {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text(field.label + ':', margin + halfWidth + 15, fieldY);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      doc.text(field.value.substring(0, 25), margin + halfWidth + 40, fieldY);
+      fieldY += 9;
     });
 
-    // Description
+    y += 60;
+
+    // === DESCRIPTION ===
     if (product.description) {
-      y = (doc as any).lastAutoTable.finalY + 15;
-      doc.setFontSize(13);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 8;
+      
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(39, 39, 42);
-      doc.text('Description', 20, y);
+      doc.text('Description', margin, y);
       y += 8;
-      doc.setFontSize(10);
+      
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(82, 82, 91); // zinc-600
-      const splitDesc = doc.splitTextToSize(product.description, 170);
-      doc.text(splitDesc, 20, y);
+      doc.setTextColor(82, 82, 91);
+      const descLines = doc.splitTextToSize(product.description, pageWidth - margin * 2);
+      doc.text(descLines, margin, y);
     }
 
-    // Footer
-    const footerY = doc.internal.pageSize.getHeight() - 10;
+    // === FOOTER ===
+    const footerY = pageHeight - 12;
     doc.setDrawColor(228, 228, 231);
     doc.setLineWidth(0.3);
-    doc.line(14, footerY - 5, pageWidth - 14, footerY - 5);
+    doc.line(margin, footerY - 3, pageWidth - margin, footerY - 3);
     
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(161, 161, 170);
-    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 14, footerY);
-    doc.text('BEV Flow', pageWidth - 14, footerY, { align: 'right' });
+    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, footerY);
+    doc.text('BEV Flow - Inventory Management System', pageWidth / 2, footerY, { align: 'center' });
+    doc.text('Page 1 of 1', pageWidth - margin, footerY, { align: 'right' });
 
     doc.save(`product_${product.sku || product.product_id}.pdf`);
   };
@@ -958,194 +1087,293 @@ export const useReceiptExport = () => {
     doc.save(`supplier_${supplier.company_name.replace(/\s+/g, '_')}.pdf`);
   };
 
-  // Export single purchase order as detail PDF with logo
+  // Export single purchase order as detail PDF with logo - Professional Form Layout
   const exportPurchaseOrderDetail = async (po: any) => {
     const doc = new jsPDF('portrait', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    let y = 10;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
 
-    // Modern header
-    doc.setFillColor(245, 158, 11); // amber-500
-    doc.rect(0, 0, pageWidth, 45, 'F');
-    
-    doc.setFillColor(217, 119, 6); // amber-600
-    doc.rect(0, 45, pageWidth, 3, 'F');
-
+    // === HEADER SECTION ===
+    // Company Logo and Title
     const logoBase64 = await loadLogoAsBase64();
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', 14, 8, 25, 25);
+        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Purchase Order', logoBase64 ? 45 : 20, 22);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(161, 161, 170);
-    doc.text('BEV Flow - Karaoke Inventory System', logoBase64 ? 45 : 20, 30);
-    
-    y = 58;
-    doc.setTextColor(39, 39, 42);
-
-    // PO Number and Status
+    // Title - "Purchasing Order Form"
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text(`PO #${po.po_number}`, 20, y);
-    
-    // Status badge with modern colors
-    const statusColors: Record<string, { bg: [number, number, number]; text: [number, number, number] }> = {
-      'Pending': { bg: [254, 243, 199], text: [180, 83, 9] },
-      'Ordered': { bg: [219, 234, 254], text: [30, 64, 175] },
-      'Shipped': { bg: [243, 232, 255], text: [126, 34, 206] },
-      'Received': { bg: [187, 247, 208], text: [22, 101, 52] },
-      'Cancelled': { bg: [254, 202, 202], text: [153, 27, 27] },
-    };
-    const statusStyle = statusColors[po.status] || { bg: [228, 228, 231], text: [63, 63, 70] };
-    
-    doc.setFillColor(statusStyle.bg[0], statusStyle.bg[1], statusStyle.bg[2]);
-    doc.roundedRect(pageWidth - 55, y - 8, 40, 12, 3, 3, 'F');
-    doc.setTextColor(statusStyle.text[0], statusStyle.text[1], statusStyle.text[2]);
+    doc.setTextColor(39, 39, 42);
+    doc.text('Purchasing Order Form', pageWidth / 2, y + 8, { align: 'center' });
+
+    // Company Information (right side)
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text(po.status, pageWidth - 35, y - 1, { align: 'center' });
-    
-    y += 15;
+    doc.setTextColor(39, 39, 42);
+    doc.text('H2O - KTV, Restaurant, Steam Sauna', pageWidth - margin, y + 4, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(82, 82, 91);
+    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
 
-    // Info cards row
+    y += 30;
+
+    // Date and PO Number row
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 5;
+
     const orderDate = po.order_date ? new Date(po.order_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
-    const etaDate = po.eta_date ? new Date(po.eta_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
     
-    doc.setFillColor(250, 250, 250);
-    doc.roundedRect(20, y, pageWidth - 40, 25, 3, 3, 'F');
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('DATE:', margin, y + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(orderDate, margin + 20, y + 5);
     
-    const cardWidth = (pageWidth - 50) / 3;
-    [
-      { label: 'Supplier', value: po.supplier?.company_name || 'N/A' },
-      { label: 'Order Date', value: orderDate },
-      { label: 'ETA', value: etaDate },
-    ].forEach((item, index) => {
-      const x = 25 + (index * cardWidth);
-      doc.setFontSize(8);
-      doc.setTextColor(113, 113, 122);
-      doc.text(item.label, x, y + 8);
-      doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PO No.:', pageWidth - margin - 50, y + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(245, 158, 11);
+    doc.text(po.po_number || 'N/A', pageWidth - margin - 25, y + 5);
+    
+    y += 12;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    // === SUPPLIER INFORMATION SECTION ===
+    const halfWidth = (pageWidth - margin * 2 - 10) / 2;
+
+    // Supplier Info Box
+    doc.setFillColor(240, 253, 244); // light green bg
+    doc.setDrawColor(34, 197, 94);
+    doc.rect(margin, y, halfWidth, 55, 'FD');
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(22, 101, 52);
+    doc.text('Supplier Information', margin + 3, y + 7);
+    
+    const supplierFields = [
+      { label: 'Company Name', value: po.supplier?.company_name || '-' },
+      { label: 'Address', value: po.supplier?.address || '-' },
+      { label: 'Phone', value: po.supplier?.phone || '-' },
+      { label: 'Email', value: po.supplier?.email || '-' },
+      { label: 'Contact Person', value: po.supplier?.contact_person || '-' },
+    ];
+
+    let fieldY = y + 14;
+    doc.setFontSize(8);
+    supplierFields.forEach(field => {
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(39, 39, 42);
-      doc.text(item.value.substring(0, 20), x, y + 17);
+      doc.setTextColor(82, 82, 91);
+      doc.text(field.label + ':', margin + 3, fieldY);
       doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      const valueText = doc.splitTextToSize(field.value, halfWidth - 35);
+      doc.text(valueText[0] || '-', margin + 35, fieldY);
+      fieldY += 8;
     });
 
-    y += 35;
+    // Third Party Agent Box
+    doc.setFillColor(254, 243, 199); // light amber bg
+    doc.setDrawColor(245, 158, 11);
+    doc.rect(margin + halfWidth + 10, y, halfWidth, 55, 'FD');
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(180, 83, 9);
+    doc.text('Third Party Agent', margin + halfWidth + 13, y + 7);
+    
+    const agentFields = [
+      { label: 'Co-Loader Name', value: po.third_party_agent || '-' },
+      { label: 'Address', value: po.agent_address || '-' },
+      { label: 'Phone', value: po.agent_phone || '-' },
+      { label: 'Email', value: po.agent_email || '-' },
+      { label: 'Agent Name', value: po.third_party_agent || '-' },
+    ];
 
-    // Additional details
-    if (po.third_party_agent || po.truck_remark) {
-      const details = [];
-      if (po.third_party_agent) details.push(['Third Party Agent', `${po.third_party_agent}${po.agent_phone ? ' • ' + po.agent_phone : ''}`]);
-      if (po.truck_remark) details.push(['Truck Remark', po.truck_remark]);
-      
-      autoTable(doc, {
-        body: details,
-        startY: y,
-        theme: 'plain',
-        styles: { fontSize: 10, cellPadding: 4 },
-        columnStyles: {
-          0: { fontStyle: 'bold', cellWidth: 45, textColor: [113, 113, 122] },
-          1: { cellWidth: 120, textColor: [63, 63, 70] },
-        },
-      });
-      y = (doc as any).lastAutoTable.finalY + 8;
-    }
-
-    // Items table
-    if (po.items && po.items.length > 0) {
-      doc.setFontSize(12);
+    fieldY = y + 14;
+    doc.setFontSize(8);
+    agentFields.forEach(field => {
       doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text(field.label + ':', margin + halfWidth + 13, fieldY);
+      doc.setFont('helvetica', 'normal');
       doc.setTextColor(39, 39, 42);
-      doc.text('Order Items', 20, y);
-      y += 6;
+      const valueText = doc.splitTextToSize(field.value, halfWidth - 40);
+      doc.text(valueText[0] || '-', margin + halfWidth + 48, fieldY);
+      fieldY += 8;
+    });
 
-      const itemsData = po.items.map((item: any) => [
+    y += 62;
+
+    // === TRANSPORT / ETA / REMARK ROW ===
+    doc.setFillColor(243, 244, 246);
+    doc.rect(margin, y, pageWidth - margin * 2, 12, 'F');
+    
+    const etaDate = po.eta_date ? new Date(po.eta_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
+    const thirdWidth = (pageWidth - margin * 2) / 3;
+    
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Requested Arrival:', margin + 3, y + 7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(39, 39, 42);
+    doc.text(etaDate, margin + 35, y + 7);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Transport Method:', margin + thirdWidth + 3, y + 7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(39, 39, 42);
+    doc.text(po.truck_remark || 'Standard', margin + thirdWidth + 40, y + 7);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Remark:', margin + thirdWidth * 2 + 3, y + 7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(39, 39, 42);
+    doc.text((po.overall_remark || '-').substring(0, 25), margin + thirdWidth * 2 + 20, y + 7);
+
+    y += 18;
+
+    // === ITEMS TABLE ===
+    if (po.items && po.items.length > 0) {
+      const itemsData = po.items.map((item: any, index: number) => [
+        String(index + 1),
         item.product?.product_name || 'N/A',
+        item.product?.description || '-',
         String(item.quantity),
         `$${Number(item.unit_cost).toFixed(2)}`,
         `$${Number(item.amount).toFixed(2)}`,
       ]);
 
       autoTable(doc, {
-        head: [['Product', 'Qty', 'Unit Cost', 'Amount']],
+        head: [['No.', 'Product Name', 'Description', 'Qty', 'Unit Price', 'Amount']],
         body: itemsData,
         startY: y,
+        margin: { left: margin, right: margin },
         headStyles: { 
           fillColor: [39, 39, 42],
           textColor: [255, 255, 255],
           fontSize: 9,
+          fontStyle: 'bold',
+          halign: 'center',
         },
-        styles: { fontSize: 9, cellPadding: 4 },
+        styles: { 
+          fontSize: 8, 
+          cellPadding: 3,
+        },
+        columnStyles: {
+          0: { cellWidth: 12, halign: 'center' },
+          1: { cellWidth: 45 },
+          2: { cellWidth: 50 },
+          3: { cellWidth: 18, halign: 'center' },
+          4: { cellWidth: 25, halign: 'right' },
+          5: { cellWidth: 25, halign: 'right' },
+        },
         alternateRowStyles: { fillColor: [250, 250, 250] },
       });
+      
+      y = (doc as any).lastAutoTable.finalY + 5;
     }
 
-    // Totals with modern styling
-    y = (doc as any).lastAutoTable.finalY + 8;
+    // === TOTALS SECTION ===
+    const totalsX = pageWidth - margin - 70;
     
     doc.setFillColor(250, 250, 250);
-    doc.roundedRect(pageWidth - 85, y, 70, 45, 3, 3, 'F');
+    doc.rect(totalsX, y, 70, 45, 'F');
     
-    const totals = [
-      { label: 'Subtotal', value: `$${Number(po.subtotal || 0).toFixed(2)}` },
-      { label: 'Shipping', value: `$${Number(po.shipping_cost || 0).toFixed(2)}` },
-      { label: 'Promotion', value: `-$${Number(po.promotion_amount || 0).toFixed(2)}` },
-    ];
+    let totalsY = y + 8;
     
-    let totalY = y + 8;
-    totals.forEach(item => {
-      doc.setFontSize(9);
-      doc.setTextColor(113, 113, 122);
-      doc.text(item.label, pageWidth - 80, totalY);
-      doc.text(item.value, pageWidth - 20, totalY, { align: 'right' });
-      totalY += 8;
-    });
+    // Subtotal
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(82, 82, 91);
+    doc.text('SUBTOTAL', totalsX + 5, totalsY);
+    doc.setTextColor(39, 39, 42);
+    doc.text(`$${Number(po.subtotal || 0).toFixed(2)}`, totalsX + 65, totalsY, { align: 'right' });
+    totalsY += 8;
     
-    // Total highlight
-    doc.setDrawColor(228, 228, 231);
-    doc.line(pageWidth - 80, totalY - 2, pageWidth - 20, totalY - 2);
-    totalY += 5;
-    doc.setFontSize(12);
+    // Shipping Cost
+    doc.setTextColor(82, 82, 91);
+    doc.text('SHIPPING Cost 3%', totalsX + 5, totalsY);
+    doc.setTextColor(39, 39, 42);
+    doc.text(`$${Number(po.shipping_cost || 0).toFixed(2)}`, totalsX + 65, totalsY, { align: 'right' });
+    totalsY += 8;
+    
+    // Promotion Amount
+    doc.setTextColor(82, 82, 91);
+    doc.text('Promotion Amount', totalsX + 5, totalsY);
+    doc.setTextColor(34, 197, 94);
+    doc.text(`-$${Number(po.promotion_amount || 0).toFixed(2)}`, totalsX + 65, totalsY, { align: 'right' });
+    totalsY += 3;
+    
+    // Divider line
+    doc.setDrawColor(200, 200, 200);
+    doc.line(totalsX + 5, totalsY, totalsX + 65, totalsY);
+    totalsY += 8;
+    
+    // Total
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
-    doc.text('TOTAL', pageWidth - 80, totalY);
+    doc.text('TOTAL', totalsX + 5, totalsY);
     doc.setTextColor(245, 158, 11);
-    doc.text(`$${Number(po.total_amount || 0).toFixed(2)}`, pageWidth - 20, totalY, { align: 'right' });
+    doc.text(`$${Number(po.total_amount || 0).toFixed(2)}`, totalsX + 65, totalsY, { align: 'right' });
 
-    // Remarks
+    // Remark section (left side, same row as totals)
     if (po.overall_remark) {
-      y += 55;
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(39, 39, 42);
-      doc.text('Remarks', 20, y);
-      y += 5;
-      doc.setFont('helvetica', 'normal');
       doc.setTextColor(82, 82, 91);
-      const splitRemark = doc.splitTextToSize(po.overall_remark, 170);
-      doc.text(splitRemark, 20, y);
+      doc.text('Remark:', margin, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      const remarkLines = doc.splitTextToSize(po.overall_remark, totalsX - margin - 10);
+      doc.text(remarkLines, margin, y + 16);
     }
 
-    // Footer
-    const footerY = doc.internal.pageSize.getHeight() - 10;
+    y += 55;
+
+    // === AUTHORIZATION SECTION ===
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Authorized by section
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Authorized by:', margin, y);
+    doc.line(margin + 25, y + 1, margin + 80, y + 1);
+    
+    doc.text('Date:', pageWidth - margin - 55, y);
+    doc.line(pageWidth - margin - 42, y + 1, pageWidth - margin, y + 1);
+
+    // === FOOTER ===
+    const footerY = pageHeight - 12;
     doc.setDrawColor(228, 228, 231);
     doc.setLineWidth(0.3);
-    doc.line(14, footerY - 5, pageWidth - 14, footerY - 5);
+    doc.line(margin, footerY - 3, pageWidth - margin, footerY - 3);
     
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(161, 161, 170);
-    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 14, footerY);
-    doc.text('BEV Flow', pageWidth - 14, footerY, { align: 'right' });
+    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, footerY);
+    doc.text('BEV Flow - Inventory Management System', pageWidth / 2, footerY, { align: 'center' });
+    doc.text(`Page 1 of 1`, pageWidth - margin, footerY, { align: 'right' });
 
     doc.save(`PO_${po.po_number}.pdf`);
   };
@@ -1154,145 +1382,226 @@ export const useReceiptExport = () => {
   const exportForecastDetail = async (forecast: any) => {
     const doc = new jsPDF('portrait', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    let y = 10;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
 
-    // Modern header - purple for AI forecast theme
-    doc.setFillColor(139, 92, 246); // purple-500
-    doc.rect(0, 0, pageWidth, 45, 'F');
-    
-    doc.setFillColor(124, 58, 237); // purple-600 accent
-    doc.rect(0, 45, pageWidth, 3, 'F');
-
+    // === HEADER SECTION ===
     const logoBase64 = await loadLogoAsBase64();
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', 14, 8, 25, 25);
+        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Sales Forecast', logoBase64 ? 45 : 20, 22);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(161, 161, 170);
-    doc.text('BEV Flow - AI-Powered Prediction', logoBase64 ? 45 : 20, 30);
-    
-    y = 60;
-    doc.setTextColor(39, 39, 42);
-
-    // Product name
+    // Title
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text(forecast.product?.product_name || 'Unknown Product', 20, y);
-    y += 18;
+    doc.setTextColor(139, 92, 246);
+    doc.text('AI Sales Forecast Report', pageWidth / 2, y + 8, { align: 'center' });
 
-    // Prediction cards
+    // Company Information (right side)
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('H2O - KTV, Restaurant, Steam Sauna', pageWidth - margin, y + 4, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(82, 82, 91);
+    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
+
+    y += 30;
+
+    // Divider
+    doc.setDrawColor(139, 92, 246);
+    doc.setLineWidth(1);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    // Report date and period
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('Report Date:', margin, y + 5);
+    doc.setFont('helvetica', 'normal');
+    const reportDate = forecast.forecast_date ? new Date(forecast.forecast_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : new Date().toLocaleDateString('en-US');
+    doc.text(reportDate, margin + 30, y + 5);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('Forecast Period:', pageWidth - margin - 55, y + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(forecast.forecast_period || 'Weekly', pageWidth - margin - 15, y + 5);
+    
+    y += 15;
+
+    // === PRODUCT INFORMATION ===
+    doc.setFillColor(243, 232, 255);
+    doc.setDrawColor(139, 92, 246);
+    doc.rect(margin, y, pageWidth - margin * 2, 25, 'FD');
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(126, 34, 206);
+    doc.text('Product: ' + (forecast.product?.product_name || 'Unknown Product'), margin + 5, y + 10);
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(82, 82, 91);
+    doc.text(`SKU: ${forecast.product?.sku || 'N/A'}  |  Category: ${forecast.product?.category || 'Uncategorized'}`, margin + 5, y + 18);
+
+    y += 35;
+
+    // === FORECAST METRICS ===
+    const thirdWidth = (pageWidth - margin * 2 - 20) / 3;
     const currentStock = forecast.product?.current_stock || 0;
     const predicted = forecast.predicted_quantity || 0;
     const confidence = forecast.confidence_score || 0;
     
-    const getConfidenceColor = (conf: number): [number, number, number] => {
-      if (conf >= 80) return [34, 197, 94];
-      if (conf >= 50) return [245, 158, 11];
-      return [239, 68, 68];
-    };
+    // Predicted Demand Box
+    doc.setFillColor(139, 92, 246);
+    doc.rect(margin, y, thirdWidth, 45, 'F');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text('Predicted Demand', margin + 5, y + 12);
+    doc.setFontSize(24);
+    doc.text(String(predicted), margin + 5, y + 32);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('units', margin + 5, y + 40);
+
+    // Confidence Score Box
+    const confColor: [number, number, number] = confidence >= 80 ? [34, 197, 94] : confidence >= 50 ? [245, 158, 11] : [239, 68, 68];
+    doc.setFillColor(confColor[0], confColor[1], confColor[2]);
+    doc.rect(margin + thirdWidth + 10, y, thirdWidth, 45, 'F');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text('AI Confidence', margin + thirdWidth + 15, y + 12);
+    doc.setFontSize(24);
+    doc.text(`${confidence}%`, margin + thirdWidth + 15, y + 32);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text(confidence >= 80 ? 'High' : confidence >= 50 ? 'Medium' : 'Low', margin + thirdWidth + 15, y + 40);
+
+    // Current Stock Box
+    doc.setFillColor(63, 63, 70);
+    doc.rect(margin + (thirdWidth + 10) * 2, y, thirdWidth, 45, 'F');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text('Current Stock', margin + (thirdWidth + 10) * 2 + 5, y + 12);
+    doc.setFontSize(24);
+    doc.text(String(currentStock), margin + (thirdWidth + 10) * 2 + 5, y + 32);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('units', margin + (thirdWidth + 10) * 2 + 5, y + 40);
+
+    y += 55;
+
+    // === STOCK ANALYSIS ===
+    const halfWidth = (pageWidth - margin * 2 - 10) / 2;
+
+    // Analysis Box
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(margin, y, halfWidth, 50, 'FD');
     
-    const cards: { label: string; value: string; color: [number, number, number] }[] = [
-      { label: 'Predicted Demand', value: String(predicted), color: [139, 92, 246] },
-      { label: 'Confidence', value: `${confidence}%`, color: getConfidenceColor(confidence) },
-      { label: 'Current Stock', value: String(currentStock), color: [63, 63, 70] },
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('Stock Analysis', margin + 5, y + 10);
+    
+    let fieldY = y + 20;
+    doc.setFontSize(8);
+    const minLevel = forecast.product?.min_stock_level || 0;
+    const stockDiff = currentStock - predicted;
+    const analysisFields = [
+      { label: 'Min Stock Level', value: String(minLevel) },
+      { label: 'Stock Difference', value: `${stockDiff >= 0 ? '+' : ''}${stockDiff}` },
+      { label: 'Restock Needed', value: predicted > currentStock ? 'Yes' : 'No' },
     ];
     
-    const cardWidth = (pageWidth - 52) / 3;
-    cards.forEach((card, index) => {
-      const x = 20 + (index * (cardWidth + 6));
-      doc.setFillColor(250, 250, 250);
-      doc.roundedRect(x, y, cardWidth, 32, 3, 3, 'F');
-      
-      doc.setFontSize(9);
-      doc.setTextColor(113, 113, 122);
-      doc.text(card.label, x + 10, y + 12);
-      
-      doc.setFontSize(20);
+    analysisFields.forEach(field => {
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(card.color[0], card.color[1], card.color[2]);
-      doc.text(card.value, x + 10, y + 26);
+      doc.setTextColor(82, 82, 91);
+      doc.text(field.label + ':', margin + 5, fieldY);
       doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      doc.text(field.value, margin + 40, fieldY);
+      fieldY += 9;
     });
 
-    y += 45;
-
-    // Details section
-    const details = [
-      ['Forecast Period', forecast.forecast_period || 'N/A'],
-      ['Min Stock Level', String(forecast.product?.min_stock_level || 0)],
-      ['Restock Needed', predicted > currentStock ? 'Yes' : 'No'],
-      ['Forecast Date', forecast.forecast_date ? new Date(forecast.forecast_date).toLocaleDateString('en-US') : 'N/A'],
-    ];
-
-    autoTable(doc, {
-      body: details,
-      startY: y,
-      theme: 'plain',
-      styles: { fontSize: 11, cellPadding: 6 },
-      columnStyles: {
-        0: { fontStyle: 'bold', cellWidth: 55, textColor: [113, 113, 122] },
-        1: { cellWidth: 80, textColor: [39, 39, 42] },
-      },
-    });
-
-    // AI Recommendation section
-    y = (doc as any).lastAutoTable.finalY + 15;
-    
-    // Recommendation box
+    // Recommendation Box
     const needsReorder = predicted > currentStock;
     if (needsReorder) {
       doc.setFillColor(254, 243, 199);
+      doc.setDrawColor(245, 158, 11);
     } else {
       doc.setFillColor(220, 252, 231);
+      doc.setDrawColor(34, 197, 94);
     }
-    doc.roundedRect(20, y - 5, pageWidth - 40, 45, 3, 3, 'F');
+    doc.rect(margin + halfWidth + 10, y, halfWidth, 50, 'FD');
     
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     if (needsReorder) {
       doc.setTextColor(180, 83, 9);
+      doc.text('⚠️ Action Required', margin + halfWidth + 15, y + 10);
     } else {
       doc.setTextColor(22, 101, 52);
+      doc.text('✓ Stock Sufficient', margin + halfWidth + 15, y + 10);
     }
-    doc.text('🤖 AI Recommendation', 28, y + 5);
     
-    y += 12;
-    doc.setFontSize(10);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(82, 82, 91);
     
-    const minLevel = forecast.product?.min_stock_level || 0;
-    let recommendation = '';
-    if (predicted > currentStock) {
+    let recText = '';
+    if (needsReorder) {
       const reorderQty = predicted - currentStock + minLevel;
-      recommendation = `Based on the AI forecast, it is recommended to order approximately ${reorderQty} units to meet the predicted demand of ${predicted} units and maintain a safety stock of ${minLevel} units.`;
+      recText = `Recommended order quantity: ${reorderQty} units to meet demand and maintain safety stock.`;
     } else {
-      recommendation = `Current stock levels of ${currentStock} units appear sufficient to meet the predicted demand of ${predicted} units. No immediate restocking is required.`;
+      recText = `Current stock of ${currentStock} units is sufficient to meet the predicted demand.`;
     }
-    
-    const splitRec = doc.splitTextToSize(recommendation, pageWidth - 56);
-    doc.text(splitRec, 28, y + 5);
+    const recLines = doc.splitTextToSize(recText, halfWidth - 15);
+    doc.text(recLines, margin + halfWidth + 15, y + 22);
 
-    // Footer
-    const footerY = doc.internal.pageSize.getHeight() - 10;
+    y += 60;
+
+    // === AI INSIGHTS ===
+    doc.setDrawColor(139, 92, 246);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(139, 92, 246);
+    doc.text('🤖 AI-Powered Insights', margin, y);
+    y += 10;
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(82, 82, 91);
+    const insights = `This forecast is generated using machine learning algorithms that analyze historical sales data, seasonal patterns, and market trends. The confidence score of ${confidence}% indicates the model's certainty in this prediction. ${needsReorder ? 'Immediate action is recommended to prevent stockouts.' : 'No immediate action is required.'}`;
+    const insightLines = doc.splitTextToSize(insights, pageWidth - margin * 2);
+    doc.text(insightLines, margin, y);
+
+    // === FOOTER ===
+    const footerY = pageHeight - 12;
     doc.setDrawColor(228, 228, 231);
     doc.setLineWidth(0.3);
-    doc.line(14, footerY - 5, pageWidth - 14, footerY - 5);
+    doc.line(margin, footerY - 3, pageWidth - margin, footerY - 3);
     
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(161, 161, 170);
-    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 14, footerY);
-    doc.text('BEV Flow', pageWidth - 14, footerY, { align: 'right' });
+    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, footerY);
+    doc.text('BEV Flow - AI-Powered Inventory Management', pageWidth / 2, footerY, { align: 'center' });
+    doc.text('Page 1 of 1', pageWidth - margin, footerY, { align: 'right' });
 
     doc.save(`forecast_${forecast.product?.product_name?.replace(/\s+/g, '_') || forecast.forecast_id}.pdf`);
   };

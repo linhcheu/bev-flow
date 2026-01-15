@@ -80,10 +80,14 @@ export interface PurchaseOrder {
   subtotal?: number;
   shipping_rate?: number;
   shipping_cost?: number;
+  promotion_percent?: number;
   promotion_amount?: number;
   promotion_text?: string;
   total_amount?: number;
   status: POStatus;
+  received_date?: string;
+  received_by?: string;
+  received_notes?: string;
   truck_remark?: string;
   overall_remark?: string;
   third_party_agent?: string;
@@ -228,6 +232,7 @@ export interface PurchaseOrderFormData {
   order_date: string;
   eta_date?: string;
   items: PurchaseOrderItemFormData[];
+  promotion_percent?: number;
   promotion_amount?: number;
   promotion_text?: string;
   truck_remark?: string;

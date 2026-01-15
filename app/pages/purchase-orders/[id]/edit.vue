@@ -202,7 +202,9 @@
                         type="number"
                         step="0.01"
                         min="0"
-                        class="input text-sm py-2 w-24 text-right pl-7"
+                        readonly
+                        class="input text-sm py-2 w-24 text-right pl-7 bg-zinc-50 cursor-not-allowed"
+                        title="Unit cost is auto-populated from product"
                       />
                     </div>
                   </td>
@@ -279,7 +281,9 @@
                       type="number"
                       step="0.01"
                       min="0"
-                      class="input text-sm py-2 w-full text-right pl-7"
+                      readonly
+                      class="input text-sm py-2 w-full text-right pl-7 bg-zinc-50 cursor-not-allowed"
+                      title="Unit cost is auto-populated from product"
                     />
                   </div>
                 </div>
@@ -304,8 +308,25 @@
               <span class="text-sm text-zinc-500">Shipping (3%):</span>
               <span class="text-sm text-zinc-900 sm:w-28 text-right">${{ shippingCost.toFixed(2) }}</span>
             </div>
+            <!-- Promotion Percentage -->
             <div class="flex justify-between sm:justify-end items-center gap-4">
-              <span class="text-sm text-zinc-500">Promotion:</span>
+              <span class="text-sm text-zinc-500">Promotion (%):</span>
+              <div class="relative w-24 sm:w-28">
+                <input 
+                  v-model.number="form.promotion_percent"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  class="input text-sm py-1 text-right pr-7"
+                  @input="onPromotionPercentChange"
+                />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">%</span>
+              </div>
+            </div>
+            <!-- Promotion Amount (Dollar) -->
+            <div class="flex justify-between sm:justify-end items-center gap-4">
+              <span class="text-sm text-zinc-500">Promotion ($):</span>
               <div class="relative w-24 sm:w-28">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">-$</span>
                 <input 
@@ -314,6 +335,7 @@
                   step="0.01"
                   min="0"
                   class="input text-sm py-1 text-right pl-8"
+                  @input="onPromotionAmountChange"
                 />
               </div>
             </div>
@@ -364,6 +386,75 @@
               />
             </div>
           </div>
+        </div>
+        
+        <!-- Third Party Agent Card (Optional - for rare cases) -->
+        <div class="bg-white border border-zinc-200 rounded-xl p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 bg-orange-50 rounded-lg flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-truck" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600" />
+              </div>
+              <span class="flex flex-wrap items-center gap-1">
+                Third Party Agent
+                <span class="text-xs font-normal text-zinc-400">(Optional)</span>
+              </span>
+            </h3>
+            <button 
+              type="button"
+              @click="showThirdPartyAgent = !showThirdPartyAgent"
+              class="text-xs text-amber-600 hover:text-amber-700 flex items-center gap-1 self-end sm:self-auto px-2 py-1 rounded-lg hover:bg-amber-50 transition-colors"
+            >
+              <UIcon :name="showThirdPartyAgent ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'" class="w-4 h-4" />
+              {{ showThirdPartyAgent ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+          
+          <div v-if="showThirdPartyAgent" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+            <div class="form-group">
+              <label class="input-label">Agent / Co-Loader Name</label>
+              <input 
+                v-model="form.third_party_agent" 
+                type="text"
+                placeholder="e.g. ABC Logistics"
+                class="input"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label class="input-label">Agent Phone</label>
+              <input 
+                v-model="form.agent_phone" 
+                type="text"
+                placeholder="e.g. 012 345 678"
+                class="input"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label class="input-label">Agent Email</label>
+              <input 
+                v-model="form.agent_email" 
+                type="email"
+                placeholder="e.g. agent@company.com"
+                class="input"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label class="input-label">Agent Address</label>
+              <input 
+                v-model="form.agent_address" 
+                type="text"
+                placeholder="e.g. 123 Street, City"
+                class="input"
+              />
+            </div>
+          </div>
+          
+          <p v-if="!showThirdPartyAgent" class="text-xs text-zinc-400 italic">
+            Click "Show" to add third party agent / co-loader details for this order
+          </p>
         </div>
         
         <!-- Error Message -->
@@ -418,11 +509,19 @@ const form = ref<PurchaseOrderFormData & { status?: string }>({
   eta_date: '',
   status: 'Pending',
   items: [{ product_id: 0, quantity: 0, unit_cost: 0 }],
+  promotion_percent: 0,
   promotion_amount: 0,
   promotion_text: '',
   truck_remark: '',
   overall_remark: '',
+  third_party_agent: '',
+  agent_phone: '',
+  agent_email: '',
+  agent_address: '',
 });
+
+// Toggle for third party agent section
+const showThirdPartyAgent = ref(false);
 
 // Get selected supplier details
 const selectedSupplier = computed(() => {
@@ -479,6 +578,25 @@ const onProductChange = (index: number) => {
   }
 };
 
+// Promotion conversion handlers
+const onPromotionPercentChange = () => {
+  // Calculate dollar amount from percentage
+  const percent = form.value.promotion_percent || 0;
+  const baseAmount = subtotal.value + shippingCost.value;
+  form.value.promotion_amount = Number((baseAmount * (percent / 100)).toFixed(2));
+};
+
+const onPromotionAmountChange = () => {
+  // Calculate percentage from dollar amount
+  const amount = form.value.promotion_amount || 0;
+  const baseAmount = subtotal.value + shippingCost.value;
+  if (baseAmount > 0) {
+    form.value.promotion_percent = Number(((amount / baseAmount) * 100).toFixed(2));
+  } else {
+    form.value.promotion_percent = 0;
+  }
+};
+
 onMounted(async () => {
   await Promise.all([fetchSuppliers(), fetchProducts()]);
   
@@ -497,11 +615,21 @@ onMounted(async () => {
             unit_cost: item.unit_cost || 0,
           }))
         : [{ product_id: 0, quantity: 0, unit_cost: 0 }],
+      promotion_percent: po.promotion_percent || 0,
       promotion_amount: po.promotion_amount || 0,
       promotion_text: po.promotion_text || '',
       truck_remark: po.truck_remark || '',
       overall_remark: po.overall_remark || '',
+      third_party_agent: po.third_party_agent || '',
+      agent_phone: po.agent_phone || '',
+      agent_email: po.agent_email || '',
+      agent_address: po.agent_address || '',
     };
+    
+    // Auto-expand third party agent section if data exists
+    if (po.third_party_agent || po.agent_phone || po.agent_email || po.agent_address) {
+      showThirdPartyAgent.value = true;
+    }
   }
   
   pageLoading.value = false;
