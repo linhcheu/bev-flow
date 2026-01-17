@@ -180,7 +180,7 @@
                       v-model.number="item.quantity"
                       type="number"
                       min="1"
-                      class="input text-sm py-2 w-20 text-right"
+                      class="input text-sm py-2 min-w-[5rem] w-full max-w-[8rem] text-right"
                       @input="calculateTotals"
                     />
                   </td>
@@ -193,7 +193,7 @@
                         step="0.01"
                         min="0"
                         readonly
-                        class="input text-sm py-2 w-24 text-right pl-7 bg-zinc-50 cursor-not-allowed"
+                        class="input text-sm py-2 min-w-[6rem] w-full max-w-[10rem] text-right pl-7 bg-zinc-50 cursor-not-allowed"
                         title="Unit cost is auto-populated from product"
                       />
                     </div>
@@ -297,16 +297,16 @@
           <div class="border-t border-zinc-200 pt-4 space-y-2">
             <div class="flex justify-between sm:justify-end items-center gap-4">
               <span class="text-sm text-zinc-500">Subtotal:</span>
-              <span class="text-sm font-medium text-zinc-900 sm:w-28 text-right">${{ subtotal.toFixed(2) }}</span>
+              <span class="text-sm font-medium text-zinc-900 sm:w-32 text-right">${{ subtotal.toFixed(2) }}</span>
             </div>
             <div class="flex justify-between sm:justify-end items-center gap-4">
               <span class="text-sm text-zinc-500">Shipping (3%):</span>
-              <span class="text-sm text-zinc-900 sm:w-28 text-right">${{ shippingCost.toFixed(2) }}</span>
+              <span class="text-sm text-zinc-900 sm:w-32 text-right">${{ shippingCost.toFixed(2) }}</span>
             </div>
             <!-- Promotion Percentage -->
             <div class="flex justify-between sm:justify-end items-center gap-4">
               <span class="text-sm text-zinc-500">Promotion (%):</span>
-              <div class="relative w-24 sm:w-28">
+              <div class="relative w-28 sm:w-32">
                 <input 
                   v-model.number="form.promotion_percent"
                   type="number"
@@ -322,7 +322,7 @@
             <!-- Promotion Amount (Dollar) -->
             <div class="flex justify-between sm:justify-end items-center gap-4">
               <span class="text-sm text-zinc-500">Promotion ($):</span>
-              <div class="relative w-24 sm:w-28">
+              <div class="relative w-28 sm:w-32">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none">-$</span>
                 <input 
                   v-model.number="form.promotion_amount"
@@ -335,18 +335,19 @@
               </div>
             </div>
             <!-- Promotion Text/Description -->
-            <div class="flex flex-col sm:flex-row justify-between sm:justify-end items-start sm:items-center gap-2 sm:gap-4">
-              <span class="text-sm text-zinc-500">Promotion Details:</span>
-              <input 
+            <div class="flex flex-col sm:flex-row justify-between sm:justify-end items-start sm:items-start gap-2 sm:gap-4">
+              <span class="text-sm text-zinc-500 pt-2">Promotion Details:</span>
+              <textarea 
                 v-model="form.promotion_text"
-                type="text"
                 placeholder="e.g. Free 2 cases, discount on next order..."
-                class="input text-sm py-1 w-full sm:w-64"
-              />
+                rows="1"
+                class="input text-sm py-2 w-full sm:w-72 min-h-[2.5rem] max-h-32 resize-y"
+                @keydown="handleTextareaKeydown"
+              ></textarea>
             </div>
             <div class="flex justify-between sm:justify-end items-center gap-4 pt-2 border-t border-zinc-200">
               <span class="text-base font-medium text-zinc-900">Total:</span>
-              <span class="text-lg sm:text-xl font-semibold text-amber-600 sm:w-28 text-right">${{ total.toFixed(2) }}</span>
+              <span class="text-lg sm:text-xl font-semibold text-amber-600 sm:w-32 text-right">${{ total.toFixed(2) }}</span>
             </div>
           </div>
         </div>
@@ -363,22 +364,24 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
             <div class="form-group">
               <label class="input-label">Truck Remark</label>
-              <input 
+              <textarea 
                 v-model="form.truck_remark" 
-                type="text"
                 placeholder="e.g. give DO"
-                class="input"
-              />
+                rows="2"
+                class="input min-h-[2.5rem] max-h-32 resize-y"
+                @keydown="handleTextareaKeydown"
+              ></textarea>
             </div>
             
             <div class="form-group">
               <label class="input-label">Overall Remark</label>
-              <input 
+              <textarea 
                 v-model="form.overall_remark" 
-                type="text"
                 placeholder="e.g. give latest expiry"
-                class="input"
-              />
+                rows="2"
+                class="input min-h-[2.5rem] max-h-32 resize-y"
+                @keydown="handleTextareaKeydown"
+              ></textarea>
             </div>
           </div>
         </div>
@@ -599,6 +602,14 @@ onMounted(async () => {
   await Promise.all([fetchSuppliers(), fetchProducts(), fetchPurchaseOrders()]);
   form.value.po_number = generatePONumber();
 });
+
+// Handle Shift+Enter for new line in textarea
+const handleTextareaKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    // Prevent form submission on Enter, allow new line on Shift+Enter
+    // Do nothing - let default behavior create new line
+  }
+};
 
 const handleSubmit = async () => {
   // Filter out empty items

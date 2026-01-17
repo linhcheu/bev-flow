@@ -131,7 +131,7 @@
                       v-model.number="item.quantity"
                       type="number"
                       min="1"
-                      class="input text-sm py-2 w-20 text-right"
+                      class="input text-sm py-2 min-w-[5rem] w-full max-w-[8rem] text-right"
                     />
                   </td>
                   <td class="py-3">
@@ -142,7 +142,7 @@
                         type="number"
                         step="0.01"
                         min="0"
-                        class="input text-sm py-2 w-24 text-right pl-7"
+                        class="input text-sm py-2 min-w-[6rem] w-full max-w-[10rem] text-right pl-7"
                       />
                     </div>
                   </td>
@@ -249,11 +249,11 @@
           <div class="border-t border-zinc-200 pt-4 space-y-2">
             <div class="flex justify-between sm:justify-end items-center gap-4">
               <span class="text-sm text-zinc-500">Subtotal:</span>
-              <span class="text-sm font-medium text-zinc-900 sm:w-28 text-right">${{ subtotal.toFixed(2) }}</span>
+              <span class="text-sm font-medium text-zinc-900 sm:w-32 text-right">${{ subtotal.toFixed(2) }}</span>
             </div>
             <div class="flex justify-between sm:justify-end items-center gap-4 pt-2 border-t border-zinc-200">
               <span class="text-base font-medium text-zinc-900">Total:</span>
-              <span class="text-lg sm:text-xl font-semibold text-amber-600 sm:w-28 text-right">${{ subtotal.toFixed(2) }}</span>
+              <span class="text-lg sm:text-xl font-semibold text-amber-600 sm:w-32 text-right">${{ subtotal.toFixed(2) }}</span>
             </div>
           </div>
         </div>
@@ -272,8 +272,9 @@
             <textarea 
               v-model="form.notes" 
               rows="3"
-              placeholder="Any additional notes..."
-              class="input resize-none"
+              placeholder="Any additional notes... (Press Shift+Enter for new line)"
+              class="input min-h-[4rem] max-h-40 resize-y"
+              @keydown="handleTextareaKeydown"
             ></textarea>
           </div>
         </div>
@@ -367,6 +368,14 @@ const onProductChange = (index: number) => {
 const getProductStock = (productId: number) => {
   const product = products.value.find(p => p.product_id === productId);
   return product?.current_stock ?? 0;
+};
+
+// Handle Shift+Enter for new line in textarea
+const handleTextareaKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    // Prevent form submission on Enter, allow new line on Shift+Enter
+    // Do nothing - let default behavior create new line
+  }
 };
 
 onMounted(async () => {

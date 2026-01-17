@@ -229,7 +229,7 @@
               <span class="text-zinc-500">Promotion</span>
               <span class="font-medium text-emerald-600">-${{ Number(order.promotion_amount).toFixed(2) }}</span>
             </div>
-            <div v-if="order.promotion_text" class="text-xs text-emerald-600 italic text-right">
+            <div v-if="order.promotion_text" class="text-xs text-emerald-600 italic text-right whitespace-pre-wrap break-words">
               {{ order.promotion_text }}
             </div>
             <div class="flex items-center justify-between pt-3 border-t border-zinc-300">
@@ -242,7 +242,7 @@
         <!-- Remarks -->
         <div v-if="order.overall_remark" class="px-6 sm:px-8 py-4 border-t border-zinc-100">
           <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Remarks</h3>
-          <p class="text-sm text-zinc-600">{{ order.overall_remark }}</p>
+          <p class="text-sm text-zinc-600 whitespace-pre-wrap break-words">{{ order.overall_remark }}</p>
         </div>
 
         <!-- Footer -->

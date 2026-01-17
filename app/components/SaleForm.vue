@@ -112,7 +112,7 @@
                     v-model.number="item.quantity"
                     type="number"
                     min="1"
-                    class="input text-sm py-2 w-20 text-right"
+                    class="input text-sm py-2 min-w-[5rem] w-full max-w-[8rem] text-right"
                   />
                 </td>
                 <td class="py-3">
@@ -123,7 +123,7 @@
                       type="number"
                       step="0.01"
                       min="0"
-                      class="input text-sm py-2 w-24 text-right pl-7"
+                      class="input text-sm py-2 min-w-[6rem] w-full max-w-[10rem] text-right pl-7"
                     />
                   </div>
                 </td>
@@ -151,7 +151,7 @@
         <div class="border-t border-zinc-200 pt-4 space-y-2">
           <div class="flex justify-end items-center gap-4 pt-2 border-t border-zinc-200">
             <span class="text-base font-medium text-zinc-900">Total:</span>
-            <span class="text-xl font-semibold text-amber-600 w-28 text-right">${{ totalAmount.toFixed(2) }}</span>
+            <span class="text-xl font-semibold text-amber-600 min-w-[7rem] text-right">${{ totalAmount.toFixed(2) }}</span>
           </div>
         </div>
       </div>
@@ -163,8 +163,8 @@
           <textarea 
             v-model="form.notes" 
             rows="3"
-            placeholder="Any additional notes..."
-            class="input resize-none"
+            placeholder="Any additional notes... (Press Shift+Enter for new line)"
+            class="input min-h-[4rem] max-h-40 resize-y"
           ></textarea>
         </div>
       </div>

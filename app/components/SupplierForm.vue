@@ -39,8 +39,8 @@
           <textarea 
             v-model="form.address" 
             rows="3"
-            placeholder="Enter company address"
-            class="input resize-none"
+            placeholder="Enter company address (Press Shift+Enter for new line)"
+            class="input min-h-[4rem] max-h-40 resize-y"
           ></textarea>
         </div>
       </div>

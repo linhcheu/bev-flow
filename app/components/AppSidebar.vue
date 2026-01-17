@@ -164,7 +164,7 @@ const mainMenuItems: MenuItem[] = [
   { path: '/products', label: 'Products', icon: 'i-lucide-package' },
   { path: '/suppliers', label: 'Suppliers', icon: 'i-lucide-building-2' },
   { path: '/purchase-orders', label: 'Purchase Orders', icon: 'i-lucide-clipboard-list' },
-  { path: '/purchase-entries', label: 'Receiving', icon: 'i-lucide-package-check' },
+  { path: '/purchase-entries', label: 'Purchase Entries', icon: 'i-lucide-package-check' },
   { path: '/sales', label: 'Sales', icon: 'i-lucide-receipt' },
   { path: '/forecasts', label: 'Forecasts', icon: 'i-lucide-trending-up', requiresPermission: 'canForecast' },
   { path: '/users', label: 'Users', icon: 'i-lucide-users', requiresPermission: 'canManageUsers' },

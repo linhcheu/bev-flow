@@ -43,8 +43,8 @@
             id="description"
             v-model="form.description" 
             rows="3"
-            placeholder="Enter product description"
-            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-zinc-200 rounded-lg sm:rounded-xl text-sm text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 resize-none"
+            placeholder="Enter product description (Press Shift+Enter for new line)"
+            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-zinc-200 rounded-lg sm:rounded-xl text-sm text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 min-h-[4rem] max-h-40 resize-y"
           ></textarea>
         </div>
       </div>
