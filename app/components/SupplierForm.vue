@@ -136,6 +136,46 @@
         </div>
       </div>
       
+      <!-- Payment Settings -->
+      <div class="bg-white border border-zinc-200 rounded-xl p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
+        <h3 class="text-sm font-semibold text-zinc-900 flex items-center gap-2 sm:gap-3">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-500 rounded-lg flex items-center justify-center shrink-0">
+            <UIcon name="i-lucide-credit-card" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+          </div>
+          <span class="text-emerald-700">✓ Payment Settings</span>
+        </h3>
+        
+        <div class="form-group">
+          <label class="input-label text-xs sm:text-sm">Payment Method</label>
+          <select 
+            v-model="form.payment_method"
+            class="input"
+          >
+            <option value="Collect">Collect (Pay on delivery)</option>
+            <option value="Prepaid">Prepaid (Pay before shipping)</option>
+            <option value="Credit">Credit (Pay later)</option>
+            <option value="COD">COD (Cash on delivery)</option>
+          </select>
+          <p class="mt-1 sm:mt-1.5 text-[10px] sm:text-xs text-zinc-500">Default payment method for purchase orders with this supplier</p>
+        </div>
+        
+        <!-- Payment Method Info Box -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div class="flex items-start gap-2">
+            <UIcon name="i-lucide-info" class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+            <div class="text-xs text-blue-700">
+              <p class="font-medium mb-1">Payment Methods:</p>
+              <ul class="list-disc list-inside space-y-0.5">
+                <li><strong>Prepaid:</strong> Payment required before order is shipped. Invoice will be attached to PO.</li>
+                <li><strong>Collect:</strong> Payment collected upon delivery or receipt of goods.</li>
+                <li><strong>Credit:</strong> Payment due within agreed credit terms.</li>
+                <li><strong>COD:</strong> Cash payment at time of delivery.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- Error Message -->
       <div 
         v-if="error" 
@@ -190,6 +230,7 @@ const form = ref<Supplier>({
   email: '',
   address: '',
   lead_time_days: 7,
+  payment_method: 'Collect',
 });
 
 // Initialize form with supplier data if editing

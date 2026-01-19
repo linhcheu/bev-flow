@@ -32,6 +32,7 @@ export default defineEventHandler(async () => {
       email,
       address,
       lead_time_days,
+      payment_method,
       is_active,
       created_at,
       updated_at

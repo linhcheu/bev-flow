@@ -114,27 +114,37 @@ export const useExport = () => {
     const pageWidth = doc.internal.pageSize.getWidth();
     let startY = 10;
 
-    // Load and add logo
+    // Load and add logo - CENTERED
     const logoBase64 = await loadLogoAsBase64();
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', 14, startY, 20, 20);
-        startY += 2;
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 25) / 2, startY, 25, 25);
       } catch {
         // If logo fails, continue without it
       }
     }
 
-    // Header - Company Name
+    // Header - Company Name (LEFT side)
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42); // zinc-800
-    doc.text('BEV FLOW', logoBase64 ? 38 : 14, startY + 8);
+    doc.text('BEV FLOW', 14, startY + 8);
     
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(113, 113, 122); // zinc-500
-    doc.text('Karaoke Inventory Management System', logoBase64 ? 38 : 14, startY + 14);
+    doc.text('Karaoke Inventory Management System', 14, startY + 14);
+
+    // Company Information (RIGHT side)
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('H2O - KTV, Restaurant, Steam Sauna', pageWidth - 14, startY + 4, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(82, 82, 91);
+    doc.text('Takdol Village, Takhmao Town, Kandal Province', pageWidth - 14, startY + 10, { align: 'right' });
+    doc.text('Phone: 012 955 499 | Email: h2oktv99@gmail.com', pageWidth - 14, startY + 15, { align: 'right' });
 
     // Subtle line separator
     startY += 25;
@@ -256,29 +266,42 @@ export const useExport = () => {
 
     // Load and add logo
     const logoBase64 = await loadLogoAsBase64();
+    
+    // Title (LEFT side)
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('Dashboard Report', 14, y + 10);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(113, 113, 122);
+    doc.text('BEV Flow - Karaoke Inventory Management', 14, y + 16);
+
+    const date = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    doc.text(`Generated: ${date}`, 14, y + 22);
+
+    // Logo (CENTER)
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', 14, y, 22, 22);
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 25) / 2, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    // Header
-    doc.setFontSize(22);
+    // Company Information (RIGHT side)
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
-    doc.text('Dashboard Report', logoBase64 ? 40 : 14, y + 10);
-    
-    doc.setFontSize(10);
+    doc.text('H2O - KTV, Restaurant, Steam Sauna', pageWidth - 14, y + 6, { align: 'right' });
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(113, 113, 122);
-    doc.text('BEV Flow - Karaoke Inventory Management', logoBase64 ? 40 : 14, y + 16);
-
-    const date = new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-    doc.text(`Generated: ${date}`, logoBase64 ? 40 : 14, y + 22);
+    doc.setFontSize(8);
+    doc.setTextColor(82, 82, 91);
+    doc.text('Takdol Village, Takhmao Town, Kandal Province', pageWidth - 14, y + 12, { align: 'right' });
+    doc.text('Phone: 012 955 499 | Email: h2oktv99@gmail.com', pageWidth - 14, y + 18, { align: 'right' });
 
     // Separator line
     y += 30;
@@ -447,21 +470,27 @@ export const useReceiptExport = () => {
 
     // === HEADER SECTION ===
     const logoBase64 = await loadLogoAsBase64();
+    
+    // Title (LEFT side)
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('Sales Invoice', margin, y + 8);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(113, 113, 122);
+    doc.text('BEV Flow - Karaoke Inventory System', margin, y + 14);
+
+    // Logo (CENTER)
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 25) / 2, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    // Title
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(39, 39, 42);
-    doc.text('Sales Invoice', pageWidth / 2, y + 8, { align: 'center' });
-
-    // Company Information (right side)
+    // Company Information (RIGHT side)
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
@@ -469,8 +498,8 @@ export const useReceiptExport = () => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(82, 82, 91);
-    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
-    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
+    doc.text('Takdol Village, Takhmao Town, Kandal Province', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 955 499 | Email: h2oktv99@gmail.com', pageWidth - margin, y + 15, { align: 'right' });
 
     y += 30;
 
@@ -659,6 +688,50 @@ export const useReceiptExport = () => {
 
     y += 50;
 
+    // === SIGNATURE SECTION ===
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+    
+    // Prepared by / Received by section
+    const signBoxWidth = (pageWidth - margin * 2 - 20) / 2;
+    
+    // Prepared by box (left)
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Prepared by:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(39, 39, 42);
+    doc.text(sale.created_by || 'Admin', margin + 28, y);
+    
+    // Signature line
+    doc.setDrawColor(150, 150, 150);
+    doc.line(margin, y + 20, margin + signBoxWidth, y + 20);
+    doc.setFontSize(8);
+    doc.setTextColor(113, 113, 122);
+    doc.text('Signature', margin, y + 25);
+    doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`, margin + 40, y + 25);
+
+    // Received by box (right)
+    const rightX = margin + signBoxWidth + 20;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Received by:', rightX, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(39, 39, 42);
+    doc.text(sale.customer?.customer_name || 'Customer', rightX + 28, y);
+    
+    // Signature line
+    doc.line(rightX, y + 20, rightX + signBoxWidth, y + 20);
+    doc.setFontSize(8);
+    doc.setTextColor(113, 113, 122);
+    doc.text('Signature', rightX, y + 25);
+    doc.text('Date: _______________', rightX + 40, y + 25);
+
+    y += 35;
+
     // === THANK YOU MESSAGE ===
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, y, pageWidth - margin, y);
@@ -780,21 +853,27 @@ export const useReceiptExport = () => {
 
     // === HEADER SECTION ===
     const logoBase64 = await loadLogoAsBase64();
+    
+    // Title (LEFT side)
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('Product Information Sheet', margin, y + 8);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(113, 113, 122);
+    doc.text('BEV Flow - Karaoke Inventory System', margin, y + 14);
+
+    // Logo (CENTER)
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 25) / 2, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    // Title
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(39, 39, 42);
-    doc.text('Product Information Sheet', pageWidth / 2, y + 8, { align: 'center' });
-
-    // Company Information (right side)
+    // Company Information (RIGHT side)
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
@@ -802,8 +881,8 @@ export const useReceiptExport = () => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(82, 82, 91);
-    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
-    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
+    doc.text('Takdol Village, Takhmao Town, Kandal Province', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 955 499 | Email: h2oktv99@gmail.com', pageWidth - margin, y + 15, { align: 'right' });
 
     y += 30;
 
@@ -962,7 +1041,33 @@ export const useReceiptExport = () => {
       doc.setTextColor(82, 82, 91);
       const descLines = doc.splitTextToSize(product.description, pageWidth - margin * 2);
       doc.text(descLines, margin, y);
+      y += descLines.length * 5 + 10;
     }
+
+    // === VERIFICATION SECTION ===
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+    
+    const signBoxWidth = (pageWidth - margin * 2 - 20) / 2;
+    
+    // Verified by (left)
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Verified by:', margin, y);
+    doc.line(margin, y + 15, margin + signBoxWidth, y + 15);
+    doc.setFontSize(8);
+    doc.setTextColor(113, 113, 122);
+    doc.text('Name & Signature', margin, y + 20);
+    
+    // Date (right)
+    const rightX = margin + signBoxWidth + 20;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(82, 82, 91);
+    doc.text('Date:', rightX, y);
+    doc.line(rightX, y + 15, rightX + signBoxWidth, y + 15);
 
     // === FOOTER ===
     const footerY = pageHeight - 12;
@@ -983,76 +1088,93 @@ export const useReceiptExport = () => {
   const exportSupplierDetail = async (supplier: any) => {
     const doc = new jsPDF('portrait', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
-    let y = 10;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
 
-    // Modern header
-    doc.setFillColor(245, 158, 11); // amber-500
-    doc.rect(0, 0, pageWidth, 45, 'F');
-    
-    doc.setFillColor(217, 119, 6); // amber-600
-    doc.rect(0, 45, pageWidth, 3, 'F');
-
+    // === HEADER SECTION ===
     const logoBase64 = await loadLogoAsBase64();
+    
+    // Title (LEFT side)
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(217, 119, 6);
+    doc.text('Supplier Profile', margin, y + 8);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(113, 113, 122);
+    doc.text('BEV Flow - Karaoke Inventory System', margin, y + 14);
+
+    // Logo (CENTER)
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', 14, 8, 25, 25);
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 25) / 2, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
+    // Company Information (RIGHT side)
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text('Supplier Profile', logoBase64 ? 45 : 20, 22);
-    doc.setFontSize(10);
+    doc.setTextColor(39, 39, 42);
+    doc.text('H2O - KTV, Restaurant, Steam Sauna', pageWidth - margin, y + 4, { align: 'right' });
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(161, 161, 170);
-    doc.text('BEV Flow - Karaoke Inventory System', logoBase64 ? 45 : 20, 30);
+    doc.setFontSize(8);
+    doc.setTextColor(82, 82, 91);
+    doc.text('Takdol Village, Takhmao Town, Kandal Province', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 955 499 | Email: h2oktv99@gmail.com', pageWidth - margin, y + 15, { align: 'right' });
     
-    y = 60;
+    y += 30;
+    
+    // Header divider
+    doc.setDrawColor(217, 119, 6);
+    doc.setLineWidth(0.8);
+    doc.line(margin, y, pageWidth - margin, y);
+    
+    y += 10;
     doc.setTextColor(39, 39, 42);
 
     // Company name with status
-    doc.setFontSize(20);
+    doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text(supplier.company_name, 20, y);
+    doc.text(supplier.company_name, margin, y);
     
     // Status badge
     if (supplier.is_active) {
       doc.setFillColor(187, 247, 208);
-      doc.roundedRect(pageWidth - 45, y - 8, 30, 10, 2, 2, 'F');
+      doc.roundedRect(pageWidth - margin - 30, y - 6, 30, 10, 2, 2, 'F');
       doc.setFontSize(8);
       doc.setTextColor(22, 101, 52);
-      doc.text('Active', pageWidth - 30, y - 1, { align: 'center' });
+      doc.text('Active', pageWidth - margin - 15, y + 1, { align: 'center' });
     } else {
       doc.setFillColor(254, 202, 202);
-      doc.roundedRect(pageWidth - 45, y - 8, 30, 10, 2, 2, 'F');
+      doc.roundedRect(pageWidth - margin - 30, y - 6, 30, 10, 2, 2, 'F');
       doc.setFontSize(8);
       doc.setTextColor(153, 27, 27);
-      doc.text('Inactive', pageWidth - 30, y - 1, { align: 'center' });
+      doc.text('Inactive', pageWidth - margin - 15, y + 1, { align: 'center' });
     }
     
-    y += 15;
+    y += 12;
 
     // Contact cards
-    doc.setFillColor(250, 250, 250);
-    doc.roundedRect(20, y, pageWidth - 40, 35, 3, 3, 'F');
+    doc.setFillColor(255, 251, 235);
+    doc.roundedRect(margin, y, pageWidth - margin * 2, 30, 3, 3, 'F');
     
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
-    doc.text('Contact Information', 28, y + 10);
+    doc.text('Contact Information', margin + 5, y + 8);
     
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setTextColor(82, 82, 91);
-    doc.text(`Contact: ${supplier.contact_person || 'N/A'}`, 28, y + 18);
-    doc.text(`Phone: ${supplier.phone || 'N/A'}`, 28, y + 26);
-    doc.text(`Email: ${supplier.email || 'N/A'}`, 110, y + 18);
-    doc.text(`Lead Time: ${supplier.lead_time_days ? `${supplier.lead_time_days} days` : 'N/A'}`, 110, y + 26);
+    doc.text(`Contact: ${supplier.contact_person || 'N/A'}`, margin + 5, y + 16);
+    doc.text(`Phone: ${supplier.phone || 'N/A'}`, margin + 5, y + 24);
+    doc.text(`Email: ${supplier.email || 'N/A'}`, 100, y + 16);
+    doc.text(`Lead Time: ${supplier.lead_time_days ? `${supplier.lead_time_days} days` : 'N/A'}`, 100, y + 24);
 
-    y += 50;
+    y += 40;
 
     // Details table
     doc.setTextColor(39, 39, 42);
@@ -1073,16 +1195,50 @@ export const useReceiptExport = () => {
       },
     });
 
+    // === VERIFICATION SECTION ===
+    y = (doc as any).lastAutoTable.finalY + 15;
+    doc.setDrawColor(217, 119, 6);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+    
+    const signBoxWidth = (pageWidth - margin * 2 - 20) / 2;
+    
+    // Verified by (left)
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(180, 83, 9);
+    doc.text('Verified by:', margin, y);
+    doc.setDrawColor(150, 150, 150);
+    doc.line(margin, y + 15, margin + signBoxWidth, y + 15);
+    doc.setFontSize(8);
+    doc.setTextColor(113, 113, 122);
+    doc.text('Name & Signature', margin, y + 20);
+    doc.text(`Date: _______________`, margin + 50, y + 20);
+    
+    // Approved by (right)
+    const rightX = margin + signBoxWidth + 20;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(180, 83, 9);
+    doc.text('Approved by:', rightX, y);
+    doc.line(rightX, y + 15, rightX + signBoxWidth, y + 15);
+    doc.setFontSize(8);
+    doc.setTextColor(113, 113, 122);
+    doc.text('Name & Signature', rightX, y + 20);
+    doc.text(`Date: _______________`, rightX + 50, y + 20);
+
     // Footer
-    const footerY = doc.internal.pageSize.getHeight() - 10;
+    const footerY = pageHeight - 12;
     doc.setDrawColor(228, 228, 231);
     doc.setLineWidth(0.3);
-    doc.line(14, footerY - 5, pageWidth - 14, footerY - 5);
+    doc.line(margin, footerY - 3, pageWidth - margin, footerY - 3);
     
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(161, 161, 170);
-    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, 14, footerY);
-    doc.text('BEV Flow', pageWidth - 14, footerY, { align: 'right' });
+    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, footerY);
+    doc.text('BEV Flow - Inventory Management System', pageWidth / 2, footerY, { align: 'center' });
+    doc.text('Page 1 of 1', pageWidth - margin, footerY, { align: 'right' });
 
     doc.save(`supplier_${supplier.company_name.replace(/\s+/g, '_')}.pdf`);
   };
@@ -1098,21 +1254,27 @@ export const useReceiptExport = () => {
     // === HEADER SECTION ===
     // Company Logo and Title
     const logoBase64 = await loadLogoAsBase64();
+    
+    // Title (LEFT side)
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(39, 39, 42);
+    doc.text('Purchasing Order Form', margin, y + 8);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(113, 113, 122);
+    doc.text('BEV Flow - Karaoke Inventory System', margin, y + 14);
+
+    // Logo (CENTER)
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 25) / 2, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    // Title - "Purchasing Order Form"
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(39, 39, 42);
-    doc.text('Purchasing Order Form', pageWidth / 2, y + 8, { align: 'center' });
-
-    // Company Information (right side)
+    // Company Information (RIGHT side)
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
@@ -1120,8 +1282,8 @@ export const useReceiptExport = () => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(82, 82, 91);
-    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
-    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
+    doc.text('Takdol Village, Takhmao Town, Kandal Province', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 955 499 | Email: h2oktv99@gmail.com', pageWidth - margin, y + 15, { align: 'right' });
 
     y += 30;
 
@@ -1279,7 +1441,7 @@ export const useReceiptExport = () => {
         columnStyles: {
           0: { cellWidth: 12, halign: 'center' },
           1: { cellWidth: 45 },
-          2: { cellWidth: 50 },
+          2: { cellWidth: 50, halign: 'center' },
           3: { cellWidth: 18, halign: 'center' },
           4: { cellWidth: 25, halign: 'right' },
           5: { cellWidth: 25, halign: 'right' },
@@ -1348,20 +1510,70 @@ export const useReceiptExport = () => {
 
     y += 55;
 
+    // === PAYMENT INFORMATION SECTION ===
+    doc.setFillColor(239, 246, 255);
+    doc.setDrawColor(59, 130, 246);
+    doc.rect(margin, y, (pageWidth - margin * 2) / 2 - 5, 25, 'FD');
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(30, 64, 175);
+    doc.text('Payment Information', margin + 5, y + 8);
+    
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(39, 39, 42);
+    doc.text(`Method: ${po.payment_method || 'Collect'}`, margin + 5, y + 15);
+    doc.text(`Status: ${po.payment_status || 'Unpaid'}`, margin + 5, y + 21);
+
+    y += 32;
+
     // === AUTHORIZATION SECTION ===
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, y, pageWidth - margin, y);
     y += 10;
 
-    // Authorized by section
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(82, 82, 91);
-    doc.text('Authorized by:', margin, y);
-    doc.line(margin + 25, y + 1, margin + 80, y + 1);
-    
-    doc.text('Date:', pageWidth - margin - 55, y);
-    doc.line(pageWidth - margin - 42, y + 1, pageWidth - margin, y + 1);
+    // If we have authorization data, show it
+    if (po.authorized_by || po.authorized_signature) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text('Authorized by:', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      doc.text(po.authorized_by || 'N/A', margin + 30, y);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text('Date:', pageWidth - margin - 55, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(39, 39, 42);
+      const authDate = po.authorization_date ? new Date(po.authorization_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
+      doc.text(authDate, pageWidth - margin - 40, y);
+      
+      // If we have a signature image, add it
+      if (po.authorized_signature && po.authorized_signature.startsWith('data:image')) {
+        y += 8;
+        doc.setFontSize(8);
+        doc.setTextColor(82, 82, 91);
+        doc.text('Signature:', margin, y);
+        try {
+          doc.addImage(po.authorized_signature, 'PNG', margin + 20, y - 3, 40, 20);
+        } catch {
+          // If signature fails, continue
+        }
+      }
+    } else {
+      // Show blank lines for manual signature
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(82, 82, 91);
+      doc.text('Authorized by:', margin, y);
+      doc.line(margin + 25, y + 1, margin + 80, y + 1);
+      
+      doc.text('Date:', pageWidth - margin - 55, y);
+      doc.line(pageWidth - margin - 42, y + 1, pageWidth - margin, y + 1);
+    }
 
     // === FOOTER ===
     const footerY = pageHeight - 12;
@@ -1388,21 +1600,27 @@ export const useReceiptExport = () => {
 
     // === HEADER SECTION ===
     const logoBase64 = await loadLogoAsBase64();
+    
+    // Title (LEFT side)
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(139, 92, 246);
+    doc.text('AI Sales Forecast Report', margin, y + 8);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(113, 113, 122);
+    doc.text('BEV Flow - Karaoke Inventory System', margin, y + 14);
+
+    // Logo (CENTER)
     if (logoBase64) {
       try {
-        doc.addImage(logoBase64, 'PNG', margin, y, 25, 25);
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 25) / 2, y, 25, 25);
       } catch {
         // Continue without logo
       }
     }
 
-    // Title
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(139, 92, 246);
-    doc.text('AI Sales Forecast Report', pageWidth / 2, y + 8, { align: 'center' });
-
-    // Company Information (right side)
+    // Company Information (RIGHT side)
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(39, 39, 42);
@@ -1410,8 +1628,8 @@ export const useReceiptExport = () => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(82, 82, 91);
-    doc.text('27 Street 588, Phnom Penh', pageWidth - margin, y + 10, { align: 'right' });
-    doc.text('Phone: 012 345 678 | Email: admin@h2o.com', pageWidth - margin, y + 15, { align: 'right' });
+    doc.text('Takdol Village, Takhmao Town, Kandal Province', pageWidth - margin, y + 10, { align: 'right' });
+    doc.text('Phone: 012 955 499 | Email: h2oktv99@gmail.com', pageWidth - margin, y + 15, { align: 'right' });
 
     y += 30;
 
@@ -1590,6 +1808,39 @@ export const useReceiptExport = () => {
     const insights = `This forecast is generated using machine learning algorithms that analyze historical sales data, seasonal patterns, and market trends. The confidence score of ${confidence}% indicates the model's certainty in this prediction. ${needsReorder ? 'Immediate action is recommended to prevent stockouts.' : 'No immediate action is required.'}`;
     const insightLines = doc.splitTextToSize(insights, pageWidth - margin * 2);
     doc.text(insightLines, margin, y);
+
+    // === REVIEW SECTION ===
+    y += insightLines.length * 4 + 10;
+    doc.setDrawColor(139, 92, 246);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+    
+    const signBoxWidth = (pageWidth - margin * 2 - 20) / 2;
+    
+    // Reviewed by (left)
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(124, 58, 237);
+    doc.text('Reviewed by:', margin, y);
+    doc.setDrawColor(150, 150, 150);
+    doc.line(margin, y + 15, margin + signBoxWidth, y + 15);
+    doc.setFontSize(8);
+    doc.setTextColor(113, 113, 122);
+    doc.text('Name & Signature', margin, y + 20);
+    doc.text(`Date: _______________`, margin + 50, y + 20);
+    
+    // Approved by (right)
+    const rightX = margin + signBoxWidth + 20;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(124, 58, 237);
+    doc.text('Approved by:', rightX, y);
+    doc.line(rightX, y + 15, rightX + signBoxWidth, y + 15);
+    doc.setFontSize(8);
+    doc.setTextColor(113, 113, 122);
+    doc.text('Name & Signature', rightX, y + 20);
+    doc.text(`Date: _______________`, rightX + 50, y + 20);
 
     // === FOOTER ===
     const footerY = pageHeight - 12;

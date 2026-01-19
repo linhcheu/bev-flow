@@ -96,26 +96,36 @@ export const useSales = () => {
     }
   };
 
-  // Generate next sale number (sequential)
-  const generateSaleNumber = () => {
-    // Find the highest existing sale number
-    let maxNum = 0;
-    sales.value.forEach(sale => {
-      const match = sale.sale_number?.match(/SALE-(\d+)/);
-      if (match && match[1]) {
-        const num = parseInt(match[1], 10);
-        if (num > maxNum) maxNum = num;
-      } else {
-        // Handle old format numbers (INV- prefix)
-        const oldMatch = sale.sale_number?.match(/INV-(\d+)/);
-        if (oldMatch && oldMatch[1]) {
-          const num = parseInt(oldMatch[1], 10);
-          if (num > maxNum) maxNum = num;
+  // Generate next sale number (fetches from API for accuracy)
+  const generateSaleNumber = async (): Promise<string> => {
+    try {
+      const response = await $fetch<{ next_number: string }>('/api/sales/next-number');
+      return response.next_number;
+    } catch (e) {
+      console.error('Failed to get next sale number from API, using fallback:', e);
+      const currentYear = new Date().getFullYear();
+      // Fallback: calculate from loaded data
+      let maxNum = 0;
+      sales.value.forEach(sale => {
+        // Handle SALE-YEAR-XXXX format
+        const match = sale.sale_number?.match(/SALE-(\d{4})-(\d+)/);
+        if (match && match[1] && match[2]) {
+          const year = parseInt(match[1], 10);
+          const num = parseInt(match[2], 10);
+          if (year === currentYear && num > maxNum) {
+            maxNum = num;
+          }
+        } else {
+          // Handle old format numbers
+          const oldMatch = sale.sale_number?.match(/(?:SALE|INV)-(\d+)/);
+          if (oldMatch && oldMatch[1]) {
+            const num = parseInt(oldMatch[1], 10);
+            if (num > maxNum) maxNum = num;
+          }
         }
-      }
-    });
-    const nextNum = maxNum + 1;
-    return `SALE-${String(nextNum).padStart(4, '0')}`;
+      });
+      return `SALE-${currentYear}-${String(maxNum + 1).padStart(4, '0')}`;
+    }
   };
 
   return {

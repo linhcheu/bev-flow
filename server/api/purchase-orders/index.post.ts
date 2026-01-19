@@ -13,43 +13,67 @@ interface POItemRow {
   sku: string;
 }
 
-// Generate next sequential PO number
+// Generate next sequential PO number (SQLite)
 const generateNextPONumber = (): string => {
   const result = queryOne<{ max_po: string | null }>(`
     SELECT po_number as max_po FROM PurchaseOrders 
-    WHERE po_number LIKE 'PO-%' 
-    ORDER BY CAST(SUBSTR(po_number, 4) AS INTEGER) DESC 
+    ORDER BY po_id DESC 
     LIMIT 1
   `);
   
-  let nextNum = 1;
+  let maxNum = 0;
   if (result?.max_po) {
-    const match = result.max_po.match(/PO-(\d+)/);
-    if (match) {
-      nextNum = parseInt(match[1], 10) + 1;
+    // Handle new format PO-XXX-XXX
+    let match = result.max_po.match(/PO-(\d+)-(\d+)/);
+    if (match && match[1] && match[2]) {
+      maxNum = parseInt(match[1], 10) * 1000 + parseInt(match[2], 10);
+    } else {
+      // Handle old format PO-XXXX
+      match = result.max_po.match(/PO-(\d+)/);
+      if (match) {
+        maxNum = parseInt(match[1], 10);
+      }
     }
   }
-  return `PO-${String(nextNum).padStart(4, '0')}`;
+  
+  const nextNum = maxNum + 1;
+  const prefix = String(Math.floor(nextNum / 1000) || 1).padStart(3, '0');
+  const suffix = String(nextNum % 1000 || nextNum).padStart(3, '0');
+  return `PO-${prefix}-${suffix}`;
 };
 
 // Generate next PO number for Supabase
 const generateNextPONumberSupabase = async (): Promise<string> => {
   const supabase = getSupabase();
+  
+  // Get all PO numbers and find the max numerically
   const { data } = await supabase
     .from('purchaseorders')
-    .select('po_number')
-    .like('po_number', 'PO-%')
-    .order('po_number', { ascending: false })
-    .limit(1);
+    .select('po_number');
   
-  let nextNum = 1;
-  if (data && data[0]?.po_number) {
-    const match = data[0].po_number.match(/PO-(\d+)/);
-    if (match) {
-      nextNum = parseInt(match[1], 10) + 1;
+  let maxNum = 0;
+  if (data) {
+    for (const po of data) {
+      // Handle new format PO-XXX-XXX
+      let match = po.po_number?.match(/PO-(\d+)-(\d+)/);
+      if (match && match[1] && match[2]) {
+        const num = parseInt(match[1], 10) * 1000 + parseInt(match[2], 10);
+        if (num > maxNum) maxNum = num;
+      } else {
+        // Handle old format PO-XXXX
+        match = po.po_number?.match(/PO-(\d+)/);
+        if (match && match[1]) {
+          const num = parseInt(match[1], 10);
+          if (num > maxNum) maxNum = num;
+        }
+      }
     }
   }
-  return `PO-${String(nextNum).padStart(4, '0')}`;
+  
+  const nextNum = maxNum + 1;
+  const prefix = String(Math.floor(nextNum / 1000) || 1).padStart(3, '0');
+  const suffix = String(nextNum % 1000 || nextNum).padStart(3, '0');
+  return `PO-${prefix}-${suffix}`;
 };
 
 export default defineEventHandler(async (event) => {
@@ -101,6 +125,12 @@ export default defineEventHandler(async (event) => {
         promotion_amount: promotionAmount,
         total_amount: totalAmount,
         status: 'Pending',
+        payment_method: body.payment_method || 'Collect',
+        payment_status: 'Unpaid',
+        payment_attachment: body.payment_attachment || null,
+        authorized_by: body.authorized_by || null,
+        authorized_signature: body.authorized_signature || null,
+        authorization_date: body.authorized_by ? new Date().toISOString().split('T')[0] : null,
         truck_remark: body.truck_remark || null,
         overall_remark: body.overall_remark || null,
         promotion_text: body.promotion_text || null,
@@ -164,10 +194,11 @@ export default defineEventHandler(async (event) => {
     INSERT INTO PurchaseOrders (
       po_number, supplier_id, order_date, eta_date,
       subtotal, shipping_rate, shipping_cost, promotion_percent, promotion_amount, promotion_text, total_amount,
-      status, truck_remark, overall_remark,
+      status, payment_method, payment_status, payment_attachment, authorized_by, authorized_signature, authorization_date,
+      truck_remark, overall_remark,
       third_party_agent, agent_phone, agent_email, agent_address
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     poNumber,
     body.supplier_id,
@@ -181,6 +212,12 @@ export default defineEventHandler(async (event) => {
     body.promotion_text || null,
     totalAmount,
     'Pending',
+    body.payment_method || 'Collect',
+    'Unpaid',
+    body.payment_attachment || null,
+    body.authorized_by || null,
+    body.authorized_signature || null,
+    body.authorized_by ? new Date().toISOString().split('T')[0] : null,
     body.truck_remark || null,
     body.overall_remark || null,
     body.third_party_agent || null,

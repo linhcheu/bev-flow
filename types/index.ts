@@ -22,6 +22,7 @@ export interface Supplier {
   email?: string;
   address?: string;
   lead_time_days?: number;
+  payment_method?: 'Prepaid' | 'Collect' | 'Credit' | 'COD';
   is_active?: number;
   created_at?: string;
   updated_at?: string;
@@ -32,10 +33,14 @@ export interface Product {
   sku?: string;
   product_name: string;
   description?: string;
+  image_url?: string;
+  category?: string;
   cost_price: number;
   selling_price: number;
   supplier_id?: number;
   supplier?: Partial<Supplier> | null;
+  safety_stock?: number;
+  reorder_quantity?: number;
   min_stock_level?: number;
   current_stock?: number;
   is_active?: number;
@@ -56,7 +61,7 @@ export interface Customer {
   updated_at?: string;
 }
 
-export type POStatus = 'Pending' | 'Ordered' | 'Shipped' | 'Received' | 'Cancelled';
+export type POStatus = 'Pending' | 'Ordered' | 'Shipped' | 'Co-loader Shipped' | 'Received' | 'Cancelled';
 
 export interface PurchaseOrderItem {
   item_id?: number;
@@ -85,6 +90,13 @@ export interface PurchaseOrder {
   promotion_text?: string;
   total_amount?: number;
   status: POStatus;
+  payment_method?: 'Prepaid' | 'Collect' | 'Credit' | 'COD';
+  payment_status?: 'Unpaid' | 'Partial' | 'Paid';
+  payment_date?: string;
+  payment_attachment?: string;
+  authorized_by?: string;
+  authorized_signature?: string;
+  authorization_date?: string;
   received_date?: string;
   received_by?: string;
   received_notes?: string;
@@ -203,6 +215,22 @@ export interface Stock {
   created_at?: string;
 }
 
+// Product Supplier Availability
+export interface ProductSupplierAvailability {
+  id?: number;
+  product_id: number;
+  supplier_id: number;
+  product?: Partial<Product> | null;
+  supplier?: Partial<Supplier> | null;
+  is_available?: boolean;
+  supplier_sku?: string;
+  supplier_price?: number;
+  lead_time_days?: number;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // Dashboard and analytics types
 export interface DashboardStats {
   totalProducts: number;
@@ -225,6 +253,18 @@ export interface ProductSalesData {
   total_amount: number;
 }
 
+// Supplier PO Summary
+export interface SupplierPOSummary {
+  supplier_id: number;
+  company_name: string;
+  total_pos: number;
+  pending_count: number;
+  received_count: number;
+  shipped_count: number;
+  cancelled_count: number;
+  total_value: number;
+}
+
 // Form types for creating/editing
 export interface PurchaseOrderFormData {
   po_number: string;
@@ -235,6 +275,10 @@ export interface PurchaseOrderFormData {
   promotion_percent?: number;
   promotion_amount?: number;
   promotion_text?: string;
+  payment_method?: 'Prepaid' | 'Collect' | 'Credit' | 'COD';
+  payment_attachment?: string;
+  authorized_by?: string;
+  authorized_signature?: string;
   truck_remark?: string;
   overall_remark?: string;
   third_party_agent?: string;

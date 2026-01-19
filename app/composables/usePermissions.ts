@@ -27,7 +27,6 @@ export const roleToDbRole = (displayRole: DisplayRole): UserRole => {
   };
   return map[displayRole] || 'user';
 };
-
 // Map db role to display role
 export const dbRoleToDisplay = (dbRole: UserRole): DisplayRole => {
   const map: Record<UserRole, DisplayRole> = {

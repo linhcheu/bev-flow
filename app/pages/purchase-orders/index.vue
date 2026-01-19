@@ -38,7 +38,7 @@
       </div>
 
       <!-- Summary Stats -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
         <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-5">
           <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
             <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
@@ -61,32 +61,52 @@
         
         <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-5">
           <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
-            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
-              <UIcon name="i-lucide-truck" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
-            </div>
-            <div class="text-[10px] sm:text-xs md:text-sm text-zinc-500 leading-tight">Shipped</div>
-          </div>
-          <div class="text-base sm:text-lg md:text-xl font-semibold text-purple-600">{{ shippedCount }}</div>
-        </div>
-        
-        <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-5">
-          <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
-            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
-              <UIcon name="i-lucide-check-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-check-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
             </div>
             <div class="text-[10px] sm:text-xs md:text-sm text-zinc-500 leading-tight">Received</div>
           </div>
           <div class="text-base sm:text-lg md:text-xl font-semibold text-emerald-600">{{ receivedCount }}</div>
         </div>
         
+        <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-5">
+          <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-purple-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-truck" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
+            </div>
+            <div class="text-[10px] sm:text-xs md:text-sm text-zinc-500 leading-tight">Co-loader Shipped</div>
+          </div>
+          <div class="text-base sm:text-lg md:text-xl font-semibold text-purple-600">{{ coloaderShippedCount }}</div>
+        </div>
+        
+        <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-5">
+          <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-package" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+            </div>
+            <div class="text-[10px] sm:text-xs md:text-sm text-zinc-500 leading-tight">Shipped</div>
+          </div>
+          <div class="text-base sm:text-lg md:text-xl font-semibold text-blue-600">{{ shippedCount }}</div>
+        </div>
+        
+        <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-5">
+          <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-red-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-x-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
+            </div>
+            <div class="text-[10px] sm:text-xs md:text-sm text-zinc-500 leading-tight">Cancelled</div>
+          </div>
+          <div class="text-base sm:text-lg md:text-xl font-semibold text-red-600">{{ cancelledCount }}</div>
+        </div>
+        
         <div class="bg-white border border-zinc-200 rounded-lg p-3 sm:p-4 md:p-5 col-span-2 sm:col-span-1">
           <div class="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
-            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
-              <UIcon name="i-lucide-dollar-sign" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+            <div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-dollar-sign" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
             </div>
             <div class="text-[10px] sm:text-xs md:text-sm text-zinc-500 leading-tight">Total Value</div>
           </div>
-          <div class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">${{ totalValue.toFixed(2) }}</div>
+          <div class="text-base sm:text-lg md:text-xl font-semibold text-emerald-600">${{ totalValue.toFixed(2) }}</div>
         </div>
       </div>
 
@@ -103,8 +123,11 @@
           >
             <option value="all">All Status</option>
             <option value="Pending">Pending</option>
+            <option value="Ordered">Ordered</option>
             <option value="Shipped">Shipped</option>
+            <option value="Co-loader Shipped">Co-loader Shipped</option>
             <option value="Received">Received</option>
+            <option value="Cancelled">Cancelled</option>
           </select>
           <select 
             v-model="supplierFilter"
@@ -259,9 +282,9 @@
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Supplier</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Order Date</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">ETA</th>
-                <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Lead Time</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Items</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Total</th>
+                <th class="px-4 lg:px-5 py-3 text-center text-xs font-medium text-emerald-600 uppercase tracking-wider bg-zinc-50">Payment</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Status</th>
                 <th class="px-4 lg:px-5 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Actions</th>
               </tr>
@@ -283,15 +306,28 @@
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatDate(po.order_date) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">{{ formatDate(po.eta_date) }}</td>
-                <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">
-                  <span class="inline-flex items-center gap-1">
-                    <UIcon name="i-lucide-clock" class="w-3.5 h-3.5 text-zinc-400" />
-                    {{ po.supplier?.lead_time_days || 7 }} days
-                  </span>
-                </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-500">{{ po.items?.length || 0 }} items</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <span class="text-sm font-medium text-zinc-900">${{ (po.total_amount || 0).toFixed(2) }}</span>
+                </td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-center">
+                  <span :class="[
+                    'inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full',
+                    po.payment_method === 'Prepaid' ? 'bg-emerald-50 text-emerald-700' :
+                    po.payment_method === 'Collect' ? 'bg-blue-50 text-blue-700' :
+                    po.payment_method === 'Credit' ? 'bg-purple-50 text-purple-700' :
+                    po.payment_method === 'COD' ? 'bg-amber-50 text-amber-700' :
+                    'bg-zinc-50 text-zinc-600'
+                  ]">
+                    <UIcon :name="
+                      po.payment_method === 'Prepaid' ? 'i-lucide-credit-card' :
+                      po.payment_method === 'Collect' ? 'i-lucide-truck' :
+                      po.payment_method === 'Credit' ? 'i-lucide-calendar' :
+                      po.payment_method === 'COD' ? 'i-lucide-banknote' :
+                      'i-lucide-circle-help'
+                    " class="w-3 h-3" />
+                    {{ po.payment_method || 'N/A' }}
+                  </span>
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <span :class="getStatusClasses(po.status)" class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full">
@@ -583,7 +619,9 @@ onMounted(() => {
 
 const pendingCount = computed(() => purchaseOrders.value.filter(po => po.status === 'Pending').length);
 const shippedCount = computed(() => purchaseOrders.value.filter(po => po.status === 'Shipped').length);
+const coloaderShippedCount = computed(() => purchaseOrders.value.filter(po => po.status === 'Co-loader Shipped').length);
 const receivedCount = computed(() => purchaseOrders.value.filter(po => po.status === 'Received').length);
+const cancelledCount = computed(() => purchaseOrders.value.filter(po => po.status === 'Cancelled').length);
 const totalValue = computed(() => purchaseOrders.value.reduce((sum, po) => sum + Number(po.total_amount || 0), 0));
 
 const formatDate = (date?: string) => {
@@ -594,8 +632,11 @@ const formatDate = (date?: string) => {
 const getStatusClasses = (status?: string) => {
   switch (status) {
     case 'Pending': return 'bg-amber-50 text-amber-700';
-    case 'Shipped': return 'bg-purple-50 text-purple-700';
+    case 'Ordered': return 'bg-blue-50 text-blue-700';
+    case 'Shipped': return 'bg-indigo-50 text-indigo-700';
+    case 'Co-loader Shipped': return 'bg-purple-50 text-purple-700';
     case 'Received': return 'bg-emerald-50 text-emerald-700';
+    case 'Cancelled': return 'bg-red-50 text-red-700';
     default: return 'bg-zinc-50 text-zinc-700';
   }
 };
@@ -603,8 +644,11 @@ const getStatusClasses = (status?: string) => {
 const getStatusDotClass = (status?: string) => {
   switch (status) {
     case 'Pending': return 'bg-amber-500';
-    case 'Shipped': return 'bg-purple-500';
+    case 'Ordered': return 'bg-blue-500';
+    case 'Shipped': return 'bg-indigo-500';
+    case 'Co-loader Shipped': return 'bg-purple-500';
     case 'Received': return 'bg-emerald-500';
+    case 'Cancelled': return 'bg-red-500';
     default: return 'bg-zinc-500';
   }
 };
@@ -643,9 +687,12 @@ const handleExportExcel = () => {
     { header: 'Order Date', key: 'order_date', width: 12 },
     { header: 'ETA Date', key: 'eta_date', width: 12 },
     { header: 'Status', key: 'status', width: 12 },
+    { header: 'Payment Method', key: 'payment_method', width: 15 },
+    { header: 'Payment Status', key: 'payment_status', width: 12 },
     { header: 'Subtotal', key: 'subtotal', width: 12 },
     { header: 'Shipping', key: 'shipping_cost', width: 12 },
     { header: 'Total', key: 'total_amount', width: 12 },
+    { header: 'Authorized By', key: 'authorized_by', width: 15 },
   ];
   
   const data = filteredPOs.value.map(po => ({
@@ -664,6 +711,7 @@ const handleExportPDF = () => {
     { header: 'Date', key: 'order_date' },
     { header: 'ETA', key: 'eta_date' },
     { header: 'Status', key: 'status' },
+    { header: 'Payment', key: 'payment_method' },
     { header: 'Total', key: 'total_amount' },
   ];
   

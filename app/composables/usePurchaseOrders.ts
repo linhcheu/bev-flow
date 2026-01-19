@@ -92,19 +92,35 @@ export const usePurchaseOrders = () => {
     }
   };
 
-  // Generate next PO number (sequential)
-  const generatePONumber = () => {
-    // Find the highest existing PO number
-    let maxNum = 0;
-    purchaseOrders.value.forEach(po => {
-      const match = po.po_number?.match(/PO-(\d+)/);
-      if (match && match[1]) {
-        const num = parseInt(match[1], 10);
-        if (num > maxNum) maxNum = num;
-      }
-    });
-    const nextNum = maxNum + 1;
-    return `PO-${String(nextNum).padStart(4, '0')}`;
+  // Generate next PO number (fetches from API for accuracy)
+  const generatePONumber = async (): Promise<string> => {
+    try {
+      const response = await $fetch<{ next_number: string }>('/api/purchase-orders/next-number');
+      return response.next_number;
+    } catch (e) {
+      console.error('Failed to get next PO number from API, using fallback:', e);
+      // Fallback: calculate from loaded data
+      let maxNum = 0;
+      purchaseOrders.value.forEach(po => {
+        // Handle PO-XXX-XXX format
+        let match = po.po_number?.match(/PO-(\d+)-(\d+)/);
+        if (match && match[1] && match[2]) {
+          const num = parseInt(match[1], 10) * 1000 + parseInt(match[2], 10);
+          if (num > maxNum) maxNum = num;
+        } else {
+          // Handle old PO-XXXX format
+          match = po.po_number?.match(/PO-(\d+)/);
+          if (match && match[1]) {
+            const num = parseInt(match[1], 10);
+            if (num > maxNum) maxNum = num;
+          }
+        }
+      });
+      const nextNum = maxNum + 1;
+      const prefix = String(Math.floor(nextNum / 1000) || 1).padStart(3, '0');
+      const suffix = String(nextNum % 1000 || nextNum).padStart(3, '0');
+      return `PO-${prefix}-${suffix}`;
+    }
   };
 
   return {

@@ -130,6 +130,11 @@
                 <UIcon name="i-lucide-mail" class="w-4 h-4 text-zinc-400" />
                 <span class="text-zinc-600">{{ order.supplier.email }}</span>
               </div>
+              <div v-if="order.supplier?.payment_method" class="flex items-center gap-2 text-sm">
+                <UIcon name="i-lucide-credit-card" class="w-4 h-4 text-emerald-500" />
+                <span class="text-zinc-500">Default Payment:</span>
+                <span class="font-medium text-emerald-600">{{ order.supplier.payment_method }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -235,6 +240,56 @@
             <div class="flex items-center justify-between pt-3 border-t border-zinc-300">
               <span class="text-base font-semibold text-zinc-900">Total</span>
               <span class="text-xl font-bold text-amber-600">${{ Number(order.total_amount || 0).toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment & Authorization -->
+        <div v-if="order.payment_method || order.authorized_by" class="px-6 sm:px-8 py-6 border-t border-zinc-100">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Payment Info -->
+            <div v-if="order.payment_method">
+              <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">Payment Information</h3>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-sm">
+                  <UIcon name="i-lucide-credit-card" class="w-4 h-4 text-emerald-600" />
+                  <span class="text-zinc-500">Method:</span>
+                  <span :class="[
+                    'font-medium px-2 py-0.5 rounded-full text-xs',
+                    order.payment_method === 'Prepaid' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'
+                  ]">
+                    {{ order.payment_method }}
+                  </span>
+                </div>
+                <div v-if="order.payment_status" class="flex items-center gap-2 text-sm">
+                  <UIcon name="i-lucide-check-circle" class="w-4 h-4 text-zinc-400" />
+                  <span class="text-zinc-500">Status:</span>
+                  <span class="font-medium text-zinc-900">{{ order.payment_status }}</span>
+                </div>
+                <div v-if="order.payment_attachment" class="flex items-center gap-2 text-sm">
+                  <UIcon name="i-lucide-paperclip" class="w-4 h-4 text-zinc-400" />
+                  <span class="text-zinc-500">Receipt:</span>
+                  <a :href="order.payment_attachment" target="_blank" class="text-amber-600 hover:underline">View Attachment</a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Authorization -->
+            <div v-if="order.authorized_by">
+              <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">Authorization</h3>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-sm">
+                  <UIcon name="i-lucide-user-check" class="w-4 h-4 text-emerald-600" />
+                  <span class="text-zinc-500">Authorized By:</span>
+                  <span class="font-medium text-zinc-900">{{ order.authorized_by }}</span>
+                </div>
+                <div v-if="order.authorized_signature" class="mt-2">
+                  <p class="text-xs text-zinc-500 mb-1">Signature:</p>
+                  <div class="bg-white border border-zinc-200 rounded-lg p-2 inline-block">
+                    <img :src="order.authorized_signature" alt="Signature" class="max-h-16" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

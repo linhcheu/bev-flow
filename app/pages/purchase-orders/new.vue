@@ -145,7 +145,7 @@
                 <tr class="border-b border-zinc-200">
                   <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">No.</th>
                   <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">Product</th>
-                  <th class="text-left py-3 text-xs font-medium text-zinc-500 uppercase">Description</th>
+                  <th class="text-center py-3 text-xs font-medium text-zinc-500 uppercase">Description</th>
                   <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Qty</th>
                   <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Unit Cost</th>
                   <th class="text-right py-3 text-xs font-medium text-zinc-500 uppercase">Amount</th>
@@ -172,7 +172,7 @@
                       </option>
                     </select>
                   </td>
-                  <td class="py-3 text-sm text-zinc-500">
+                  <td class="py-3 text-sm text-zinc-500 text-center">
                     {{ getProductDescription(item.product_id) }}
                   </td>
                   <td class="py-3">
@@ -386,6 +386,120 @@
           </div>
         </div>
         
+        <!-- Payment & Authorization Card -->
+        <div class="bg-white border border-zinc-200 rounded-xl p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
+          <h3 class="text-sm font-medium text-zinc-900 flex items-center gap-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-credit-card" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+            </div>
+            <span class="text-emerald-700">✓ Payment & Authorization</span>
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+            <div class="form-group">
+              <label class="input-label">Payment Method</label>
+              <select 
+                v-model="form.payment_method"
+                class="select"
+              >
+                <option value="Collect">Collect (Pay on delivery)</option>
+                <option value="Prepaid">Prepaid (Pay before shipping)</option>
+                <option value="Credit">Credit (Pay later)</option>
+                <option value="COD">COD (Cash on delivery)</option>
+              </select>
+              <p class="text-xs text-zinc-400 mt-1">
+                {{ form.payment_method === 'Prepaid' ? '⚠️ Payment invoice will be attached with PO form' : '' }}
+              </p>
+            </div>
+            
+            <div v-if="form.payment_method === 'Prepaid'" class="form-group">
+              <label class="input-label">
+                Payment Attachment
+                <span class="text-amber-500 font-normal ml-1">(Required for Prepaid)</span>
+              </label>
+              <div class="flex items-center gap-2">
+                <label class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 text-sm font-medium rounded-lg hover:bg-amber-100 cursor-pointer transition-colors">
+                  <UIcon name="i-lucide-paperclip" class="w-4 h-4" />
+                  Attach Invoice
+                  <input 
+                    type="file" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    class="hidden"
+                    @change="handlePaymentAttachment"
+                  />
+                </label>
+                <span v-if="paymentAttachmentName" class="text-xs text-zinc-500 flex items-center gap-1">
+                  <UIcon name="i-lucide-check-circle" class="w-3.5 h-3.5 text-emerald-500" />
+                  {{ paymentAttachmentName }}
+                </span>
+              </div>
+              <p class="text-[10px] text-zinc-400 mt-1">Attach payment invoice/receipt (PDF, JPG, PNG)</p>
+            </div>
+          </div>
+          
+          <!-- Authorization Section -->
+          <div class="border-t border-zinc-200 pt-4 mt-4">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-sm font-medium text-zinc-700 flex items-center gap-2">
+                <UIcon name="i-lucide-pen-tool" class="w-4 h-4 text-amber-600" />
+                Authorization
+              </h4>
+              <button 
+                type="button"
+                @click="showAuthorization = !showAuthorization"
+                class="text-xs text-amber-600 hover:text-amber-700 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-amber-50 transition-colors"
+              >
+                <UIcon :name="showAuthorization ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'" class="w-4 h-4" />
+                {{ showAuthorization ? 'Hide' : 'Add Signature' }}
+              </button>
+            </div>
+            
+            <div v-if="showAuthorization" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="input-label">Authorized By</label>
+                <input 
+                  v-model="form.authorized_by" 
+                  type="text"
+                  placeholder="Enter name"
+                  class="input"
+                />
+              </div>
+              
+              <div class="form-group">
+                <label class="input-label">Signature</label>
+                <div class="relative">
+                  <!-- Signature Canvas -->
+                  <div 
+                    class="w-full h-24 bg-zinc-50 border border-zinc-300 rounded-lg flex items-center justify-center cursor-crosshair"
+                    @mousedown="startDrawing"
+                    @mousemove="draw"
+                    @mouseup="stopDrawing"
+                    @mouseleave="stopDrawing"
+                    ref="signatureCanvas"
+                  >
+                    <canvas ref="canvasRef" class="w-full h-full rounded-lg"></canvas>
+                    <span v-if="!hasSignature" class="absolute text-xs text-zinc-400 pointer-events-none">
+                      Click and drag to sign
+                    </span>
+                  </div>
+                  <button 
+                    v-if="hasSignature"
+                    type="button"
+                    @click="clearSignature"
+                    class="absolute top-1 right-1 p-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <p v-if="!showAuthorization" class="text-xs text-zinc-400 italic">
+              Click "Add Signature" to authorize this PO with name and signature
+            </p>
+          </div>
+        </div>
+        
         <!-- Third Party Agent Card (Optional - for rare cases) -->
         <div class="bg-white border border-zinc-200 rounded-xl p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -495,6 +609,14 @@ const { suppliers, fetchSuppliers } = useSuppliers();
 const { products, fetchProducts } = useProducts();
 const router = useRouter();
 
+// Authorization and payment state
+const showAuthorization = ref(false);
+const paymentAttachmentName = ref('');
+const canvasRef = ref<HTMLCanvasElement | null>(null);
+const isDrawing = ref(false);
+const hasSignature = ref(false);
+let ctx: CanvasRenderingContext2D | null = null;
+
 const form = ref<PurchaseOrderFormData>({
   po_number: '',
   supplier_id: 0,
@@ -504,6 +626,10 @@ const form = ref<PurchaseOrderFormData>({
   promotion_percent: 0,
   promotion_amount: 0,
   promotion_text: '',
+  payment_method: 'Collect',
+  payment_attachment: '',
+  authorized_by: '',
+  authorized_signature: '',
   truck_remark: '',
   overall_remark: '',
   third_party_agent: '',
@@ -558,6 +684,10 @@ const removeItem = (index: number) => {
 const onSupplierChange = () => {
   // Clear items when supplier changes since products are filtered by supplier
   form.value.items = [{ product_id: 0, quantity: 0, unit_cost: 0 }];
+  // Set payment method from supplier default
+  if (selectedSupplier.value?.payment_method) {
+    form.value.payment_method = selectedSupplier.value.payment_method;
+  }
 };
 
 const onProductChange = (index: number) => {
@@ -598,9 +728,84 @@ const onPromotionAmountChange = () => {
   }
 };
 
+// Payment attachment handler
+const handlePaymentAttachment = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    paymentAttachmentName.value = file.name;
+    // Convert to base64 for storage
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      form.value.payment_attachment = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Signature drawing functions
+const initCanvas = () => {
+  if (canvasRef.value) {
+    ctx = canvasRef.value.getContext('2d');
+    if (ctx) {
+      canvasRef.value.width = canvasRef.value.offsetWidth;
+      canvasRef.value.height = canvasRef.value.offsetHeight;
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+    }
+  }
+};
+
+const startDrawing = (e: MouseEvent) => {
+  if (!ctx || !canvasRef.value) return;
+  isDrawing.value = true;
+  const rect = canvasRef.value.getBoundingClientRect();
+  ctx.beginPath();
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+};
+
+const draw = (e: MouseEvent) => {
+  if (!isDrawing.value || !ctx || !canvasRef.value) return;
+  const rect = canvasRef.value.getBoundingClientRect();
+  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.stroke();
+  hasSignature.value = true;
+};
+
+const stopDrawing = () => {
+  if (!ctx) return;
+  isDrawing.value = false;
+  ctx.closePath();
+  // Save signature as base64
+  if (canvasRef.value && hasSignature.value) {
+    form.value.authorized_signature = canvasRef.value.toDataURL();
+  }
+};
+
+const clearSignature = () => {
+  if (!ctx || !canvasRef.value) return;
+  ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+  hasSignature.value = false;
+  form.value.authorized_signature = '';
+};
+
 onMounted(async () => {
   await Promise.all([fetchSuppliers(), fetchProducts(), fetchPurchaseOrders()]);
-  form.value.po_number = generatePONumber();
+  form.value.po_number = await generatePONumber();
+  // Initialize canvas after mount
+  nextTick(() => {
+    initCanvas();
+  });
+});
+
+// Watch for authorization section toggle to init canvas
+watch(showAuthorization, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      initCanvas();
+    });
+  }
 });
 
 // Handle Shift+Enter for new line in textarea

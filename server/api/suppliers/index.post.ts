@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
         email: body.email || null,
         address: body.address || null,
         lead_time_days: body.lead_time_days || 7,
+        payment_method: body.payment_method || 'Collect',
         is_active: body.is_active === undefined ? true : Boolean(body.is_active)
       })
       .select()
@@ -41,8 +42,8 @@ export default defineEventHandler(async (event) => {
   
   // Development: Use SQLite
   execute(`
-    INSERT INTO Suppliers (company_name, contact_person, sale_agent, phone, email, address, lead_time_days, is_active)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO Suppliers (company_name, contact_person, sale_agent, phone, email, address, lead_time_days, payment_method, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     body.company_name,
     body.contact_person || null,
@@ -51,6 +52,7 @@ export default defineEventHandler(async (event) => {
     body.email || null,
     body.address || null,
     body.lead_time_days || 7,
+    body.payment_method || 'Collect',
     body.is_active === undefined ? 1 : (body.is_active ? 1 : 0)
   ]);
   

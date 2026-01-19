@@ -144,12 +144,24 @@
               class="bg-zinc-50 border border-zinc-200 rounded-lg p-3 sm:p-4"
             >
               <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="flex-1 min-w-0">
-                  <span class="inline-flex items-center px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] sm:text-xs font-medium rounded mb-1.5">
-                    {{ product.sku }}
-                  </span>
-                  <h3 class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ product.product_name }}</h3>
-                  <p class="text-xs text-zinc-500 mt-0.5">{{ product.supplier?.company_name || 'No supplier' }}</p>
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                  <!-- Product Image -->
+                  <div class="w-12 h-12 bg-zinc-100 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+                    <img 
+                      v-if="product.image_url" 
+                      :src="product.image_url" 
+                      :alt="product.product_name"
+                      class="w-full h-full object-contain"
+                    />
+                    <UIcon v-else name="i-lucide-package" class="w-6 h-6 text-zinc-400" />
+                  </div>
+                  <div class="min-w-0">
+                    <span class="inline-flex items-center px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] sm:text-xs font-medium rounded mb-1.5">
+                      {{ product.sku }}
+                    </span>
+                    <h3 class="text-sm sm:text-base font-medium text-zinc-900 truncate">{{ product.product_name }}</h3>
+                    <p class="text-xs text-zinc-500 mt-0.5">{{ product.supplier?.company_name || 'No supplier' }}</p>
+                  </div>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
                   <button 
@@ -175,11 +187,21 @@
                   </button>
                 </div>
               </div>
-              <div class="grid grid-cols-4 gap-2 text-center">
+              <div class="grid grid-cols-3 gap-2 text-center mb-2">
                 <div class="bg-white rounded-lg p-2">
                   <p class="text-[10px] text-zinc-500 mb-0.5">Stock</p>
                   <p :class="['text-xs sm:text-sm font-medium', getStockColorClass(product.current_stock || 0)]">{{ product.current_stock || 0 }}</p>
                 </div>
+                <div class="bg-white rounded-lg p-2">
+                  <p class="text-[10px] text-emerald-600 mb-0.5">Safety</p>
+                  <p class="text-xs sm:text-sm font-medium text-emerald-600">{{ product.safety_stock || 0 }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-2">
+                  <p class="text-[10px] text-emerald-600 mb-0.5">EOQ</p>
+                  <p class="text-xs sm:text-sm font-medium text-emerald-600">{{ product.reorder_quantity || 0 }}</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="bg-white rounded-lg p-2">
                   <p class="text-[10px] text-zinc-500 mb-0.5">Cost</p>
                   <p class="text-xs sm:text-sm font-medium text-zinc-900">${{ product.cost_price.toFixed(2) }}</p>
@@ -241,9 +263,12 @@
           <table class="w-full min-w-[640px]">
             <thead class="sticky top-0 z-10">
               <tr class="bg-zinc-50 border-b border-zinc-200">
+                <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Image</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">SKU</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Product Name</th>
                 <th class="px-4 lg:px-5 py-3 text-center text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Stock</th>
+                <th class="px-4 lg:px-5 py-3 text-center text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50 text-emerald-600">Safety Stock</th>
+                <th class="px-4 lg:px-5 py-3 text-center text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50 text-emerald-600">EOQ</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Cost Price</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Selling Price</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Profit</th>
@@ -254,6 +279,17 @@
             <tbody class="divide-y divide-zinc-100">
               <tr v-for="product in paginatedItems" :key="product.product_id" class="hover:bg-zinc-50 transition-colors">
                 <td class="px-4 lg:px-5 py-3 lg:py-4">
+                  <div class="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img 
+                      v-if="product.image_url" 
+                      :src="product.image_url" 
+                      :alt="product.product_name"
+                      class="w-full h-full object-contain"
+                    />
+                    <UIcon v-else name="i-lucide-package" class="w-5 h-5 text-zinc-400" />
+                  </div>
+                </td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4">
                   <span class="inline-flex items-center px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded">
                     {{ product.sku }}
                   </span>
@@ -263,6 +299,12 @@
                   <span :class="['text-sm font-medium px-2 py-0.5 rounded', getStockBadgeClass(product.current_stock || 0)]">
                     {{ product.current_stock || 0 }}
                   </span>
+                </td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-center">
+                  <span class="text-sm font-medium text-emerald-600">{{ product.safety_stock || 0 }}</span>
+                </td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-center">
+                  <span class="text-sm font-medium text-emerald-600">{{ product.reorder_quantity || 0 }}</span>
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">${{ product.cost_price.toFixed(2) }}</td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600">${{ product.selling_price.toFixed(2) }}</td>
@@ -364,6 +406,13 @@
             
             <!-- Details -->
             <div class="space-y-4 mb-5">
+              <!-- Product Image -->
+              <div v-if="selectedProduct?.image_url" class="flex justify-center">
+                <div class="w-32 h-32 bg-zinc-100 rounded-xl overflow-hidden">
+                  <img :src="selectedProduct.image_url" :alt="selectedProduct.product_name" class="w-full h-full object-contain" />
+                </div>
+              </div>
+              
               <div class="grid grid-cols-2 gap-4">
                 <div class="bg-zinc-50 rounded-lg p-3">
                   <p class="text-xs text-zinc-500 mb-1">Cost Price</p>
@@ -385,14 +434,21 @@
                 </div>
               </div>
               
-              <div class="bg-zinc-50 rounded-lg p-3">
-                <p class="text-xs text-zinc-500 mb-1">Supplier</p>
-                <p class="text-sm font-medium text-zinc-900">{{ selectedProduct?.supplier?.company_name || 'No supplier assigned' }}</p>
+              <!-- Safety Stock & EOQ -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-emerald-50 rounded-lg p-3">
+                  <p class="text-xs text-emerald-600 mb-1">Safety Stock</p>
+                  <p class="text-lg font-semibold text-emerald-700">{{ selectedProduct?.safety_stock || 0 }}</p>
+                </div>
+                <div class="bg-emerald-50 rounded-lg p-3">
+                  <p class="text-xs text-emerald-600 mb-1">Re-order Qty (EOQ)</p>
+                  <p class="text-lg font-semibold text-emerald-700">{{ selectedProduct?.reorder_quantity || 0 }}</p>
+                </div>
               </div>
               
               <div class="bg-zinc-50 rounded-lg p-3">
-                <p class="text-xs text-zinc-500 mb-1">Min Stock Level</p>
-                <p class="text-sm font-medium text-zinc-900">{{ selectedProduct?.min_stock_level || 0 }}</p>
+                <p class="text-xs text-zinc-500 mb-1">Supplier</p>
+                <p class="text-sm font-medium text-zinc-900">{{ selectedProduct?.supplier?.company_name || 'No supplier assigned' }}</p>
               </div>
               
               <div v-if="selectedProduct?.description" class="bg-zinc-50 rounded-lg p-3">
@@ -580,6 +636,8 @@ const handleExportExcel = () => {
     { header: 'Selling Price', key: 'selling_price', width: 12 },
     { header: 'Profit', key: 'profit', width: 12 },
     { header: 'Current Stock', key: 'current_stock', width: 12 },
+    { header: 'Safety Stock', key: 'safety_stock', width: 12 },
+    { header: 'EOQ', key: 'reorder_quantity', width: 10 },
   ];
   
   const data = filteredProducts.value.map(p => ({
@@ -599,6 +657,8 @@ const handleExportPDF = () => {
     { header: 'Cost', key: 'cost_price' },
     { header: 'Price', key: 'selling_price' },
     { header: 'Stock', key: 'current_stock' },
+    { header: 'Safety', key: 'safety_stock' },
+    { header: 'EOQ', key: 'reorder_quantity' },
   ];
   
   const data = filteredProducts.value.map(p => ({

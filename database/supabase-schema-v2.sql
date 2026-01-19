@@ -47,6 +47,7 @@ CREATE TABLE suppliers (
     email VARCHAR(100),
     address TEXT,
     lead_time_days INTEGER DEFAULT 7,
+    payment_method VARCHAR(50) DEFAULT 'Collect' CHECK (payment_method IN ('Prepaid', 'Collect', 'Credit', 'COD')),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -60,9 +61,12 @@ CREATE TABLE products (
     sku VARCHAR(50) UNIQUE,
     product_name VARCHAR(100) NOT NULL,
     description TEXT,
+    image_url TEXT,
     cost_price DECIMAL(10, 2) NOT NULL DEFAULT 0,
     selling_price DECIMAL(10, 2) NOT NULL DEFAULT 0,
     supplier_id INTEGER REFERENCES suppliers(supplier_id) ON DELETE SET NULL,
+    safety_stock INTEGER DEFAULT 0,
+    reorder_quantity INTEGER DEFAULT 0,
     min_stock_level INTEGER DEFAULT 0,
     current_stock INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT true,
@@ -105,7 +109,14 @@ CREATE TABLE purchaseorders (
     promotion_amount DECIMAL(10, 2) DEFAULT 0,
     promotion_text TEXT,
     total_amount DECIMAL(10, 2) DEFAULT 0,
-    status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Ordered', 'Shipped', 'Received', 'Cancelled')),
+    status VARCHAR(30) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Ordered', 'Shipped', 'Co-loader Shipped', 'Received', 'Cancelled')),
+    payment_method VARCHAR(50) DEFAULT 'Collect' CHECK (payment_method IN ('Prepaid', 'Collect', 'Credit', 'COD')),
+    payment_status VARCHAR(30) DEFAULT 'Unpaid' CHECK (payment_status IN ('Unpaid', 'Partial', 'Paid')),
+    payment_date DATE,
+    payment_attachment TEXT,
+    authorized_by VARCHAR(100),
+    authorized_signature TEXT,
+    authorization_date DATE,
     received_date DATE,
     received_by VARCHAR(100),
     received_notes TEXT,
@@ -243,14 +254,114 @@ CREATE TRIGGER update_sales_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 -- ==============================================
--- ENABLE ROW LEVEL SECURITY (optional)
+-- ENABLE ROW LEVEL SECURITY
 -- ==============================================
--- ALTER TABLE users ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE products ENABLE ROW LEVEL SECURITY;
--- etc.
+-- Enable RLS on all tables
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE suppliers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE purchaseorders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE purchaseorderitems ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE saleitems ENABLE ROW LEVEL SECURITY;
+ALTER TABLE forecasts ENABLE ROW LEVEL SECURITY;
+
+-- ==============================================
+-- RLS POLICIES - Allow service_role full access
+-- ==============================================
+-- Users table policies
+CREATE POLICY "Service role has full access to users" ON users
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Users can view their own profile" ON users
+    FOR SELECT USING (auth.uid()::text = email OR auth.role() = 'service_role');
+
+-- Suppliers table policies
+CREATE POLICY "Service role has full access to suppliers" ON suppliers
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view suppliers" ON suppliers
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage suppliers" ON suppliers
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- Products table policies
+CREATE POLICY "Service role has full access to products" ON products
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view products" ON products
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage products" ON products
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- Customers table policies
+CREATE POLICY "Service role has full access to customers" ON customers
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view customers" ON customers
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage customers" ON customers
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- Purchase Orders table policies
+CREATE POLICY "Service role has full access to purchaseorders" ON purchaseorders
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view purchaseorders" ON purchaseorders
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage purchaseorders" ON purchaseorders
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- Purchase Order Items table policies
+CREATE POLICY "Service role has full access to purchaseorderitems" ON purchaseorderitems
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view purchaseorderitems" ON purchaseorderitems
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage purchaseorderitems" ON purchaseorderitems
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- Sales table policies
+CREATE POLICY "Service role has full access to sales" ON sales
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view sales" ON sales
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage sales" ON sales
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- Sale Items table policies
+CREATE POLICY "Service role has full access to saleitems" ON saleitems
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view saleitems" ON saleitems
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage saleitems" ON saleitems
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- Forecasts table policies
+CREATE POLICY "Service role has full access to forecasts" ON forecasts
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view forecasts" ON forecasts
+    FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can manage forecasts" ON forecasts
+    FOR ALL USING (true) WITH CHECK (true);
 
 -- ==============================================
 -- GRANTS (for Supabase service role)
 -- ==============================================
--- GRANT ALL ON ALL TABLES IN SCHEMA public TO service_role;
--- GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;

@@ -170,6 +170,10 @@
                   <UIcon name="i-lucide-clock" class="w-3.5 h-3.5" />
                   <span>Lead Time: {{ supplier.lead_time_days || 7 }} days</span>
                 </div>
+                <div v-if="supplier.payment_method" class="flex items-center gap-2 text-emerald-600">
+                  <UIcon name="i-lucide-credit-card" class="w-3.5 h-3.5" />
+                  <span>Payment: {{ supplier.payment_method }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -222,6 +226,7 @@
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Email</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Phone</th>
                 <th class="px-4 lg:px-5 py-3 text-center text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Lead Time</th>
+                <th class="px-4 lg:px-5 py-3 text-center text-xs font-medium text-emerald-600 uppercase tracking-wider bg-zinc-50">Payment</th>
                 <th class="px-4 lg:px-5 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Address</th>
                 <th class="px-4 lg:px-5 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-50">Actions</th>
               </tr>
@@ -243,6 +248,25 @@
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded-full">
                     <UIcon name="i-lucide-clock" class="w-3 h-3" />
                     {{ supplier.lead_time_days || 7 }}d
+                  </span>
+                </td>
+                <td class="px-4 lg:px-5 py-3 lg:py-4 text-center">
+                  <span :class="[
+                    'inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full',
+                    supplier.payment_method === 'Prepaid' ? 'bg-emerald-50 text-emerald-700' :
+                    supplier.payment_method === 'Collect' ? 'bg-blue-50 text-blue-700' :
+                    supplier.payment_method === 'Credit' ? 'bg-purple-50 text-purple-700' :
+                    supplier.payment_method === 'COD' ? 'bg-amber-50 text-amber-700' :
+                    'bg-zinc-50 text-zinc-600'
+                  ]">
+                    <UIcon :name="
+                      supplier.payment_method === 'Prepaid' ? 'i-lucide-credit-card' :
+                      supplier.payment_method === 'Collect' ? 'i-lucide-truck' :
+                      supplier.payment_method === 'Credit' ? 'i-lucide-calendar' :
+                      supplier.payment_method === 'COD' ? 'i-lucide-banknote' :
+                      'i-lucide-circle-help'
+                    " class="w-3 h-3" />
+                    {{ supplier.payment_method || 'N/A' }}
                   </span>
                 </td>
                 <td class="px-4 lg:px-5 py-3 lg:py-4 text-sm text-zinc-600 max-w-[200px] truncate">{{ supplier.address || '-' }}</td>
@@ -386,6 +410,14 @@
                 </div>
               </div>
               
+              <div v-if="selectedSupplier?.payment_method" class="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
+                <UIcon name="i-lucide-credit-card" class="w-4 h-4 text-emerald-600" />
+                <div>
+                  <p class="text-xs text-emerald-600">Payment Method</p>
+                  <p class="text-sm font-medium text-emerald-700">{{ selectedSupplier.payment_method }}</p>
+                </div>
+              </div>
+              
               <div v-if="selectedSupplier?.products" class="flex items-start gap-3 p-3 bg-zinc-50 rounded-lg">
                 <UIcon name="i-lucide-package" class="w-4 h-4 text-zinc-400 mt-0.5" />
                 <div>
@@ -517,6 +549,7 @@ const handleExportExcel = () => {
     { header: 'Email', key: 'email', width: 25 },
     { header: 'Address', key: 'address', width: 30 },
     { header: 'Lead Time (Days)', key: 'lead_time_days', width: 15 },
+    { header: 'Payment Method', key: 'payment_method', width: 15 },
   ];
   exportToExcel(filteredSuppliers.value, columns, 'suppliers');
 };
@@ -529,6 +562,7 @@ const handleExportPDF = () => {
     { header: 'Phone', key: 'phone' },
     { header: 'Email', key: 'email' },
     { header: 'Lead Time', key: 'lead_time_days' },
+    { header: 'Payment', key: 'payment_method' },
   ];
   exportToPDF(filteredSuppliers.value, columns, 'Suppliers Report', 'suppliers');
 };

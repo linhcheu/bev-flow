@@ -32,10 +32,12 @@ export default defineEventHandler(async (event) => {
       .update({
         company_name: body.company_name,
         contact_person: body.contact_person || null,
+        sale_agent: body.sale_agent || null,
         phone: body.phone || null,
         email: body.email || null,
         address: body.address || null,
         lead_time_days: body.lead_time_days || 0,
+        payment_method: body.payment_method || 'Collect',
         is_active: body.is_active == null ? true : !!body.is_active,
         updated_at: new Date().toISOString()
       })
@@ -65,20 +67,24 @@ export default defineEventHandler(async (event) => {
     UPDATE Suppliers 
     SET company_name = ?, 
         contact_person = ?, 
+        sale_agent = ?,
         phone = ?, 
         email = ?, 
         address = ?, 
         lead_time_days = ?,
+        payment_method = ?,
         is_active = ?,
         updated_at = CURRENT_TIMESTAMP
     WHERE supplier_id = ?
   `, [
     body.company_name,
     body.contact_person || null,
+    body.sale_agent || null,
     body.phone || null,
     body.email || null,
     body.address || null,
     body.lead_time_days || 0,
+    body.payment_method || 'Collect',
     body.is_active == null ? 1 : (body.is_active ? 1 : 0),
     id
   ]);

@@ -518,7 +518,7 @@ const handleTextareaKeydown = (event: KeyboardEvent) => {
 
 onMounted(async () => {
   await Promise.all([fetchProducts(), fetchCustomers(), fetchSales()]);
-  form.value.sale_number = generateSaleNumber();
+  form.value.sale_number = await generateSaleNumber();
 });
 
 const handleSubmit = async () => {

@@ -11,9 +11,18 @@ interface PurchaseOrderRow {
   subtotal: number;
   shipping_rate: number;
   shipping_cost: number;
+  promotion_percent: number;
   promotion_amount: number;
+  promotion_text: string | null;
   total_amount: number;
   status: string;
+  payment_method: string | null;
+  payment_status: string | null;
+  payment_date: string | null;
+  payment_attachment: string | null;
+  authorized_by: string | null;
+  authorized_signature: string | null;
+  authorization_date: string | null;
   truck_remark: string | null;
   overall_remark: string | null;
   third_party_agent: string | null;
@@ -27,6 +36,8 @@ interface PurchaseOrderRow {
   supplier_phone: string | null;
   supplier_email: string | null;
   supplier_address: string | null;
+  supplier_lead_time_days: number | null;
+  supplier_payment_method: string | null;
 }
 
 interface POItemRow {
@@ -56,7 +67,9 @@ export default defineEventHandler(async () => {
           contact_person,
           phone,
           email,
-          address
+          address,
+          lead_time_days,
+          payment_method
         )
       `)
       .order('order_date', { ascending: false });
@@ -110,9 +123,18 @@ export default defineEventHandler(async () => {
       subtotal: Number(o.subtotal),
       shipping_rate: Number(o.shipping_rate),
       shipping_cost: Number(o.shipping_cost),
+      promotion_percent: Number(o.promotion_percent || 0),
       promotion_amount: Number(o.promotion_amount),
+      promotion_text: o.promotion_text || undefined,
       total_amount: Number(o.total_amount),
       status: o.status as PurchaseOrder['status'],
+      payment_method: o.payment_method || 'Collect',
+      payment_status: o.payment_status || 'Unpaid',
+      payment_date: o.payment_date || undefined,
+      payment_attachment: o.payment_attachment || undefined,
+      authorized_by: o.authorized_by || undefined,
+      authorized_signature: o.authorized_signature || undefined,
+      authorization_date: o.authorization_date || undefined,
       truck_remark: o.truck_remark || undefined,
       overall_remark: o.overall_remark || undefined,
       third_party_agent: o.third_party_agent || undefined,
@@ -128,6 +150,8 @@ export default defineEventHandler(async () => {
         phone: o.suppliers?.phone || undefined,
         email: o.suppliers?.email || undefined,
         address: o.suppliers?.address || undefined,
+        lead_time_days: o.suppliers?.lead_time_days || 7,
+        payment_method: o.suppliers?.payment_method || undefined,
       },
       items: itemsByPO[o.po_id] || [],
     }));
@@ -142,7 +166,9 @@ export default defineEventHandler(async () => {
       s.contact_person,
       s.phone as supplier_phone,
       s.email as supplier_email,
-      s.address as supplier_address
+      s.address as supplier_address,
+      s.lead_time_days as supplier_lead_time_days,
+      s.payment_method as supplier_payment_method
     FROM PurchaseOrders po
     LEFT JOIN Suppliers s ON po.supplier_id = s.supplier_id
     ORDER BY po.order_date DESC
@@ -191,9 +217,18 @@ export default defineEventHandler(async () => {
     subtotal: Number(o.subtotal),
     shipping_rate: Number(o.shipping_rate),
     shipping_cost: Number(o.shipping_cost),
+    promotion_percent: Number(o.promotion_percent || 0),
     promotion_amount: Number(o.promotion_amount),
+    promotion_text: o.promotion_text || undefined,
     total_amount: Number(o.total_amount),
     status: o.status as PurchaseOrder['status'],
+    payment_method: (o.payment_method || 'Collect') as PurchaseOrder['payment_method'],
+    payment_status: (o.payment_status || 'Unpaid') as PurchaseOrder['payment_status'],
+    payment_date: o.payment_date || undefined,
+    payment_attachment: o.payment_attachment || undefined,
+    authorized_by: o.authorized_by || undefined,
+    authorized_signature: o.authorized_signature || undefined,
+    authorization_date: o.authorization_date || undefined,
     truck_remark: o.truck_remark || undefined,
     overall_remark: o.overall_remark || undefined,
     third_party_agent: o.third_party_agent || undefined,
@@ -209,6 +244,8 @@ export default defineEventHandler(async () => {
       phone: o.supplier_phone || undefined,
       email: o.supplier_email || undefined,
       address: o.supplier_address || undefined,
+      lead_time_days: o.supplier_lead_time_days || 7,
+      payment_method: o.supplier_payment_method as 'Prepaid' | 'Collect' | 'Credit' | 'COD' | undefined,
     },
     items: itemsByPO[o.po_id] || [],
   }));
