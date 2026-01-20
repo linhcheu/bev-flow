@@ -453,7 +453,7 @@ export const useExport = () => {
 
 // Professional receipt-style exports for individual items
 export const useReceiptExport = () => {
-  // Export single sale as professional invoice PDF - A4 format
+  // Export single sale as professional invoice PDF - Custom taller format
   const exportSaleReceipt = async (sale: any) => {
     const items = sale.items || [{ 
       product: sale.product, 
@@ -462,10 +462,16 @@ export const useReceiptExport = () => {
       amount: sale.total_amount 
     }];
     
-    const doc = new jsPDF('portrait', 'mm', 'a4');
+    // Use custom taller page format (210mm x 380mm) for better content fit
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: [210, 380]
+    });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 15;
+    const footerHeight = 35; // Reserve space for footer
     let y = margin;
 
     // === HEADER SECTION ===
@@ -686,12 +692,32 @@ export const useReceiptExport = () => {
       doc.text(noteLines, margin, y + 16);
     }
 
-    y += 50;
+    y += 55;
 
     // === SIGNATURE SECTION ===
+    // Check if we need a new page for signature section (need ~120mm for signature + thank you + footer)
+    const signatureSectionHeight = 120;
+    if (y + signatureSectionHeight > pageHeight - footerHeight) {
+      // Add footer to current page before adding new page
+      const currentFooterY = pageHeight - 20;
+      doc.setDrawColor(228, 228, 231);
+      doc.setLineWidth(0.3);
+      doc.line(margin, currentFooterY - 3, pageWidth - margin, currentFooterY - 3);
+      doc.setFontSize(7);
+      doc.setTextColor(161, 161, 170);
+      doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, currentFooterY);
+      doc.text('BEV Flow - Inventory Management System', pageWidth / 2, currentFooterY, { align: 'center' });
+      doc.text('Page 1 of 2', pageWidth - margin, currentFooterY, { align: 'right' });
+      
+      // Add new page
+      doc.addPage();
+      y = margin + 10;
+    }
+
     doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
     doc.line(margin, y, pageWidth - margin, y);
-    y += 10;
+    y += 20;
     
     // Prepared by / Received by section
     const signBoxWidth = (pageWidth - margin * 2 - 20) / 2;
@@ -700,59 +726,57 @@ export const useReceiptExport = () => {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(82, 82, 91);
-    doc.text('Prepared by:', margin, y);
+    doc.text('Authorized by:', margin, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(39, 39, 42);
-    doc.text(sale.created_by || 'Admin', margin + 28, y);
+    doc.text(sale.created_by || 'Admin', margin + 32, y);
     
-    // Signature line
-    doc.setDrawColor(150, 150, 150);
-    doc.line(margin, y + 20, margin + signBoxWidth, y + 20);
-    doc.setFontSize(8);
-    doc.setTextColor(113, 113, 122);
-    doc.text('Signature', margin, y + 25);
-    doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`, margin + 40, y + 25);
-
-    // Received by box (right)
-    const rightX = margin + signBoxWidth + 20;
-    doc.setFontSize(9);
+    // Add date on the right of authorized by
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(82, 82, 91);
-    doc.text('Received by:', rightX, y);
+    doc.text('Date:', margin + 80, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(39, 39, 42);
-    doc.text(sale.customer?.customer_name || 'Customer', rightX + 28, y);
+    doc.text(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }), margin + 95, y);
     
-    // Signature line
-    doc.line(rightX, y + 20, rightX + signBoxWidth, y + 20);
-    doc.setFontSize(8);
-    doc.setTextColor(113, 113, 122);
-    doc.text('Signature', rightX, y + 25);
-    doc.text('Date: _______________', rightX + 40, y + 25);
+    y += 8;
+    doc.setFontSize(9);
+    doc.setTextColor(82, 82, 91);
+    doc.text('Signature:', margin, y);
+    
+    // Signature line with more space for actual signature
+    doc.setDrawColor(150, 150, 150);
+    doc.line(margin, y + 35, margin + signBoxWidth, y + 35);
 
-    y += 35;
+    y += 55;
 
     // === THANK YOU MESSAGE ===
     doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
     doc.line(margin, y, pageWidth - margin, y);
-    y += 10;
+    y += 15;
     
-    doc.setFontSize(10);
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(245, 158, 11);
     doc.text('Thank you for your business!', pageWidth / 2, y, { align: 'center' });
 
-    // === FOOTER ===
-    const footerY = pageHeight - 12;
-    doc.setDrawColor(228, 228, 231);
-    doc.setLineWidth(0.3);
-    doc.line(margin, footerY - 3, pageWidth - margin, footerY - 3);
-    
-    doc.setFontSize(7);
-    doc.setTextColor(161, 161, 170);
-    doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, footerY);
-    doc.text('BEV Flow - Inventory Management System', pageWidth / 2, footerY, { align: 'center' });
-    doc.text('Page 1 of 1', pageWidth - margin, footerY, { align: 'right' });
+    // === FOOTER (on all pages) ===
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      const currentFooterY = pageHeight - 20;
+      
+      doc.setDrawColor(228, 228, 231);
+      doc.setLineWidth(0.3);
+      doc.line(margin, currentFooterY - 5, pageWidth - margin, currentFooterY - 5);
+      
+      doc.setFontSize(7);
+      doc.setTextColor(161, 161, 170);
+      doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, margin, currentFooterY);
+      doc.text('BEV Flow - Inventory Management System', pageWidth / 2, currentFooterY, { align: 'center' });
+      doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, currentFooterY, { align: 'right' });
+    }
 
     doc.save(`invoice_${sale.sale_number}.pdf`);
   };
