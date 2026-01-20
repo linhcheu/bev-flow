@@ -13,6 +13,27 @@ interface SaleItemRow {
   sku: string;
 }
 
+// Local interface for SQLite raw sale row (includes legacy single-product fields)
+interface SaleRow {
+  sale_id: number;
+  invoice_number: string;
+  customer_id: number | null;
+  customer_name: string | null;
+  sale_date: string;
+  product_id: number | null;
+  unit_price: number | null;
+  quantity: number | null;
+  total_amount: number;
+  notes: string | null;
+  created_at: string;
+}
+
+interface SaleRowWithJoins extends SaleRow {
+  product_name: string;
+  sku: string;
+  db_customer_name: string | null;
+}
+
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
   const body = await readBody(event);
@@ -153,9 +174,8 @@ export default defineEventHandler(async (event) => {
     
     return {
       sale_id: updated?.sale_id,
-      invoice_number: updated?.sale_number, // Map back from Supabase column
+      sale_number: updated?.sale_number,
       customer_id: updated?.customer_id || undefined,
-      customer_name: updated?.customers?.customer_name || undefined,
       sale_date: updated?.sale_date,
       subtotal,
       discount_percent: Number(updated?.discount_percent || 0),
@@ -175,7 +195,7 @@ export default defineEventHandler(async (event) => {
   
   // Development: Use SQLite
   // Check if sale exists
-  const existing = queryOne<Sale>('SELECT * FROM Sales WHERE sale_id = ?', [id]);
+  const existing = queryOne<SaleRow>('SELECT * FROM Sales WHERE sale_id = ?', [id]);
   if (!existing) {
     throw createError({
       statusCode: 404,
@@ -266,7 +286,7 @@ export default defineEventHandler(async (event) => {
   `, [id]);
   
   // Return updated sale with items
-  const updated = queryOne<Sale & { product_name: string; sku: string; db_customer_name: string | null }>(`
+  const updated = queryOne<SaleRowWithJoins>(`
     SELECT 
       s.*,
       p.product_name,
@@ -294,26 +314,17 @@ export default defineEventHandler(async (event) => {
   
   return {
     sale_id: updated?.sale_id,
-    invoice_number: updated?.invoice_number,
+    sale_number: updated?.invoice_number || '',
     customer_id: updated?.customer_id || undefined,
-    customer_name: updated?.customer_name || updated?.db_customer_name || undefined,
     sale_date: updated?.sale_date,
-    product_id: updated?.product_id,
-    unit_price: Number(updated?.unit_price),
-    quantity: updated?.quantity,
     subtotal,
     total_amount: Number(updated?.total_amount),
     notes: updated?.notes || undefined,
     created_at: updated?.created_at,
     items: resultItems,
-    product: updated?.product_id ? {
-      product_id: updated.product_id,
-      product_name: updated.product_name,
-      sku: updated.sku
-    } : null,
     customer: updated?.customer_id ? {
       customer_id: updated.customer_id,
       customer_name: updated.db_customer_name || ''
     } : undefined
-  };
+  } as Sale;
 });

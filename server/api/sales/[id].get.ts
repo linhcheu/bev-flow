@@ -91,11 +91,11 @@ export default defineEventHandler(async (event) => {
     
     return {
       sale_id: sale.sale_id,
-      invoice_number: sale.sale_number || sale.invoice_number, // Supabase uses sale_number
+      sale_number: sale.sale_number || sale.invoice_number, // Supabase uses sale_number
       customer_id: sale.customer_id || undefined,
       customer_name: sale.customers?.customer_name || undefined,
       sale_date: sale.sale_date,
-      subtotal: Number(sale.subtotal) || subtotal,
+    subtotal: Number(sale.subtotal) || subtotal,
       discount_percent: Number(sale.discount_percent || 0),
       discount_amount: Number(sale.discount_amount || 0),
       total_amount: Number(sale.total_amount),
@@ -169,7 +169,7 @@ export default defineEventHandler(async (event) => {
   
   return {
     sale_id: sale.sale_id,
-    invoice_number: sale.invoice_number,
+    sale_number: sale.invoice_number,
     customer_id: sale.customer_id || undefined,
     customer_name: sale.customer_name || sale.db_customer_name || undefined,
     sale_date: sale.sale_date,
