@@ -161,6 +161,7 @@ interface MenuItem {
 const mainMenuItems: MenuItem[] = [
   { path: '/', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },
   { path: '/analytics', label: 'Analytics', icon: 'i-lucide-bar-chart-2' },
+  { path: '/stock-reports', label: 'Stock Reports', icon: 'i-lucide-clipboard-check' },
   { path: '/products', label: 'Products', icon: 'i-lucide-package' },
   { path: '/suppliers', label: 'Suppliers', icon: 'i-lucide-building-2' },
   { path: '/purchase-orders', label: 'Purchase Orders', icon: 'i-lucide-clipboard-list' },

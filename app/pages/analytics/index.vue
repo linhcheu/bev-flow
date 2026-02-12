@@ -409,6 +409,186 @@
             <p class="text-sm text-zinc-600">All products have healthy stock levels!</p>
           </div>
         </div>
+        <!-- ROP & EOQ Analytics Section -->
+        <div class="mt-6 space-y-4">
+          <!-- Section Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-calculator" class="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <h2 class="text-sm sm:text-base font-semibold text-zinc-900">Reorder Point & EOQ Analysis</h2>
+                <p class="text-xs text-zinc-500">Inventory optimization metrics for all products</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Constants Cards -->
+          <div v-if="ropConstants" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+            <div class="bg-indigo-50 rounded-xl p-3 sm:p-4 border border-indigo-100">
+              <p class="text-[10px] sm:text-xs font-medium text-indigo-600 mb-1">Service Level</p>
+              <p class="text-base sm:text-lg font-bold text-indigo-900">{{ (ropConstants.serviceLevel * 100).toFixed(0) }}%</p>
+            </div>
+            <div class="bg-violet-50 rounded-xl p-3 sm:p-4 border border-violet-100">
+              <p class="text-[10px] sm:text-xs font-medium text-violet-600 mb-1">Z-Score</p>
+              <p class="text-base sm:text-lg font-bold text-violet-900">{{ ropConstants.zScore }}</p>
+            </div>
+            <div class="bg-sky-50 rounded-xl p-3 sm:p-4 border border-sky-100">
+              <p class="text-[10px] sm:text-xs font-medium text-sky-600 mb-1">Ordering Cost</p>
+              <p class="text-base sm:text-lg font-bold text-sky-900">${{ ropConstants.orderingCost?.toFixed(2) }}</p>
+            </div>
+            <div class="bg-rose-50 rounded-xl p-3 sm:p-4 border border-rose-100">
+              <p class="text-[10px] sm:text-xs font-medium text-rose-600 mb-1">Holding Cost/yr</p>
+              <p class="text-base sm:text-lg font-bold text-rose-900">${{ ropConstants.holdingCost?.toFixed(2) }}</p>
+            </div>
+          </div>
+
+          <!-- Summary Cards -->
+          <div v-if="ropSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+            <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-zinc-100 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-lucide-package" class="w-3.5 h-3.5 text-zinc-600" />
+                </div>
+                <span class="text-[10px] sm:text-xs font-medium text-zinc-500">Products</span>
+              </div>
+              <p class="text-lg sm:text-xl font-bold text-zinc-900">{{ ropSummary.totalProducts }}</p>
+            </div>
+            <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-lucide-check-circle" class="w-3.5 h-3.5 text-emerald-600" />
+                </div>
+                <span class="text-[10px] sm:text-xs font-medium text-emerald-600">Healthy</span>
+              </div>
+              <p class="text-lg sm:text-xl font-bold text-emerald-600">{{ ropSummary.healthyCount }}</p>
+            </div>
+            <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-red-50 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-lucide-alert-triangle" class="w-3.5 h-3.5 text-red-600" />
+                </div>
+                <span class="text-[10px] sm:text-xs font-medium text-red-600">Needs Reorder</span>
+              </div>
+              <p class="text-lg sm:text-xl font-bold text-red-600">{{ ropSummary.needsReorderCount }}</p>
+            </div>
+            <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-blue-50 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-lucide-target" class="w-3.5 h-3.5 text-blue-600" />
+                </div>
+                <span class="text-[10px] sm:text-xs font-medium text-blue-600">Avg ROP</span>
+              </div>
+              <p class="text-lg sm:text-xl font-bold text-blue-600">{{ ropSummary.avgReorderPoint?.toFixed(0) }}</p>
+            </div>
+          </div>
+
+          <!-- ROP/EOQ Table -->
+          <div class="bg-white rounded-xl border border-zinc-200 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="bg-zinc-50 text-left text-xs text-zinc-500 border-b border-zinc-200">
+                    <th class="px-3 py-3 font-medium sticky left-0 bg-zinc-50 z-10">No.</th>
+                    <th class="px-3 py-3 font-medium sticky left-8 bg-zinc-50 z-10 min-w-[120px]">Product</th>
+                    <th class="px-3 py-3 font-medium text-center">SKU</th>
+                    <th class="px-3 py-3 font-medium text-center whitespace-nowrap">Lead Time<br/><span class="text-[10px] text-zinc-400">(days)</span></th>
+                    <th class="px-3 py-3 font-medium text-center whitespace-nowrap">Std Dev<br/><span class="text-[10px] text-zinc-400">(σ)</span></th>
+                    <th class="px-3 py-3 font-medium text-center whitespace-nowrap">Safety<br/>Stock</th>
+                    <th class="px-3 py-3 font-medium text-center whitespace-nowrap">Avg Daily<br/>Demand</th>
+                    <th class="px-3 py-3 font-medium text-center whitespace-nowrap">Demand<br/>During LT</th>
+                    <th class="px-3 py-3 font-medium text-center">
+                      <span class="inline-flex items-center gap-1 text-indigo-600 font-semibold">
+                        ROP
+                      </span>
+                    </th>
+                    <th class="px-3 py-3 font-medium text-center whitespace-nowrap">Annual<br/>Demand</th>
+                    <th class="px-3 py-3 font-medium text-center">
+                      <span class="inline-flex items-center gap-1 text-violet-600 font-semibold">
+                        EOQ
+                      </span>
+                    </th>
+                    <th class="px-3 py-3 font-medium text-center whitespace-nowrap">Current<br/>Stock</th>
+                    <th class="px-3 py-3 font-medium text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr 
+                    v-for="(item, idx) in ropEoqData" 
+                    :key="item.product_id"
+                    :class="['border-b border-zinc-50 hover:bg-zinc-50/80 transition-colors', item.needs_reorder ? 'bg-red-50/30' : '']"
+                  >
+                    <td class="px-3 py-2.5 sticky left-0 bg-inherit z-10 text-zinc-400 text-xs">{{ idx + 1 }}</td>
+                    <td class="px-3 py-2.5 sticky left-8 bg-inherit z-10">
+                      <span class="font-medium text-zinc-900 text-xs sm:text-sm">{{ item.product_name }}</span>
+                    </td>
+                    <td class="px-3 py-2.5 text-center text-xs text-zinc-500">{{ item.sku }}</td>
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-zinc-700">{{ item.lead_time_days }}</td>
+                    <td class="px-3 py-2.5 text-center text-xs text-zinc-600">{{ item.std_dev_daily_demand?.toFixed(2) }}</td>
+                    <td class="px-3 py-2.5 text-center">
+                      <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-xs font-semibold">
+                        {{ item.safety_stock?.toFixed(0) }}
+                      </span>
+                    </td>
+                    <td class="px-3 py-2.5 text-center text-xs text-zinc-600">{{ item.avg_daily_demand?.toFixed(2) }}</td>
+                    <td class="px-3 py-2.5 text-center text-xs text-zinc-600">{{ item.demand_during_lead_time?.toFixed(1) }}</td>
+                    <td class="px-3 py-2.5 text-center">
+                      <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold">
+                        {{ item.reorder_point?.toFixed(0) }}
+                      </span>
+                    </td>
+                    <td class="px-3 py-2.5 text-center text-xs text-zinc-600">{{ item.annual_demand?.toFixed(0) }}</td>
+                    <td class="px-3 py-2.5 text-center">
+                      <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-violet-50 text-violet-700 text-xs font-bold">
+                        {{ item.eoq?.toFixed(0) }}
+                      </span>
+                    </td>
+                    <td class="px-3 py-2.5 text-center">
+                      <span :class="['text-xs font-bold', item.current_stock <= (item.safety_stock || 0) ? 'text-red-600' : 'text-emerald-600']">
+                        {{ item.current_stock }}
+                      </span>
+                    </td>
+                    <td class="px-3 py-2.5 text-center">
+                      <span 
+                        :class="['inline-flex items-center gap-1 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap', 
+                          item.needs_reorder ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700']"
+                      >
+                        <UIcon :name="item.needs_reorder ? 'i-lucide-alert-triangle' : 'i-lucide-check'" class="w-3 h-3" />
+                        {{ item.needs_reorder ? 'Re-order' : 'OK' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Formula Reference -->
+          <div class="bg-zinc-50 rounded-xl p-4 sm:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 mb-3">
+              <UIcon name="i-lucide-book-open" class="w-4 h-4 text-zinc-500" />
+              <h3 class="text-xs sm:text-sm font-medium text-zinc-700">Formula Reference</h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+              <div class="bg-white rounded-lg p-3 border border-zinc-100">
+                <p class="font-semibold text-amber-700 mb-1">Safety Stock (SS)</p>
+                <p class="text-zinc-600 font-mono text-[11px]">Z × σ × √(Lead Time)</p>
+                <p class="text-zinc-400 mt-1">Z = {{ ropConstants?.zScore || 1.64 }} ({{ ((ropConstants?.serviceLevel || 0.95) * 100).toFixed(0) }}% service level)</p>
+              </div>
+              <div class="bg-white rounded-lg p-3 border border-zinc-100">
+                <p class="font-semibold text-indigo-700 mb-1">Reorder Point (ROP)</p>
+                <p class="text-zinc-600 font-mono text-[11px]">(Avg Daily Demand × LT) + SS</p>
+                <p class="text-zinc-400 mt-1">When stock ≤ ROP → Place order</p>
+              </div>
+              <div class="bg-white rounded-lg p-3 border border-zinc-100">
+                <p class="font-semibold text-violet-700 mb-1">Economic Order Qty (EOQ)</p>
+                <p class="text-zinc-600 font-mono text-[11px]">√(2 × Annual Demand × OC / HC)</p>
+                <p class="text-zinc-400 mt-1">OC = ${{ ropConstants?.orderingCost?.toFixed(2) || '100.83' }}, HC = ${{ ropConstants?.holdingCost?.toFixed(2) || '600.00' }}/yr</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Tooltip -->
@@ -436,6 +616,7 @@
 const { sales, fetchSales } = useSales();
 const { purchaseOrders, fetchPurchaseOrders } = usePurchaseOrders();
 const { products, fetchProducts } = useProducts();
+const { analyticsData: ropEoqData, analyticsSummary: ropSummary, analyticsConstants: ropConstants, fetchAnalytics } = useStockReports();
 
 const loading = ref(true);
 
@@ -681,7 +862,7 @@ const getStockStatus = (stock: number) => {
 // Load data
 onMounted(async () => {
   try {
-    await Promise.all([fetchSales(), fetchPurchaseOrders(), fetchProducts()]);
+    await Promise.all([fetchSales(), fetchPurchaseOrders(), fetchProducts(), fetchAnalytics()]);
   } finally {
     loading.value = false;
   }

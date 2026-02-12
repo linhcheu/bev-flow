@@ -202,6 +202,22 @@ CREATE TABLE IF NOT EXISTS ProductSupplierAvailability (
 );
 
 -- ==============================================
+-- 11. DAILY STOCK REPORTS TABLE
+-- ==============================================
+CREATE TABLE IF NOT EXISTS DailyStockReports (
+    report_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    report_date DATE NOT NULL,
+    opening_stock INTEGER DEFAULT 0,
+    purchased_qty INTEGER DEFAULT 0,
+    sold_qty INTEGER DEFAULT 0,
+    closing_stock INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
+    UNIQUE(product_id, report_date)
+);
+
+-- ==============================================
 -- INDEXES
 -- ==============================================
 CREATE INDEX IF NOT EXISTS idx_users_email ON Users(email);
@@ -221,3 +237,6 @@ CREATE INDEX IF NOT EXISTS idx_si_product ON SaleItems(product_id);
 CREATE INDEX IF NOT EXISTS idx_forecasts_product ON Forecasts(product_id);
 CREATE INDEX IF NOT EXISTS idx_psa_product ON ProductSupplierAvailability(product_id);
 CREATE INDEX IF NOT EXISTS idx_psa_supplier ON ProductSupplierAvailability(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_dsr_product ON DailyStockReports(product_id);
+CREATE INDEX IF NOT EXISTS idx_dsr_date ON DailyStockReports(report_date);
+CREATE INDEX IF NOT EXISTS idx_dsr_product_date ON DailyStockReports(product_id, report_date);

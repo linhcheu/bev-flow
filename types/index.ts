@@ -215,6 +215,54 @@ export interface Stock {
   created_at?: string;
 }
 
+// Daily Stock Report
+export interface DailyStockReport {
+  report_id?: number;
+  product_id: number;
+  product_name?: string;
+  sku?: string;
+  description?: string;
+  report_date: string;
+  opening_stock: number;
+  purchased_qty: number;
+  sold_qty: number;
+  closing_stock: number;
+  created_at?: string;
+}
+
+// Product Analytics (ROP/EOQ)
+export interface ProductAnalytics {
+  product_id: number;
+  sku: string;
+  product_name: string;
+  description: string;
+  lead_time_days: number;
+  std_dev_daily_demand: number;
+  safety_stock: number;
+  avg_daily_demand: number;
+  demand_during_lead_time: number;
+  reorder_point: number;
+  annual_demand: number;
+  eoq: number;
+  current_stock: number;
+  needs_reorder: boolean;
+}
+
+// BoH (Balance on Hand) Summary
+export interface BoHSummary {
+  product_id: number;
+  product_name: string;
+  description: string;
+  sku: string;
+  current_stock: number;
+  safety_stock: number;
+  reorder_point: number;
+  eoq: number;
+  needs_reorder: boolean;
+  total_purchased: number;
+  total_sold: number;
+}
+
 // Product Supplier Availability
 export interface ProductSupplierAvailability {
   id?: number;

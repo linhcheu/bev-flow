@@ -16,26 +16,22 @@ export default defineEventHandler(async () => {
     let maxNum = 0;
     if (data) {
       for (const sale of data) {
-        // Check SALE-YEAR-XXXX format
-        const match = sale.sale_number?.match(/SALE-(\d{4})-(\d+)/);
-        if (match && match[1] && match[2]) {
-          const year = parseInt(match[1], 10);
-          const num = parseInt(match[2], 10);
-          // Only count numbers from current year or find overall max
-          if (year === currentYear && num > maxNum) {
-            maxNum = num;
-          }
+        // Check INV-H20-XXXX format (new)
+        const match = sale.sale_number?.match(/INV-H20-(\d+)/);
+        if (match && match[1]) {
+          const num = parseInt(match[1], 10);
+          if (num > maxNum) maxNum = num;
         }
-        // Also check old formats for migration
-        const oldMatch = sale.sale_number?.match(/(?:SALE|INV)-(\d+)/);
-        if (oldMatch && oldMatch[1]) {
-          const num = parseInt(oldMatch[1], 10);
+        // Also check old SALE-YEAR-XXXX format for migration
+        const oldMatch = sale.sale_number?.match(/SALE-(\d{4})-(\d+)/);
+        if (oldMatch && oldMatch[2]) {
+          const num = parseInt(oldMatch[2], 10);
           if (num > maxNum) maxNum = num;
         }
       }
     }
     
-    return { next_number: `SALE-${currentYear}-${String(maxNum + 1).padStart(4, '0')}` };
+    return { next_number: `INV-H20-${String(maxNum + 1).padStart(4, '0')}` };
   }
   
   // Development: Use SQLite
@@ -47,22 +43,18 @@ export default defineEventHandler(async () => {
   
   let maxNum = 0;
   if (result?.max_inv) {
-    // Check SALE-YEAR-XXXX format
-    const match = result.max_inv.match(/SALE-(\d{4})-(\d+)/);
-    if (match && match[1] && match[2]) {
-      const year = parseInt(match[1], 10);
-      const num = parseInt(match[2], 10);
-      if (year === currentYear) {
-        maxNum = num;
-      }
+    // Check INV-H20-XXXX format (new)
+    const match = result.max_inv.match(/INV-H20-(\d+)/);
+    if (match && match[1]) {
+      maxNum = parseInt(match[1], 10);
     } else {
-      // Handle old formats
-      const oldMatch = result.max_inv.match(/(?:SALE|INV)-(\d+)/);
-      if (oldMatch && oldMatch[1]) {
-        maxNum = parseInt(oldMatch[1], 10);
+      // Handle old SALE-YEAR-XXXX format
+      const oldMatch = result.max_inv.match(/SALE-(\d{4})-(\d+)/);
+      if (oldMatch && oldMatch[2]) {
+        maxNum = parseInt(oldMatch[2], 10);
       }
     }
   }
   
-  return { next_number: `SALE-${currentYear}-${String(maxNum + 1).padStart(4, '0')}` };
+  return { next_number: `INV-H20-${String(maxNum + 1).padStart(4, '0')}` };
 });

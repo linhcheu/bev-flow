@@ -315,6 +315,96 @@
         </div>
       </div>
 
+      <!-- Balance on Hand (BoH) Section -->
+      <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 lg:mb-8 border border-zinc-200">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-warehouse" class="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-semibold text-zinc-900">Balance on Hand (BoH)</h3>
+              <p class="text-xs text-zinc-500">Current stock levels &amp; reorder status</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div v-if="bohSummary" class="flex items-center gap-2">
+              <span class="text-xs text-zinc-500">Need Reorder:</span>
+              <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', bohSummary.needsReorderCount > 0 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700']">
+                {{ bohSummary.needsReorderCount }} / {{ bohSummary.totalProducts }}
+              </span>
+            </div>
+            <NuxtLink to="/stock-reports" class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 no-underline">
+              View Reports <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5" />
+            </NuxtLink>
+          </div>
+        </div>
+
+        <!-- BoH Summary Cards -->
+        <div v-if="bohSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4">
+          <div class="bg-blue-50 rounded-lg p-3">
+            <p class="text-xs text-blue-600 mb-1">Total Stock</p>
+            <p class="text-lg font-bold text-blue-700">{{ bohSummary.totalStock }}</p>
+            <p class="text-[10px] text-blue-500">units on hand</p>
+          </div>
+          <div class="bg-emerald-50 rounded-lg p-3">
+            <p class="text-xs text-emerald-600 mb-1">Inventory Value</p>
+            <p class="text-lg font-bold text-emerald-700">${{ (bohSummary.totalValue || 0).toLocaleString() }}</p>
+            <p class="text-[10px] text-emerald-500">at cost price</p>
+          </div>
+          <div class="bg-amber-50 rounded-lg p-3">
+            <p class="text-xs text-amber-600 mb-1">Healthy</p>
+            <p class="text-lg font-bold text-amber-700">{{ bohSummary.healthyCount }}</p>
+            <p class="text-[10px] text-amber-500">products OK</p>
+          </div>
+          <div :class="['rounded-lg p-3', bohSummary.needsReorderCount > 0 ? 'bg-red-50' : 'bg-emerald-50']">
+            <p :class="['text-xs mb-1', bohSummary.needsReorderCount > 0 ? 'text-red-600' : 'text-emerald-600']">Needs Reorder</p>
+            <p :class="['text-lg font-bold', bohSummary.needsReorderCount > 0 ? 'text-red-700' : 'text-emerald-700']">{{ bohSummary.needsReorderCount }}</p>
+            <p :class="['text-[10px]', bohSummary.needsReorderCount > 0 ? 'text-red-500' : 'text-emerald-500']">products below ROP</p>
+          </div>
+        </div>
+
+        <!-- BoH Product Table -->
+        <div v-if="bohItems.length > 0" class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-zinc-200">
+                <th class="text-left px-3 py-2 text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase">Product</th>
+                <th class="text-center px-3 py-2 text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase hidden sm:table-cell">Desc</th>
+                <th class="text-center px-3 py-2 text-[10px] sm:text-xs font-semibold text-amber-600 uppercase bg-amber-50/50 rounded-t">BoH</th>
+                <th class="text-center px-3 py-2 text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase">Safety</th>
+                <th class="text-center px-3 py-2 text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase">Reorder?</th>
+                <th class="text-center px-3 py-2 text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase">EOQ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in bohItems" :key="item.product_id" class="border-b border-zinc-50 hover:bg-zinc-50/50 transition-colors">
+                <td class="px-3 py-2.5 text-xs sm:text-sm font-medium text-zinc-900">{{ item.product_name }}</td>
+                <td class="px-3 py-2.5 text-xs text-zinc-500 text-center hidden sm:table-cell">{{ item.description }}</td>
+                <td class="px-3 py-2.5 text-center">
+                  <span :class="[
+                    'text-xs sm:text-sm font-bold px-2 py-0.5 rounded-lg',
+                    item.current_stock <= 0 ? 'text-red-700 bg-red-100' :
+                    item.needs_reorder ? 'text-amber-700 bg-amber-100' :
+                    'text-emerald-700 bg-emerald-50'
+                  ]">{{ item.current_stock }}</span>
+                </td>
+                <td class="px-3 py-2.5 text-center text-xs text-zinc-600">{{ item.safety_stock }}</td>
+                <td class="px-3 py-2.5 text-center">
+                  <span :class="['text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full', item.needs_reorder ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700']">
+                    {{ item.needs_reorder ? 'Yes' : 'No' }}
+                  </span>
+                </td>
+                <td class="px-3 py-2.5 text-center text-xs font-semibold text-zinc-700">{{ item.eoq }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="text-center py-6">
+          <p class="text-xs text-zinc-400">No stock data available. <NuxtLink to="/stock-reports" class="text-amber-600 hover:underline">Load stock reports</NuxtLink> first.</p>
+        </div>
+      </div>
+
       <!-- Quick Actions -->
       <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
         <div class="flex items-center gap-3 mb-4">
@@ -415,6 +505,9 @@ const {
   getSalesColorClass,
 } = useDashboard();
 
+// BoH data
+const { bohData: bohItems, bohSummary, fetchBoH } = useStockReports();
+
 // Today's formatted date
 const todayFormatted = computed(() => {
   return new Date().toLocaleDateString('en-US', { 
@@ -449,7 +542,7 @@ let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
 onMounted(async () => {
   // Fetch data immediately (uses cache if available)
-  await fetchStats();
+  await Promise.all([fetchStats(), fetchBoH()]);
   
   // Set up auto-refresh every 60 seconds
   refreshInterval = setInterval(() => {
