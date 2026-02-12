@@ -769,9 +769,14 @@ const costAreaPath = computed(() => {
 const topProductsData = computed(() => {
   const productSales: { [key: string]: { name: string; value: number } } = {};
   filteredSales.value.forEach(s => {
-    const name = s.product?.product_name || 'Unknown';
-    if (!productSales[name]) productSales[name] = { name, value: 0 };
-    productSales[name].value += Number(s.total_amount || 0);
+    // Each sale can have multiple items (products)
+    if (s.items && s.items.length > 0) {
+      s.items.forEach(item => {
+        const name = item.product?.product_name || 'Unknown';
+        if (!productSales[name]) productSales[name] = { name, value: 0 };
+        productSales[name].value += Number(item.amount || 0);
+      });
+    }
   });
   return Object.values(productSales).sort((a, b) => b.value - a.value).slice(0, 7);
 });
