@@ -224,6 +224,20 @@ export default defineNuxtConfig({
     "@nuxt/hints",
     "@nuxt/image",
     "@nuxt/scripts",
-    "@nuxt/test-utils",
   ],
+
+  // Nitro server engine configuration
+  nitro: {
+    // Disable prerendering to prevent build hangs on Vercel
+    prerender: {
+      crawlLinks: false,
+      routes: [],
+    },
+    // Exclude native modules from the serverless bundle
+    externals: {
+      external: ['better-sqlite3'],
+    },
+    // Disable server source maps to reduce output size
+    sourceMap: false,
+  },
 });
