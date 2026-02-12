@@ -2,10 +2,6 @@
 import { join } from 'path';
 import { existsSync, readFileSync, mkdirSync } from 'fs';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { createRequire } from 'module';
-
-// Create require function for ESM compatibility
-const require = createRequire(import.meta.url);
 
 // Check if we should use Supabase
 // Use Supabase if: production OR Vercel OR Supabase env vars are available
@@ -41,14 +37,17 @@ export const getSupabase = (): SupabaseClient => {
 let db: any = null;
 let Database: any = null;
 
-// Pre-load better-sqlite3 at module level for development
-if (!isProduction()) {
+const loadBetterSqlite3 = () => {
+  if (Database) return Database;
   try {
-    Database = require('better-sqlite3');
-  } catch (e) {
-    console.warn('better-sqlite3 not available:', e);
+    // Use globalThis.process to ensure we only run in Node.js
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    Database = eval('require')('better-sqlite3');
+  } catch {
+    throw new Error('SQLite not available. Make sure better-sqlite3 is installed for local development.');
   }
-}
+  return Database;
+};
 
 const getSQLite = () => {
   if (db) return db;
@@ -58,9 +57,7 @@ const getSQLite = () => {
     throw new Error('SQLite is not available in production. Use Supabase.');
   }
 
-  if (!Database) {
-    throw new Error('SQLite not available. Make sure better-sqlite3 is installed for local development.');
-  }
+  loadBetterSqlite3();
 
   try {
     
