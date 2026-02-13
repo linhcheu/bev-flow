@@ -1,12 +1,4 @@
 {
   "buildCommand": "nuxt build",
-  "outputDirectory": ".output",
-  "functions": {
-    "api/**": {
-      "maxDuration": 30
-    }
-  },
-  "env": {
-    "NITRO_PRESET": "vercel"
-  }
+  "outputDirectory": ".output"
 }
