@@ -219,15 +219,14 @@ export default defineNuxtConfig({
   
   modules: [
     "@nuxt/ui",
-    "@nuxt/content",
     "@nuxt/eslint",
-    "@nuxt/hints",
     "@nuxt/image",
-    "@nuxt/scripts",
   ],
 
   // Nitro server engine configuration
   nitro: {
+    // Force Vercel preset for proper serverless deployment
+    preset: 'vercel',
     // Disable prerendering to prevent build hangs on Vercel
     prerender: {
       crawlLinks: false,
@@ -239,5 +238,14 @@ export default defineNuxtConfig({
     },
     // Disable server source maps to reduce output size
     sourceMap: false,
+    // Rollup config to externalize native modules
+    rollupConfig: {
+      external: ['better-sqlite3'],
+    },
+  },
+
+  // Disable features that slow down or hang the build
+  experimental: {
+    payloadExtraction: false,
   },
 });
