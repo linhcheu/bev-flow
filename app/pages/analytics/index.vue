@@ -2,7 +2,7 @@
   <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
             <UIcon name="i-lucide-bar-chart-2" class="w-5 h-5 text-zinc-600" />
@@ -34,8 +34,8 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="flex items-center justify-center py-20">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-600"></div>
+      <div v-if="loading" class="flex items-center justify-center py-12 sm:py-20">
+        <UIcon name="i-lucide-loader-2" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 animate-spin" />
       </div>
 
       <div v-else>
@@ -95,10 +95,10 @@
         </div>
 
         <!-- Charts Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
           <!-- Revenue Trend -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-5">
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5">
               <div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
                 <UIcon name="i-lucide-line-chart" class="w-4 h-4 text-emerald-600" />
               </div>
@@ -169,8 +169,8 @@
           </div>
 
           <!-- Inventory Health -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-5">
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5">
               <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
                 <UIcon name="i-lucide-warehouse" class="w-4 h-4 text-amber-600" />
               </div>
@@ -181,64 +181,64 @@
             </div>
             
             <!-- Stock Summary Cards -->
-            <div class="space-y-3 mb-4">
+            <div class="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
               <div 
-                class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg cursor-pointer hover:bg-emerald-100 transition-colors"
+                class="flex items-center justify-between p-2.5 sm:p-3 bg-emerald-50 rounded-lg cursor-pointer hover:bg-emerald-100 transition-colors"
                 @mouseenter="showTooltip($event, `${stockStats.inStockProducts} products with healthy stock (${formatNumber(stockStats.inStockUnits)} units)`)"
                 @mouseleave="hideTooltip"
               >
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-600" />
+                <div class="flex items-center gap-2 sm:gap-3">
+                  <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-100 rounded-lg flex items-center justify-center shrink-0">
+                    <UIcon name="i-lucide-check" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
                   </div>
                   <div>
-                    <p class="text-sm font-semibold text-emerald-700">In Stock</p>
-                    <p class="text-xs text-emerald-600">{{ stockStats.inStockProducts }} products</p>
+                    <p class="text-xs sm:text-sm font-semibold text-emerald-700">In Stock</p>
+                    <p class="text-[10px] sm:text-xs text-emerald-600">{{ stockStats.inStockProducts }} products</p>
                   </div>
                 </div>
                 <div class="text-right">
-                  <p class="text-lg font-semibold text-emerald-700">{{ formatNumber(stockStats.inStockUnits) }}</p>
-                  <p class="text-xs text-emerald-600">units</p>
+                  <p class="text-sm sm:text-lg font-semibold text-emerald-700">{{ formatNumber(stockStats.inStockUnits) }}</p>
+                  <p class="text-[10px] sm:text-xs text-emerald-600">units</p>
                 </div>
               </div>
               
               <div 
-                class="flex items-center justify-between p-3 bg-amber-50 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors"
+                class="flex items-center justify-between p-2.5 sm:p-3 bg-amber-50 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors"
                 @mouseenter="showTooltip($event, `${stockStats.lowStockProducts} products with low stock (${formatNumber(stockStats.lowStockUnits)} units)`)"
                 @mouseleave="hideTooltip"
               >
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                    <UIcon name="i-lucide-alert-triangle" class="w-4 h-4 text-amber-600" />
+                <div class="flex items-center gap-2 sm:gap-3">
+                  <div class="w-7 h-7 sm:w-8 sm:h-8 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                    <UIcon name="i-lucide-alert-triangle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-amber-700">Low Stock</p>
-                    <p class="text-xs text-amber-600">{{ stockStats.lowStockProducts }} products</p>
+                    <p class="text-xs sm:text-sm font-medium text-amber-700">Low Stock</p>
+                    <p class="text-[10px] sm:text-xs text-amber-600">{{ stockStats.lowStockProducts }} products</p>
                   </div>
                 </div>
                 <div class="text-right">
-                  <p class="text-lg font-semibold text-amber-700">{{ formatNumber(stockStats.lowStockUnits) }}</p>
-                  <p class="text-xs text-amber-600">units</p>
+                  <p class="text-sm sm:text-lg font-semibold text-amber-700">{{ formatNumber(stockStats.lowStockUnits) }}</p>
+                  <p class="text-[10px] sm:text-xs text-amber-600">units</p>
                 </div>
               </div>
               
               <div 
-                class="flex items-center justify-between p-3 bg-red-50 rounded-lg cursor-pointer hover:bg-red-100 transition-colors"
+                class="flex items-center justify-between p-2.5 sm:p-3 bg-red-50 rounded-lg cursor-pointer hover:bg-red-100 transition-colors"
                 @mouseenter="showTooltip($event, `${stockStats.outOfStockProducts} products with zero stock`)"
                 @mouseleave="hideTooltip"
               >
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                    <UIcon name="i-lucide-x" class="w-4 h-4 text-red-600" />
+                <div class="flex items-center gap-2 sm:gap-3">
+                  <div class="w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                    <UIcon name="i-lucide-x" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
                   </div>
                   <div>
-                    <p class="text-sm font-medium text-red-700">Out of Stock</p>
-                    <p class="text-xs text-red-600">{{ stockStats.outOfStockProducts }} products</p>
+                    <p class="text-xs sm:text-sm font-medium text-red-700">Out of Stock</p>
+                    <p class="text-[10px] sm:text-xs text-red-600">{{ stockStats.outOfStockProducts }} products</p>
                   </div>
                 </div>
                 <div class="text-right">
-                  <p class="text-lg font-semibold text-red-700">0</p>
-                  <p class="text-xs text-red-600">units</p>
+                  <p class="text-sm sm:text-lg font-semibold text-red-700">0</p>
+                  <p class="text-[10px] sm:text-xs text-red-600">units</p>
                 </div>
               </div>
             </div>
@@ -260,22 +260,22 @@
         </div>
 
         <!-- Second Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
           <!-- Top Products Donut -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 bg-purple-50 rounded-lg flex items-center justify-center">
                 <UIcon name="i-lucide-pie-chart" class="w-4 h-4 text-purple-600" />
               </div>
               <div>
-                <h3 class="text-sm font-medium text-zinc-900">Sales by Product</h3>
-                <p class="text-xs text-zinc-500">Top performing products</p>
+                <h3 class="text-xs sm:text-sm font-medium text-zinc-900">Sales by Product</h3>
+                <p class="text-[10px] sm:text-xs text-zinc-500">Top performing products</p>
               </div>
             </div>
             
-            <div class="flex items-center gap-6">
+            <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <div class="relative">
-                <svg class="w-44 h-44" viewBox="0 0 200 200">
+                <svg class="w-32 h-32 sm:w-44 sm:h-44" viewBox="0 0 200 200">
                   <circle cx="100" cy="100" r="80" fill="none" stroke="#f4f4f5" stroke-width="24" />
                   <g v-for="(segment, idx) in productDonutSegments" :key="idx">
                     <circle 
@@ -297,11 +297,11 @@
                 </svg>
               </div>
               
-              <div class="flex-1 space-y-2 max-h-44 overflow-y-auto">
+              <div class="w-full sm:flex-1 space-y-1.5 sm:space-y-2 max-h-44 overflow-y-auto">
                 <div 
                   v-for="(item, idx) in topProductsData.slice(0, 6)" 
                   :key="idx"
-                  class="flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-50 cursor-pointer"
+                  class="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg hover:bg-zinc-50 cursor-pointer"
                   @mouseenter="showTooltip($event, `${item.name}: $${formatNumber(item.value)}`)"
                   @mouseleave="hideTooltip"
                 >
@@ -314,32 +314,32 @@
           </div>
 
           <!-- PO Status -->
-          <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+          <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+            <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5">
+              <div class="w-8 h-8 sm:w-9 sm:h-9 bg-blue-50 rounded-lg flex items-center justify-center">
                 <UIcon name="i-lucide-clipboard-list" class="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <h3 class="text-sm font-medium text-zinc-900">Purchase Order Status</h3>
-                <p class="text-xs text-zinc-500">Order pipeline</p>
+                <h3 class="text-xs sm:text-sm font-medium text-zinc-900">Purchase Order Status</h3>
+                <p class="text-[10px] sm:text-xs text-zinc-500">Order pipeline</p>
               </div>
             </div>
             
-            <div class="space-y-3">
+            <div class="space-y-2 sm:space-y-3">
               <div 
                 v-for="status in poStatusData" 
                 :key="status.name"
-                class="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-50 cursor-pointer transition-colors"
+                class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl hover:bg-zinc-50 cursor-pointer transition-colors"
                 @mouseenter="showTooltip($event, `${status.name}: ${status.count} orders worth $${formatNumber(status.value)}`)"
                 @mouseleave="hideTooltip"
               >
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center" :style="{ backgroundColor: status.color + '20' }">
-                  <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: status.color }"></div>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" :style="{ backgroundColor: status.color + '20' }">
+                  <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full" :style="{ backgroundColor: status.color }"></div>
                 </div>
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                   <div class="flex justify-between items-center mb-1">
-                    <span class="text-sm font-medium text-zinc-700">{{ status.name }}</span>
-                    <span class="font-semibold text-zinc-900">${{ formatNumber(status.value) }}</span>
+                    <span class="text-xs sm:text-sm font-medium text-zinc-700">{{ status.name }}</span>
+                    <span class="text-xs sm:text-base font-semibold text-zinc-900">${{ formatNumber(status.value) }}</span>
                   </div>
                   <div class="flex items-center gap-2">
                     <div class="flex-1 h-2 bg-zinc-100 rounded-full overflow-hidden">
@@ -351,32 +351,59 @@
               </div>
             </div>
             
-            <div class="flex justify-between mt-4 pt-4 border-t border-zinc-100">
+            <div class="flex justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-zinc-100">
               <div class="text-center">
-                <p class="text-lg font-semibold text-amber-600">{{ getPendingCount }}</p>
-                <p class="text-xs text-zinc-500">Pending</p>
+                <p class="text-sm sm:text-lg font-semibold text-amber-600">{{ getPendingCount }}</p>
+                <p class="text-[10px] sm:text-xs text-zinc-500">Pending</p>
               </div>
               <div class="text-center">
-                <p class="text-lg font-semibold text-emerald-600">{{ getReceivedCount }}</p>
-                <p class="text-xs text-zinc-500">Received</p>
+                <p class="text-sm sm:text-lg font-semibold text-emerald-600">{{ getReceivedCount }}</p>
+                <p class="text-[10px] sm:text-xs text-zinc-500">Received</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Low Stock Alerts Table -->
-        <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-9 h-9 bg-red-50 rounded-lg flex items-center justify-center">
+        <!-- Low Stock Alerts -->
+        <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200">
+          <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-red-50 rounded-lg flex items-center justify-center">
               <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-red-600" />
             </div>
             <div>
-              <h3 class="text-sm font-medium text-zinc-900">Low Stock Alerts</h3>
-              <p class="text-xs text-zinc-500">Products requiring attention</p>
+              <h3 class="text-xs sm:text-sm font-medium text-zinc-900">Low Stock Alerts</h3>
+              <p class="text-[10px] sm:text-xs text-zinc-500">Products requiring attention</p>
             </div>
           </div>
           
-          <div v-if="lowStockProducts.length > 0" class="overflow-x-auto">
+          <!-- Mobile Cards -->
+          <div v-if="lowStockProducts.length > 0" class="block md:hidden space-y-2">
+            <div 
+              v-for="product in lowStockProducts" 
+              :key="'m-' + product.product_id"
+              class="bg-zinc-50 border border-zinc-200 rounded-lg p-3"
+            >
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h4 class="text-sm font-medium text-zinc-900 truncate">{{ product.product_name }}</h4>
+                <span :class="['text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0', getStockBadge(product.current_stock || 0, product.safety_stock)]">
+                  {{ getStockStatus(product.current_stock || 0, product.safety_stock) }}
+                </span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-center">
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-zinc-500 mb-0.5">Stock</p>
+                  <p class="text-xs font-bold" :class="getStockTextClass(product.current_stock || 0, product.safety_stock)">{{ product.current_stock || 0 }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-zinc-500 mb-0.5">Min Level</p>
+                  <p class="text-xs font-medium text-zinc-700">{{ product.safety_stock || 10 }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop Table -->
+          <div v-if="lowStockProducts.length > 0" class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="text-left text-xs text-zinc-500 border-b border-zinc-100">
@@ -404,9 +431,9 @@
               </tbody>
             </table>
           </div>
-          <div v-else class="text-center py-8">
-            <UIcon name="i-lucide-check-circle-2" class="w-12 h-12 text-emerald-500 mx-auto mb-2" />
-            <p class="text-sm text-zinc-600">All products have healthy stock levels!</p>
+          <div v-if="lowStockProducts.length === 0" class="text-center py-6 sm:py-8">
+            <UIcon name="i-lucide-check-circle-2" class="w-10 h-10 sm:w-12 sm:h-12 text-emerald-500 mx-auto mb-2" />
+            <p class="text-xs sm:text-sm text-zinc-600">All products have healthy stock levels!</p>
           </div>
         </div>
         <!-- ROP & EOQ Analytics Section -->
@@ -484,8 +511,66 @@
             </div>
           </div>
 
-          <!-- ROP/EOQ Table -->
-          <div class="bg-white rounded-xl border border-zinc-200 overflow-hidden">
+          <!-- ROP/EOQ Mobile Cards -->
+          <div class="block md:hidden space-y-2">
+            <div 
+              v-for="(item, idx) in ropEoqData" 
+              :key="'m-' + item.product_id"
+              :class="['bg-zinc-50 border border-zinc-200 rounded-lg p-3', item.needs_reorder ? 'border-red-200 bg-red-50/30' : '']"
+            >
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="text-[10px] text-zinc-400">{{ idx + 1 }}.</span>
+                    <span class="text-[10px] text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">{{ item.sku }}</span>
+                  </div>
+                  <h4 class="text-sm font-medium text-zinc-900 truncate">{{ item.product_name }}</h4>
+                </div>
+                <span 
+                  :class="['inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap', 
+                    item.needs_reorder ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700']"
+                >
+                  <UIcon :name="item.needs_reorder ? 'i-lucide-alert-triangle' : 'i-lucide-check'" class="w-3 h-3" />
+                  {{ item.needs_reorder ? 'Re-order' : 'OK' }}
+                </span>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 text-center mb-1.5">
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-indigo-600 mb-0.5">ROP</p>
+                  <p class="text-xs font-bold text-indigo-700">{{ item.reorder_point?.toFixed(0) }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-violet-600 mb-0.5">EOQ</p>
+                  <p class="text-xs font-bold text-violet-700">{{ item.eoq?.toFixed(0) }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-zinc-500 mb-0.5">Stock</p>
+                  <p :class="['text-xs font-bold', item.current_stock <= (item.safety_stock || 0) ? 'text-red-600' : 'text-emerald-600']">{{ item.current_stock }}</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 text-center">
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-zinc-400 mb-0.5">Lead</p>
+                  <p class="text-[10px] font-medium text-zinc-700">{{ item.lead_time_days }}d</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-zinc-400 mb-0.5">Safety</p>
+                  <p class="text-[10px] font-semibold text-amber-700">{{ item.safety_stock?.toFixed(0) }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-zinc-400 mb-0.5">Avg/Day</p>
+                  <p class="text-[10px] font-medium text-zinc-600">{{ item.avg_daily_demand?.toFixed(1) }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-zinc-400 mb-0.5">Annual</p>
+                  <p class="text-[10px] font-medium text-zinc-600">{{ item.annual_demand?.toFixed(0) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ROP/EOQ Desktop Table -->
+          <div class="hidden md:block bg-white rounded-xl border border-zinc-200 overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
                 <thead>

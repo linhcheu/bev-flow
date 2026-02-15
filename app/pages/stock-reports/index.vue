@@ -2,7 +2,7 @@
   <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
             <UIcon name="i-lucide-clipboard-check" class="w-5 h-5 text-zinc-600" />
@@ -37,8 +37,8 @@
       </div>
 
       <!-- Date Navigation -->
-      <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200 mb-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div class="bg-white rounded-xl p-3 sm:p-4 md:p-5 border border-zinc-200 mb-4 sm:mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           <!-- Month Navigation -->
           <div class="flex items-center gap-2">
             <button
@@ -107,60 +107,60 @@
       </div>
 
       <!-- Summary Cards -->
-      <div v-if="reportSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div class="bg-white rounded-xl p-4 border border-zinc-200">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-package-open" class="w-4 h-4 text-blue-600" />
+      <div v-if="reportSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+          <div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-package-open" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
             </div>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-zinc-900">{{ reportSummary.totalOpening }}</p>
-          <p class="text-xs text-zinc-500">Opening Stock</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ reportSummary.totalOpening }}</p>
+          <p class="text-[10px] sm:text-xs text-zinc-500">Opening Stock</p>
         </div>
-        <div class="bg-white rounded-xl p-4 border border-zinc-200">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-truck" class="w-4 h-4 text-emerald-600" />
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+          <div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-truck" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
             </div>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-emerald-600">+{{ reportSummary.totalPurchased }}</p>
-          <p class="text-xs text-zinc-500">Purchased</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-emerald-600">+{{ reportSummary.totalPurchased }}</p>
+          <p class="text-[10px] sm:text-xs text-zinc-500">Purchased</p>
         </div>
-        <div class="bg-white rounded-xl p-4 border border-zinc-200">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-shopping-cart" class="w-4 h-4 text-red-600" />
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+          <div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-red-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-shopping-cart" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
             </div>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-red-600">-{{ reportSummary.totalSold }}</p>
-          <p class="text-xs text-zinc-500">Sold</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-red-600">-{{ reportSummary.totalSold }}</p>
+          <p class="text-[10px] sm:text-xs text-zinc-500">Sold</p>
         </div>
-        <div class="bg-white rounded-xl p-4 border border-zinc-200">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-warehouse" class="w-4 h-4 text-amber-600" />
+        <div class="bg-white rounded-xl p-3 sm:p-4 border border-zinc-200">
+          <div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-warehouse" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
             </div>
           </div>
-          <p class="text-lg sm:text-xl font-semibold text-zinc-900">{{ reportSummary.totalClosing }}</p>
-          <p class="text-xs text-zinc-500">Closing Stock</p>
+          <p class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900">{{ reportSummary.totalClosing }}</p>
+          <p class="text-[10px] sm:text-xs text-zinc-500">Closing Stock</p>
         </div>
       </div>
 
       <!-- Loading -->
-      <div v-if="isLoading" class="flex items-center justify-center py-20">
+      <div v-if="isLoading" class="flex items-center justify-center py-12 sm:py-20">
         <div class="flex flex-col items-center gap-3">
-          <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
-          <p class="text-sm text-zinc-600">Loading stock report...</p>
+          <UIcon name="i-lucide-loader-2" class="w-6 h-6 sm:w-8 sm:h-8 text-amber-500 animate-spin" />
+          <p class="text-xs sm:text-sm text-zinc-600">Loading stock report...</p>
         </div>
       </div>
 
       <!-- No Data State -->
-      <div v-else-if="stockReports.length === 0" class="text-center py-20">
-        <div class="w-16 h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <UIcon name="i-lucide-database" class="w-8 h-8 text-zinc-400" />
+      <div v-else-if="stockReports.length === 0" class="text-center py-12 sm:py-20">
+        <div class="w-12 h-12 sm:w-16 sm:h-16 bg-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+          <UIcon name="i-lucide-database" class="w-6 h-6 sm:w-8 sm:h-8 text-zinc-400" />
         </div>
-        <h3 class="text-lg font-semibold text-zinc-900 mb-2">No Stock Report Data</h3>
-        <p class="text-sm text-zinc-500 mb-4">No data for this date. Click "Load Sample Data" to populate stock reports.</p>
+        <h3 class="text-base sm:text-lg font-semibold text-zinc-900 mb-1 sm:mb-2">No Stock Report Data</h3>
+        <p class="text-xs sm:text-sm text-zinc-500 mb-3 sm:mb-4">No data for this date. Click "Load Sample Data" to populate stock reports.</p>
         <button
           @click="handleSeedData"
           :disabled="seeding"
@@ -171,8 +171,74 @@
         </button>
       </div>
 
-      <!-- Stock Report Table -->
-      <div v-else class="bg-white rounded-xl border border-zinc-200 overflow-hidden">
+      <!-- Stock Report - Mobile Cards -->
+      <div v-else class="block md:hidden">
+        <div class="bg-white border border-zinc-200 rounded-lg overflow-hidden">
+          <!-- Summary totals bar -->
+          <div v-if="reportSummary" class="bg-zinc-50 border-b border-zinc-200 px-3 py-2 flex items-center justify-between">
+            <span class="text-[10px] font-semibold text-zinc-500 uppercase">Totals</span>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] font-bold text-blue-700">O: {{ reportSummary.totalOpening }}</span>
+              <span class="text-[10px] font-bold text-emerald-700">+{{ reportSummary.totalPurchased }}</span>
+              <span class="text-[10px] font-bold text-red-700">-{{ reportSummary.totalSold }}</span>
+              <span class="text-[10px] font-bold text-amber-700">C: {{ reportSummary.totalClosing }}</span>
+            </div>
+          </div>
+          <div class="max-h-[50vh] overflow-y-auto space-y-2 sm:space-y-3 p-3">
+            <div 
+              v-for="(report, index) in stockReports" 
+              :key="report.report_id"
+              :class="[
+                'bg-zinc-50 border border-zinc-200 rounded-lg p-3',
+                report.closing_stock <= 0 && 'border-red-200 bg-red-50/30',
+                report.closing_stock > 0 && report.closing_stock <= 5 && 'border-amber-200 bg-amber-50/30'
+              ]"
+            >
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="text-[10px] text-zinc-400 font-medium">{{ index + 1 }}.</span>
+                  </div>
+                  <h4 class="text-sm font-medium text-zinc-900 truncate">{{ report.product_name }}</h4>
+                  <p class="text-[10px] text-zinc-500 truncate">{{ report.description }}</p>
+                </div>
+                <span :class="[
+                  'text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap',
+                  getStockStatusClass(report.closing_stock)
+                ]">
+                  {{ getStockStatus(report.closing_stock) }}
+                </span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 text-center">
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-blue-600 mb-0.5">Opening</p>
+                  <p class="text-xs font-semibold text-blue-700">{{ report.opening_stock }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-emerald-600 mb-0.5">Purchased</p>
+                  <p class="text-xs font-semibold text-emerald-700">{{ report.purchased_qty > 0 ? '+' + report.purchased_qty : '—' }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-red-600 mb-0.5">Sold</p>
+                  <p class="text-xs font-semibold text-red-700">{{ report.sold_qty > 0 ? '-' + report.sold_qty : '—' }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[9px] text-amber-600 mb-0.5">Closing</p>
+                  <p :class="[
+                    'text-xs font-bold',
+                    report.closing_stock <= 0 ? 'text-red-700' :
+                    report.closing_stock <= 5 ? 'text-amber-700' :
+                    'text-zinc-900'
+                  ]">{{ report.closing_stock }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Report Table - Desktop -->
+      <div v-if="stockReports.length > 0" class="hidden md:block bg-white rounded-xl border border-zinc-200 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
@@ -253,19 +319,74 @@
       </div>
 
       <!-- BoH Section -->
-      <div v-if="bohData.length > 0" class="mt-6">
+      <div v-if="bohData.length > 0" class="mt-4 sm:mt-6">
         <div class="bg-white rounded-xl border border-zinc-200 overflow-hidden">
-          <div class="px-4 py-4 border-b border-zinc-100 flex items-center gap-3">
-            <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-warehouse" class="w-5 h-5 text-amber-600" />
+          <div class="px-3 sm:px-4 py-3 sm:py-4 border-b border-zinc-100 flex items-center gap-2 sm:gap-3">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-warehouse" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
             </div>
             <div>
-              <h3 class="text-sm sm:text-base font-semibold text-zinc-900">Balance on Hand (BoH)</h3>
-              <p class="text-xs text-zinc-500">Current stock status with reorder indicators</p>
+              <h3 class="text-xs sm:text-sm md:text-base font-semibold text-zinc-900">Balance on Hand (BoH)</h3>
+              <p class="text-[10px] sm:text-xs text-zinc-500">Current stock status with reorder indicators</p>
             </div>
           </div>
 
-          <div class="overflow-x-auto">
+          <!-- BoH Mobile Cards -->
+          <div class="block md:hidden">
+            <div class="max-h-[50vh] overflow-y-auto space-y-2 sm:space-y-3 p-3">
+              <div 
+                v-for="(item, index) in bohData" 
+                :key="'m-boh-' + item.product_id"
+                :class="['bg-zinc-50 border border-zinc-200 rounded-lg p-3', item.needs_reorder && 'border-red-200 bg-red-50/20']"
+              >
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div class="min-w-0">
+                    <span class="text-[10px] text-zinc-400 font-medium">{{ index + 1 }}.</span>
+                    <h4 class="text-sm font-medium text-zinc-900 truncate">{{ item.product_name }}</h4>
+                    <p class="text-[10px] text-zinc-500 truncate">{{ item.description }}</p>
+                  </div>
+                  <span :class="[
+                    'text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0',
+                    item.needs_reorder ? 'text-red-700 bg-red-100' : 'text-emerald-700 bg-emerald-100'
+                  ]">
+                    {{ item.needs_reorder ? 'Reorder' : 'OK' }}
+                  </span>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-center mb-1.5">
+                  <div class="bg-white rounded-lg p-1.5">
+                    <p class="text-[9px] text-amber-600 mb-0.5">BoH</p>
+                    <p :class="[
+                      'text-xs font-bold',
+                      item.current_stock <= 0 ? 'text-red-700' :
+                      item.current_stock <= item.safety_stock ? 'text-amber-700' :
+                      'text-emerald-700'
+                    ]">{{ item.current_stock }}</p>
+                  </div>
+                  <div class="bg-white rounded-lg p-1.5">
+                    <p class="text-[9px] text-emerald-600 mb-0.5">Purchased</p>
+                    <p class="text-xs font-medium text-emerald-700">{{ item.total_purchased }}</p>
+                  </div>
+                  <div class="bg-white rounded-lg p-1.5">
+                    <p class="text-[9px] text-red-600 mb-0.5">Sold</p>
+                    <p class="text-xs font-medium text-red-700">{{ item.total_sold }}</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 text-center">
+                  <div class="bg-white rounded-lg p-1.5">
+                    <p class="text-[9px] text-zinc-500 mb-0.5">Safety Stock</p>
+                    <p class="text-[10px] font-medium text-zinc-700">{{ item.safety_stock }}</p>
+                  </div>
+                  <div class="bg-white rounded-lg p-1.5">
+                    <p class="text-[9px] text-zinc-500 mb-0.5">EOQ</p>
+                    <p class="text-[10px] font-semibold text-zinc-700">{{ item.eoq }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BoH Desktop Table -->
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full">
               <thead>
                 <tr class="bg-zinc-50 border-b border-zinc-200">

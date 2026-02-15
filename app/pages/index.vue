@@ -364,8 +364,43 @@
           </div>
         </div>
 
-        <!-- BoH Product Table -->
-        <div v-if="bohItems.length > 0" class="overflow-x-auto">
+        <!-- BoH Product Cards - Mobile -->
+        <div v-if="bohItems.length > 0" class="block md:hidden">
+          <div class="max-h-[50vh] overflow-y-auto space-y-2 sm:space-y-3">
+            <div 
+              v-for="item in bohItems" 
+              :key="'m-' + item.product_id"
+              :class="['bg-zinc-50 border border-zinc-200 rounded-lg p-3', item.needs_reorder && 'border-red-200 bg-red-50/30']"
+            >
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <div class="min-w-0">
+                  <h4 class="text-sm font-medium text-zinc-900 truncate">{{ item.product_name }}</h4>
+                  <p class="text-[10px] text-zinc-500 truncate">{{ item.description }}</p>
+                </div>
+                <span :class="['text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0', item.needs_reorder ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700']">
+                  {{ item.needs_reorder ? 'Reorder' : 'OK' }}
+                </span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-amber-600 mb-0.5">BoH</p>
+                  <p :class="['text-xs font-bold', item.current_stock <= 0 ? 'text-red-700' : item.needs_reorder ? 'text-amber-700' : 'text-emerald-700']">{{ item.current_stock }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-zinc-500 mb-0.5">Safety</p>
+                  <p class="text-xs font-medium text-zinc-700">{{ item.safety_stock }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-1.5">
+                  <p class="text-[10px] text-zinc-500 mb-0.5">EOQ</p>
+                  <p class="text-xs font-semibold text-zinc-700">{{ item.eoq }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BoH Product Table - Desktop -->
+        <div v-if="bohItems.length > 0" class="hidden md:block overflow-x-auto">
           <table class="w-full">
             <thead>
               <tr class="border-b border-zinc-200">
