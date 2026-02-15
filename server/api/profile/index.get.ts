@@ -1,8 +1,34 @@
 // Get current user profile
-import { queryOne, isProduction, getSupabase } from '~/server/utils/db';
+import { queryOne, execute, isProduction, getSupabase } from '~/server/utils/db';
+
+// Ensure profile_image column exists (self-healing for existing dev DBs)
+let columnChecked = false;
+function ensureProfileImageColumn() {
+  if (columnChecked || isProduction()) return;
+  try {
+    queryOne<{ profile_image: string | null }>(
+      'SELECT profile_image FROM Users LIMIT 1',
+      []
+    );
+    columnChecked = true;
+  } catch {
+    try {
+      execute('ALTER TABLE Users ADD COLUMN profile_image TEXT', []);
+      console.log('✅ Auto-added profile_image column to Users (from GET)');
+      columnChecked = true;
+    } catch {
+      columnChecked = true;
+    }
+  }
+}
 
 export default defineEventHandler(async (event) => {
   try {
+    // Ensure the profile_image column exists in dev DB
+    if (!isProduction()) {
+      ensureProfileImageColumn();
+    }
+
     // Get user_id from cookie (set during login)
     const userIdCookie = getCookie(event, 'userId');
     const userId = userIdCookie ? parseInt(userIdCookie) : 1;

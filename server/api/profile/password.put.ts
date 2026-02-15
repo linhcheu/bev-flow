@@ -1,5 +1,16 @@
 // Update user password
 import { execute, queryOne, isProduction, getSupabase } from '~/server/utils/db';
+import bcrypt from 'bcryptjs';
+
+const BCRYPT_SALT_ROUNDS = 10;
+
+// Verify password - supports both bcrypt hashes and plain text (for legacy/seed data)
+async function verifyPassword(inputPassword: string, storedHash: string): Promise<boolean> {
+  if (storedHash.startsWith('$2')) {
+    return await bcrypt.compare(inputPassword, storedHash);
+  }
+  return inputPassword === storedHash;
+}
 
 export default defineEventHandler(async (event) => {
   try {
@@ -57,17 +68,21 @@ export default defineEventHandler(async (event) => {
         });
       }
       
-      if (user.password_hash !== currentPassword) {
+      const isValidPassword = await verifyPassword(currentPassword, user.password_hash);
+      if (!isValidPassword) {
         throw createError({
           statusCode: 401,
           statusMessage: 'Current password is incorrect',
         });
       }
       
+      // Hash the new password before storing
+      const newHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+      
       await supabase
         .from('users')
         .update({
-          password_hash: newPassword,
+          password_hash: newHash,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', userId);
@@ -79,8 +94,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // Development: Use SQLite
-    // Verify current password
-    // Note: In production, this should use proper password hashing (bcrypt, argon2, etc.)
     const user = queryOne<{ password_hash: string }>(
       'SELECT password_hash FROM Users WHERE user_id = ?',
       [userId]
@@ -93,21 +106,23 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Simple password check (seed data uses plain text - in production use bcrypt)
-    if (user.password_hash !== currentPassword) {
+    // Verify current password (supports bcrypt hashes and plain text seed data)
+    const isValidPassword = await verifyPassword(currentPassword, user.password_hash);
+    if (!isValidPassword) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Current password is incorrect',
       });
     }
 
-    // Update password
-    // Note: In production, hash the new password before storing
+    // Hash the new password with bcrypt before storing
+    const newHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+    
     execute(
       `UPDATE Users 
        SET password_hash = ?, updated_at = CURRENT_TIMESTAMP 
        WHERE user_id = ?`,
-      [newPassword, userId]
+      [newHash, userId]
     );
 
     return {

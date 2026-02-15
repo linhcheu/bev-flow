@@ -147,7 +147,7 @@ onMounted(() => {
 });
 
 // Permission keys for menu items
-type PermissionKey = 'canManageUsers' | 'canChangeRoles' | 'canBackupRestore' | 'canForecast' | 
+type PermissionKey = 'canManageUsers' | 'canChangeRoles' | 'canBackupRestore' | 
   'canManageProducts' | 'canManageSales' | 'canManagePurchaseOrders' | 'canManageSuppliers' | 
   'canViewAnalytics' | 'canExportData';
 
@@ -167,7 +167,6 @@ const mainMenuItems: MenuItem[] = [
   { path: '/purchase-orders', label: 'Purchase Orders', icon: 'i-lucide-clipboard-list' },
   { path: '/purchase-entries', label: 'Purchase Entries', icon: 'i-lucide-package-check' },
   { path: '/sales', label: 'Sales', icon: 'i-lucide-receipt' },
-  { path: '/forecasts', label: 'Forecasts', icon: 'i-lucide-trending-up', requiresPermission: 'canForecast' },
   { path: '/users', label: 'Users', icon: 'i-lucide-users', requiresPermission: 'canManageUsers' },
   { path: '/profile', label: 'Profile', icon: 'i-lucide-user-circle' },
 ];

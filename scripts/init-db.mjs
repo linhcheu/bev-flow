@@ -27,54 +27,66 @@ db.pragma('foreign_keys = ON');
 db.pragma('journal_mode = WAL');
 
 // Read and execute schema
-const schemaPath = join(rootDir, 'database', 'schema.sql');
+const schemaPath = join(rootDir, 'database', 'sqlite', 'schema.sql');
 const schema = readFileSync(schemaPath, 'utf-8');
 
 console.log('📝 Executing schema...');
 
-try {
-  db.exec(schema);
-  console.log('✅ Database initialized successfully!');
-} catch (e) {
-  console.log('⚠️ Some errors occurred, trying statement by statement...');
-  
-  // Parse and execute statements
-  const lines = schema.split('\n');
-  let statement = '';
-  
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('--')) continue;
-    
-    statement += line + '\n';
-    
-    if (trimmed.endsWith(';')) {
-      try {
-        db.exec(statement);
-      } catch (err) {
-        console.warn('  ⚠️', (err as Error).message.substring(0, 80));
+const execSql = (sql, label) => {
+  try {
+    db.exec(sql);
+    console.log(`✅ ${label} executed successfully!`);
+  } catch (e) {
+    console.log(`⚠️ ${label}: some errors, trying statement by statement...`);
+    const lines = sql.split('\n');
+    let statement = '';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('--')) continue;
+      statement += line + '\n';
+      if (trimmed.endsWith(';')) {
+        try { db.exec(statement); } catch (err) {
+          console.warn('  ⚠️', err.message.substring(0, 80));
+        }
+        statement = '';
       }
-      statement = '';
     }
+    console.log(`✅ ${label} complete (with warnings)`);
   }
-  
-  console.log('✅ Database initialization complete (with warnings)');
+};
+
+execSql(schema, 'Schema');
+
+// Read and execute seed data
+const seedPath = join(rootDir, 'database', 'sqlite', 'seed.sql');
+if (existsSync(seedPath)) {
+  const seed = readFileSync(seedPath, 'utf-8');
+  console.log('🌱 Seeding data...');
+  execSql(seed, 'Seed data');
+} else {
+  console.log('⚠️ No seed-all.sql found, skipping seed data');
 }
 
 // Verify tables
 const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all();
-console.log('\n📋 Created tables:', tables.map((t: any) => t.name).join(', '));
+console.log('\n📋 Created tables:', tables.map(t => t.name).join(', '));
 
-// Verify sample data
-const userCount = db.prepare('SELECT COUNT(*) as count FROM Users').get() as { count: number };
-const productCount = db.prepare('SELECT COUNT(*) as count FROM Products').get() as { count: number };
-const supplierCount = db.prepare('SELECT COUNT(*) as count FROM Suppliers').get() as { count: number };
+// Verify sample data counts
+const counts = {
+  Users: db.prepare('SELECT COUNT(*) as c FROM Users').get().c,
+  Suppliers: db.prepare('SELECT COUNT(*) as c FROM Suppliers').get().c,
+  Products: db.prepare('SELECT COUNT(*) as c FROM Products').get().c,
+  Customers: db.prepare('SELECT COUNT(*) as c FROM Customers').get().c,
+  PurchaseOrders: db.prepare('SELECT COUNT(*) as c FROM PurchaseOrders').get().c,
+  Sales: db.prepare('SELECT COUNT(*) as c FROM Sales').get().c,
+  SaleItems: db.prepare('SELECT COUNT(*) as c FROM SaleItems').get().c,
+  DailyStockReports: db.prepare('SELECT COUNT(*) as c FROM DailyStockReports').get().c,
+};
 
-console.log(`\n📊 Sample data loaded:
-  - Users: ${userCount.count}
-  - Products: ${productCount.count}
-  - Suppliers: ${supplierCount.count}
-`);
+console.log('\n📊 Data loaded:');
+for (const [table, count] of Object.entries(counts)) {
+  console.log(`  - ${table}: ${count}`);
+}
 
 db.close();
 console.log('🎉 Done!');

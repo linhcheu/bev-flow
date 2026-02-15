@@ -9,7 +9,6 @@ export interface UserPermissions {
   canManageUsers: boolean;
   canChangeRoles: boolean;
   canBackupRestore: boolean;
-  canForecast: boolean;
   canManageProducts: boolean;
   canManageSales: boolean;
   canManagePurchaseOrders: boolean;
@@ -52,7 +51,6 @@ export const getPermissionsByRole = (role: UserRole | DisplayRole): UserPermissi
         canManageUsers: true,
         canChangeRoles: true,
         canBackupRestore: true,
-        canForecast: true,
         canManageProducts: true,
         canManageSales: true,
         canManagePurchaseOrders: true,
@@ -64,8 +62,7 @@ export const getPermissionsByRole = (role: UserRole | DisplayRole): UserPermissi
       return {
         canManageUsers: false,
         canChangeRoles: false,
-        canBackupRestore: false, // Manager cannot backup/restore
-        canForecast: true,
+        canBackupRestore: false,
         canManageProducts: true,
         canManageSales: true,
         canManagePurchaseOrders: true,
@@ -79,7 +76,6 @@ export const getPermissionsByRole = (role: UserRole | DisplayRole): UserPermissi
         canManageUsers: false,
         canChangeRoles: false,
         canBackupRestore: false,
-        canForecast: false, // Staff cannot forecast
         canManageProducts: true,
         canManageSales: true,
         canManagePurchaseOrders: true,

@@ -390,14 +390,14 @@
                 <tr v-for="product in lowStockProducts" :key="product.product_id" class="border-b border-zinc-50 hover:bg-zinc-50">
                   <td class="py-3 font-medium text-zinc-900">{{ product.product_name }}</td>
                   <td class="py-3 text-right">
-                    <span class="text-sm font-bold" :class="getStockTextClass(product.current_stock || 0)">
+                    <span class="text-sm font-bold" :class="getStockTextClass(product.current_stock || 0, product.safety_stock)">
                       {{ product.current_stock || 0 }}
                     </span>
                   </td>
-                  <td class="py-3 text-right text-zinc-500">{{ product.min_stock_level || 10 }}</td>
+                  <td class="py-3 text-right text-zinc-500">{{ product.safety_stock || 10 }}</td>
                   <td class="py-3 text-right">
-                    <span :class="['text-xs font-medium px-2 py-1 rounded-full', getStockBadge(product.current_stock || 0)]">
-                      {{ getStockStatus(product.current_stock || 0) }}
+                    <span :class="['text-xs font-medium px-2 py-1 rounded-full', getStockBadge(product.current_stock || 0, product.safety_stock)]">
+                      {{ getStockStatus(product.current_stock || 0, product.safety_stock) }}
                     </span>
                   </td>
                 </tr>
@@ -661,15 +661,17 @@ const profitMargin = computed(() => totalRevenue.value > 0 ? Math.round((grossPr
 const totalStockUnits = computed(() => products.value.reduce((sum, p) => sum + (p.current_stock || 0), 0));
 const totalInventoryValue = computed(() => products.value.reduce((sum, p) => sum + ((p.current_stock || 0) * (p.selling_price || 0)), 0));
 
-// Stock Stats - Uses 50 as threshold for low stock detection
+// Stock Stats - Uses product's safety_stock for threshold
 const stockStats = computed(() => {
   const inStockProds = products.value.filter(p => {
     const stock = p.current_stock || 0;
-    return stock >= 50;
+    const threshold = p.safety_stock || 10;
+    return stock >= threshold;
   });
   const lowStockProds = products.value.filter(p => {
     const stock = p.current_stock || 0;
-    return stock > 0 && stock < 50;
+    const threshold = p.safety_stock || 10;
+    return stock > 0 && stock < threshold;
   });
   const outOfStockProds = products.value.filter(p => (p.current_stock || 0) === 0);
   
@@ -690,12 +692,13 @@ const stockStats = computed(() => {
   };
 });
 
-// Low stock products list (below 50 units)
+// Low stock products list (below safety_stock level)
 const lowStockProducts = computed(() => {
   return products.value
     .filter(p => {
       const stock = p.current_stock || 0;
-      return stock < 50;
+      const threshold = p.safety_stock || 10;
+      return stock < threshold;
     })
     .sort((a, b) => (a.current_stock || 0) - (b.current_stock || 0))
     .slice(0, 10);
@@ -845,22 +848,25 @@ const formatChartLabel = (num: number) => {
   return num.toFixed(0);
 };
 
-const getStockBadge = (stock: number) => {
+const getStockBadge = (stock: number, safetyStock?: number) => {
+  const threshold = safetyStock || 10;
   if (stock === 0) return 'bg-red-100 text-red-700';
-  if (stock < 50) return 'bg-amber-100 text-amber-700';
+  if (stock < threshold) return 'bg-amber-100 text-amber-700';
   return 'bg-emerald-100 text-emerald-700';
 };
 
-const getStockTextClass = (stock: number) => {
+const getStockTextClass = (stock: number, safetyStock?: number) => {
+  const threshold = safetyStock || 10;
   if (stock === 0) return 'text-red-600';
-  if (stock < 50) return 'text-amber-600';
+  if (stock < threshold) return 'text-amber-600';
   return 'text-emerald-600';
 };
 
-const getStockStatus = (stock: number) => {
+const getStockStatus = (stock: number, safetyStock?: number) => {
+  const threshold = safetyStock || 10;
   if (stock === 0) return 'Out of Stock';
-  if (stock < 20) return 'Critical';
-  if (stock < 50) return 'Low';
+  if (stock < Math.floor(threshold / 2)) return 'Critical';
+  if (stock < threshold) return 'Low';
   return 'OK';
 };
 

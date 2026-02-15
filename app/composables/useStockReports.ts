@@ -43,9 +43,11 @@ export const useStockReports = () => {
   };
 
   // Fetch BoH data
-  const fetchBoH = async () => {
+  const fetchBoH = async (month?: string) => {
     try {
-      const response = await $fetch<any>('/api/stock-reports/boh');
+      const query: Record<string, string> = {};
+      if (month) query.month = month;
+      const response = await $fetch<any>('/api/stock-reports/boh', { query });
       bohData.value = response.data || [];
       bohSummary.value = response.summary || null;
       return response;

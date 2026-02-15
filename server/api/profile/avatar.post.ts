@@ -4,14 +4,38 @@ import { execute, queryOne, isProduction, getSupabase } from '~/server/utils/db'
 const MAX_SIZE_BYTES = 512 * 1024; // 512 KB max after base64 encoding
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
+// Ensure profile_image column exists (self-healing for existing dev DBs)
+let columnChecked = false;
+function ensureProfileImageColumn() {
+  if (columnChecked || isProduction()) return;
+  try {
+    // Use a safe test query — if it fails, the column doesn't exist
+    queryOne<{ profile_image: string | null }>(
+      'SELECT profile_image FROM Users LIMIT 1',
+      []
+    );
+    columnChecked = true;
+  } catch {
+    try {
+      execute('ALTER TABLE Users ADD COLUMN profile_image TEXT', []);
+      console.log('✅ Auto-added profile_image column to Users');
+      columnChecked = true;
+    } catch {
+      // Column might already exist, that's fine
+      columnChecked = true;
+    }
+  }
+}
+
 export default defineEventHandler(async (event) => {
   try {
-    const userIdCookie = getCookie(event, 'userId');
-    const userId = userIdCookie ? parseInt(userIdCookie) : null;
-
-    if (!userId) {
-      throw createError({ statusCode: 401, statusMessage: 'Not authenticated' });
+    // Ensure the profile_image column exists in dev DB
+    if (!isProduction()) {
+      ensureProfileImageColumn();
     }
+
+    const userIdCookie = getCookie(event, 'userId');
+    const userId = userIdCookie ? parseInt(userIdCookie) : 1;
 
     const body = await readBody(event);
     const { image } = body; // Expected: data:image/png;base64,... or null to remove

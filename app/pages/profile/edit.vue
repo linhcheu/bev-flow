@@ -124,25 +124,32 @@
             <!-- Role -->
             <div>
               <label for="role" class="block text-xs sm:text-sm font-medium text-zinc-700 mb-1.5">
-                Role
-                <span v-if="!canChangeRole" class="text-[10px] sm:text-xs text-zinc-400 ml-1">(Read only)</span>
+                <span class="flex items-center gap-1.5">
+                  <UIcon name="i-lucide-badge" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-zinc-400" />
+                  Role
+                  <span v-if="!canChangeRole" class="text-[10px] sm:text-xs text-zinc-400">(Read only)</span>
+                </span>
               </label>
-              <select
-                v-if="canChangeRole"
-                id="role"
-                v-model="form.role"
-                class="w-full px-3 py-2.5 bg-white border border-zinc-300 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all"
-              >
-                <option value="System Administrator">System Administrator</option>
-                <option value="Manager">Manager</option>
-                <option value="Staff">Staff</option>
-              </select>
+              <div v-if="canChangeRole" class="relative">
+                <select
+                  id="role"
+                  v-model="form.role"
+                  class="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 focus:bg-white appearance-none cursor-pointer pr-10 transition-all"
+                >
+                  <option value="System Administrator">🛡️ System Administrator</option>
+                  <option value="Manager">💼 Manager</option>
+                  <option value="Staff">👤 Staff</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <UIcon name="i-lucide-chevron-down" class="w-4 h-4 text-zinc-400" />
+                </div>
+              </div>
               <div v-else class="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-500 cursor-not-allowed flex items-center gap-2">
                 <UIcon name="i-lucide-shield" class="w-4 h-4" />
                 {{ form.role }}
               </div>
-              <p v-if="!canChangeRole" class="mt-1 text-[10px] sm:text-xs text-zinc-400">
-                Only System Administrators can change roles
+              <p class="mt-1 text-[10px] sm:text-xs text-zinc-400">
+                {{ canChangeRole ? 'Determines access permissions' : 'Only System Administrators can change roles' }}
               </p>
             </div>
           </div>
@@ -286,6 +293,7 @@ const handleFileSelect = async (event: Event) => {
   const reader = new FileReader();
   reader.onload = async () => {
     const dataUrl = reader.result as string;
+    const previousAvatar = avatarPreview.value;
     avatarPreview.value = dataUrl;
 
     uploadingAvatar.value = true;
@@ -296,8 +304,8 @@ const handleFileSelect = async (event: Event) => {
       });
     } catch (err: any) {
       avatarError.value = err?.data?.statusMessage || 'Failed to upload avatar';
-      // Revert preview on error
-      avatarPreview.value = null;
+      // Revert preview on error to previous value
+      avatarPreview.value = previousAvatar;
     } finally {
       uploadingAvatar.value = false;
     }

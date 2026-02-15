@@ -1,5 +1,6 @@
 // API endpoint for creating a sale with multiple items
 import { execute, getLastInsertId, queryOne, queryAll, isProduction, getSupabase } from '~/server/utils/db';
+import { batchUpdateDailyStockReport } from '~/server/utils/stock-report-helper';
 import type { Sale, SaleFormData, SaleItem } from '~/types';
 
 interface ProductRow {
@@ -76,6 +77,13 @@ export default defineEventHandler(async (event) => {
       }
     }
     
+    // Update DailyStockReports — record sold quantities
+    const saleDate = body.sale_date || new Date().toISOString().split('T')[0];
+    await batchUpdateDailyStockReport(
+      body.items.map(item => ({ productId: item.product_id, soldDelta: item.quantity, purchasedDelta: 0 })),
+      saleDate
+    );
+
     // Get sale items with product info
     const { data: saleItems } = await supabase
       .from('saleitems')
@@ -135,6 +143,13 @@ export default defineEventHandler(async (event) => {
     `, [item.quantity, item.product_id]);
   }
   
+  // Update DailyStockReports — record sold quantities
+  const saleDate = body.sale_date || new Date().toISOString().split('T')[0];
+  await batchUpdateDailyStockReport(
+    body.items.map(item => ({ productId: item.product_id, soldDelta: item.quantity, purchasedDelta: 0 })),
+    saleDate
+  );
+
   // Fetch the created sale with items
   const sale = queryOne<Sale>('SELECT * FROM Sales WHERE sale_id = ?', [saleId]);
   const saleItems = queryAll<SaleItem & ProductRow>(`

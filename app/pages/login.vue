@@ -43,8 +43,8 @@
               <UIcon name="i-lucide-bar-chart-3" class="w-4 h-4 xl:w-5 xl:h-5 text-zinc-600" />
             </div>
             <div>
-              <p class="text-zinc-800 font-medium text-sm xl:text-base">Smart Forecasting</p>
-              <p class="text-xs xl:text-sm text-zinc-500">AI-powered predictions</p>
+              <p class="text-zinc-800 font-medium text-sm xl:text-base">Stock Analytics</p>
+              <p class="text-xs xl:text-sm text-zinc-500">ROP & EOQ analysis</p>
             </div>
           </div>
         </div>

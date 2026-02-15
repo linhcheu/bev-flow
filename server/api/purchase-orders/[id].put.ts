@@ -1,5 +1,6 @@
 // API endpoint for updating a purchase order
 import { execute, queryOne, queryAll, isProduction, getSupabase } from '~/server/utils/db';
+import { batchUpdateDailyStockReport } from '~/server/utils/stock-report-helper';
 import type { PurchaseOrder, PurchaseOrderFormData, PurchaseOrderItem } from '~/types';
 
 interface POItemRow {
@@ -73,7 +74,7 @@ export default defineEventHandler(async (event) => {
       await supabase.from('purchaseorderitems').insert(itemsData);
     }
     
-    // If status is changing to 'Received', update product stock
+    // If status is changing to 'Received', update product stock + DailyStockReports
     if (body.status === 'Received' && existing.status !== 'Received') {
       const { data: items } = await supabase
         .from('purchaseorderitems')
@@ -94,6 +95,13 @@ export default defineEventHandler(async (event) => {
             .eq('product_id', item.product_id);
         }
       }
+
+      // Record purchased quantities in DailyStockReports
+      const receivedDate = new Date().toISOString().split('T')[0];
+      await batchUpdateDailyStockReport(
+        (items || []).map((item: any) => ({ productId: item.product_id, soldDelta: 0, purchasedDelta: item.quantity })),
+        receivedDate
+      );
     }
     
     // Update the purchase order
@@ -213,12 +221,19 @@ export default defineEventHandler(async (event) => {
     }
   }
   
-  // If status is changing to 'Received', update product stock
+  // If status is changing to 'Received', update product stock + DailyStockReports
   if (body.status === 'Received' && existing.status !== 'Received') {
     const items = queryAll<{ product_id: number; quantity: number }>('SELECT product_id, quantity FROM PurchaseOrderItems WHERE po_id = ?', [id]);
     for (const item of items) {
       execute('UPDATE Products SET current_stock = current_stock + ? WHERE product_id = ?', [item.quantity, item.product_id]);
     }
+
+    // Record purchased quantities in DailyStockReports
+    const receivedDate = new Date().toISOString().split('T')[0];
+    await batchUpdateDailyStockReport(
+      items.map(item => ({ productId: item.product_id, soldDelta: 0, purchasedDelta: item.quantity })),
+      receivedDate
+    );
   }
   
   // Update the purchase order

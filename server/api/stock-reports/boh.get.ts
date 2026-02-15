@@ -1,7 +1,14 @@
 // Get BoH (Balance on Hand) summary  
 import { queryAll, isProduction, getSupabase } from '~/server/utils/db';
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  // Accept ?month=YYYY-MM or default to current month
+  const query = getQuery(event);
+  const now = new Date();
+  const monthParam = (query.month as string) || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const monthStart = `${monthParam}-01`;
+  const monthEnd = `${monthParam}-31`;
+
   // === PRODUCTION: Supabase ===
   if (isProduction()) {
     const supabase = getSupabase();
@@ -19,8 +26,8 @@ export default defineEventHandler(async () => {
     const { data: totals, error: tErr } = await supabase
       .from('dailystockreports')
       .select('product_id, purchased_qty, sold_qty')
-      .gte('report_date', '2026-02-01')
-      .lte('report_date', '2026-02-28');
+      .gte('report_date', monthStart)
+      .lte('report_date', monthEnd);
 
     if (tErr) throw createError({ statusCode: 500, message: tErr.message });
 
@@ -92,7 +99,7 @@ export default defineEventHandler(async () => {
     ORDER BY p.product_id ASC
   `);
 
-  // Get monthly totals for Feb 2026
+  // Get monthly totals from DailyStockReports
   const monthlyTotals = queryAll<{
     product_id: number;
     total_purchased: number;
@@ -102,9 +109,9 @@ export default defineEventHandler(async () => {
            COALESCE(SUM(purchased_qty), 0) as total_purchased,
            COALESCE(SUM(sold_qty), 0) as total_sold
     FROM DailyStockReports
-    WHERE report_date BETWEEN '2026-02-01' AND '2026-02-28'
+    WHERE report_date BETWEEN ? AND ?
     GROUP BY product_id
-  `);
+  `, [monthStart, monthEnd]);
 
   const totalsMap = new Map(monthlyTotals.map(t => [t.product_id, t]));
 

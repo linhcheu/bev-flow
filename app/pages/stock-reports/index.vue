@@ -22,7 +22,7 @@
             class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-50 text-amber-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-100 disabled:opacity-50"
           >
             <UIcon :name="seeding ? 'i-lucide-loader-2' : 'i-lucide-database'" :class="['w-3.5 h-3.5', seeding && 'animate-spin']" />
-            {{ seeding ? 'Seeding...' : 'Load Feb 2026 Data' }}
+            {{ seeding ? 'Seeding...' : 'Load Sample Data' }}
           </button>
 
           <!-- Export -->
@@ -39,10 +39,19 @@
       <!-- Date Navigation -->
       <div class="bg-white rounded-xl p-4 md:p-5 border border-zinc-200 mb-6">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <!-- Month Navigation -->
           <div class="flex items-center gap-2">
+            <button
+              @click="prevMonth"
+              class="p-2 rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors"
+              title="Previous month"
+            >
+              <UIcon name="i-lucide-chevrons-left" class="w-4 h-4 text-zinc-600" />
+            </button>
             <button
               @click="prevDay"
               class="p-2 rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors"
+              title="Previous day"
             >
               <UIcon name="i-lucide-chevron-left" class="w-4 h-4 text-zinc-600" />
             </button>
@@ -51,8 +60,6 @@
               <input
                 type="date"
                 v-model="selectedDate"
-                min="2026-02-01"
-                max="2026-02-28"
                 class="px-4 py-2 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
               />
             </div>
@@ -60,8 +67,16 @@
             <button
               @click="nextDay"
               class="p-2 rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors"
+              title="Next day"
             >
               <UIcon name="i-lucide-chevron-right" class="w-4 h-4 text-zinc-600" />
+            </button>
+            <button
+              @click="nextMonth"
+              class="p-2 rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors"
+              title="Next month"
+            >
+              <UIcon name="i-lucide-chevrons-right" class="w-4 h-4 text-zinc-600" />
             </button>
           </div>
 
@@ -69,7 +84,7 @@
             <h2 class="text-base sm:text-lg font-semibold text-zinc-900">
               {{ formattedDate }}
             </h2>
-            <p class="text-xs text-zinc-500">February 2026 — Day {{ currentDay }} of 28</p>
+            <p class="text-xs text-zinc-500">{{ monthLabel }} — Day {{ currentDay }} of {{ daysInMonth }}</p>
           </div>
 
           <!-- Quick Day Selector -->
@@ -145,14 +160,14 @@
           <UIcon name="i-lucide-database" class="w-8 h-8 text-zinc-400" />
         </div>
         <h3 class="text-lg font-semibold text-zinc-900 mb-2">No Stock Report Data</h3>
-        <p class="text-sm text-zinc-500 mb-4">Click "Load Feb 2026 Data" to populate daily stock reports for the full month.</p>
+        <p class="text-sm text-zinc-500 mb-4">No data for this date. Click "Load Sample Data" to populate stock reports.</p>
         <button
           @click="handleSeedData"
           :disabled="seeding"
           class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50"
         >
           <UIcon :name="seeding ? 'i-lucide-loader-2' : 'i-lucide-database'" :class="['w-4 h-4', seeding && 'animate-spin']" />
-          {{ seeding ? 'Generating data...' : 'Generate Feb 2026 Stock Data' }}
+          {{ seeding ? 'Generating data...' : 'Generate Stock Data' }}
         </button>
       </div>
 
@@ -320,18 +335,28 @@ const {
   seedData,
 } = useStockReports();
 
+// Default to Feb 1 2026 (where seed data exists)
 const selectedDate = ref('2026-02-01');
 const seeding = ref(false);
 const hasData = ref(false);
 
-const currentDay = computed(() => {
-  const d = new Date(selectedDate.value + 'T00:00:00');
-  return d.getDate();
+// Computed date helpers
+const selectedDateObj = computed(() => new Date(selectedDate.value + 'T00:00:00'));
+
+const currentDay = computed(() => selectedDateObj.value.getDate());
+
+const currentMonth = computed(() => selectedDateObj.value.getMonth());
+
+const currentYear = computed(() => selectedDateObj.value.getFullYear());
+
+const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate());
+
+const monthLabel = computed(() => {
+  return selectedDateObj.value.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 });
 
 const formattedDate = computed(() => {
-  const d = new Date(selectedDate.value + 'T00:00:00');
-  return d.toLocaleDateString('en-US', {
+  return selectedDateObj.value.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -339,26 +364,60 @@ const formattedDate = computed(() => {
   });
 });
 
-const quickDays = [1, 5, 10, 15, 20, 25, 28];
+// Dynamic quick day buttons based on current month
+const quickDays = computed(() => {
+  const dim = daysInMonth.value;
+  const days: number[] = [1];
+  // Add evenly spaced days
+  for (let d = 5; d < dim; d += 5) {
+    days.push(d);
+  }
+  // Always include last day
+  if (!days.includes(dim)) {
+    days.push(dim);
+  }
+  return days;
+});
+
+const formatDateStr = (d: Date) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 const goToDay = (day: number) => {
-  selectedDate.value = `2026-02-${String(day).padStart(2, '0')}`;
+  const d = new Date(currentYear.value, currentMonth.value, day);
+  selectedDate.value = formatDateStr(d);
 };
 
 const prevDay = () => {
-  const d = new Date(selectedDate.value + 'T00:00:00');
+  const d = new Date(selectedDateObj.value);
   d.setDate(d.getDate() - 1);
-  if (d.getMonth() === 1 && d.getFullYear() === 2026 && d.getDate() >= 1) {
-    selectedDate.value = d.toISOString().split('T')[0] || selectedDate.value;
-  }
+  selectedDate.value = formatDateStr(d);
 };
 
 const nextDay = () => {
-  const d = new Date(selectedDate.value + 'T00:00:00');
+  const d = new Date(selectedDateObj.value);
   d.setDate(d.getDate() + 1);
-  if (d.getMonth() === 1 && d.getFullYear() === 2026 && d.getDate() <= 28) {
-    selectedDate.value = d.toISOString().split('T')[0] || selectedDate.value;
-  }
+  selectedDate.value = formatDateStr(d);
+};
+
+const prevMonth = () => {
+  const d = new Date(selectedDateObj.value);
+  d.setMonth(d.getMonth() - 1);
+  // Clamp day to new month's max
+  const dim = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  if (d.getDate() > dim) d.setDate(dim);
+  selectedDate.value = formatDateStr(d);
+};
+
+const nextMonth = () => {
+  const d = new Date(selectedDateObj.value);
+  d.setMonth(d.getMonth() + 1);
+  const dim = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  if (d.getDate() > dim) d.setDate(dim);
+  selectedDate.value = formatDateStr(d);
 };
 
 const getStockStatus = (stock: number) => {
@@ -389,9 +448,10 @@ const handleSeedData = async () => {
 };
 
 const loadData = async () => {
+  const monthStr = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}`;
   await Promise.all([
     fetchDailyReport(selectedDate.value),
-    fetchBoH(),
+    fetchBoH(monthStr),
   ]);
   hasData.value = stockReports.value.length > 0;
 };

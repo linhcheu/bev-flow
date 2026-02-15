@@ -3,7 +3,6 @@ type DbRole = 'admin' | 'manager' | 'user';
 
 // Permission structure
 interface UserPermissions {
-  canForecast: boolean;
   canBackupRestore: boolean;
   canChangeRoles: boolean;
   canExport: boolean;
@@ -20,7 +19,6 @@ function getPermissionsByRole(role: DbRole): UserPermissions {
   switch (role) {
     case 'admin':
       return {
-        canForecast: true,
         canBackupRestore: true,
         canChangeRoles: true,
         canExport: true,
@@ -33,7 +31,6 @@ function getPermissionsByRole(role: DbRole): UserPermissions {
       };
     case 'manager':
       return {
-        canForecast: true,
         canBackupRestore: false,
         canChangeRoles: false,
         canExport: true,
@@ -47,7 +44,6 @@ function getPermissionsByRole(role: DbRole): UserPermissions {
     case 'user':
     default:
       return {
-        canForecast: false,
         canBackupRestore: false,
         canChangeRoles: false,
         canExport: false,
@@ -63,7 +59,6 @@ function getPermissionsByRole(role: DbRole): UserPermissions {
 
 // Route permission mapping
 const routePermissions: Record<string, keyof UserPermissions> = {
-  '/forecasts': 'canForecast',
   '/users': 'canManageUsers',
 };
 

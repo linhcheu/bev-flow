@@ -1,14 +1,13 @@
 -- ==============================================
 -- BEV Flow - SQLite Database Schema
 -- Compatible with better-sqlite3
--- Based on Excel IMS structure
+-- Version: 2.0 (No Forecasts)
 -- ==============================================
 
--- Enable foreign key support for SQLite
 PRAGMA foreign_keys = ON;
 
 -- ==============================================
--- 1. USERS TABLE
+-- 1. USERS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS Users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,7 +25,7 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 -- ==============================================
--- 2. SUPPLIERS TABLE
+-- 2. SUPPLIERS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS Suppliers (
     supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +43,7 @@ CREATE TABLE IF NOT EXISTS Suppliers (
 );
 
 -- ==============================================
--- 3. PRODUCTS TABLE
+-- 3. PRODUCTS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS Products (
     product_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +65,7 @@ CREATE TABLE IF NOT EXISTS Products (
 );
 
 -- ==============================================
--- 4. CUSTOMERS TABLE
+-- 4. CUSTOMERS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS Customers (
     customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,7 +80,7 @@ CREATE TABLE IF NOT EXISTS Customers (
 );
 
 -- ==============================================
--- 5. PURCHASE ORDERS TABLE
+-- 5. PURCHASE ORDERS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS PurchaseOrders (
     po_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -119,7 +118,7 @@ CREATE TABLE IF NOT EXISTS PurchaseOrders (
 );
 
 -- ==============================================
--- 6. PURCHASE ORDER ITEMS TABLE
+-- 6. PURCHASE ORDER ITEMS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS PurchaseOrderItems (
     item_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -134,7 +133,7 @@ CREATE TABLE IF NOT EXISTS PurchaseOrderItems (
 );
 
 -- ==============================================
--- 7. SALES TABLE
+-- 7. SALES
 -- ==============================================
 CREATE TABLE IF NOT EXISTS Sales (
     sale_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -154,7 +153,7 @@ CREATE TABLE IF NOT EXISTS Sales (
 );
 
 -- ==============================================
--- 8. SALE ITEMS TABLE
+-- 8. SALE ITEMS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS SaleItems (
     item_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -169,24 +168,7 @@ CREATE TABLE IF NOT EXISTS SaleItems (
 );
 
 -- ==============================================
--- 9. FORECASTS TABLE
--- ==============================================
-CREATE TABLE IF NOT EXISTS Forecasts (
-    forecast_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_id INTEGER NOT NULL,
-    forecast_date DATE NOT NULL,
-    predicted_demand INTEGER NOT NULL DEFAULT 0,
-    confidence_score DECIMAL(3, 2) DEFAULT 0.80,
-    recommended_order INTEGER DEFAULT 0,
-    notes TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
-    UNIQUE(product_id, forecast_date)
-);
-
--- ==============================================
--- 10. PRODUCT-SUPPLIER AVAILABILITY TABLE
+-- 9. PRODUCT-SUPPLIER AVAILABILITY
 -- ==============================================
 CREATE TABLE IF NOT EXISTS ProductSupplierAvailability (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -203,7 +185,7 @@ CREATE TABLE IF NOT EXISTS ProductSupplierAvailability (
 );
 
 -- ==============================================
--- 11. DAILY STOCK REPORTS TABLE
+-- 10. DAILY STOCK REPORTS
 -- ==============================================
 CREATE TABLE IF NOT EXISTS DailyStockReports (
     report_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -216,6 +198,17 @@ CREATE TABLE IF NOT EXISTS DailyStockReports (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
     UNIQUE(product_id, report_date)
+);
+
+-- ==============================================
+-- 11. USER SETTINGS
+-- ==============================================
+CREATE TABLE IF NOT EXISTS UserSettings (
+    setting_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 -- ==============================================
@@ -235,22 +228,9 @@ CREATE INDEX IF NOT EXISTS idx_sales_date ON Sales(sale_date);
 CREATE INDEX IF NOT EXISTS idx_sales_status ON Sales(status);
 CREATE INDEX IF NOT EXISTS idx_si_sale ON SaleItems(sale_id);
 CREATE INDEX IF NOT EXISTS idx_si_product ON SaleItems(product_id);
-CREATE INDEX IF NOT EXISTS idx_forecasts_product ON Forecasts(product_id);
 CREATE INDEX IF NOT EXISTS idx_psa_product ON ProductSupplierAvailability(product_id);
 CREATE INDEX IF NOT EXISTS idx_psa_supplier ON ProductSupplierAvailability(supplier_id);
 CREATE INDEX IF NOT EXISTS idx_dsr_product ON DailyStockReports(product_id);
 CREATE INDEX IF NOT EXISTS idx_dsr_date ON DailyStockReports(report_date);
 CREATE INDEX IF NOT EXISTS idx_dsr_product_date ON DailyStockReports(product_id, report_date);
-
--- ==============================================
--- USER SETTINGS TABLE (minimal - for account management)
--- ==============================================
-CREATE TABLE IF NOT EXISTS UserSettings (
-    setting_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL UNIQUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
 CREATE INDEX IF NOT EXISTS idx_user_settings_user_id ON UserSettings(user_id);

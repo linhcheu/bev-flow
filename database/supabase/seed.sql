@@ -1,86 +1,65 @@
 -- ==============================================
--- BEV Flow - SQLite Seed Data
--- Based on actual business data (2025-2026)
--- Run this AFTER running schema.sql
+-- BEV Flow - Supabase Seed Data
+-- Run AFTER schema.sql in Supabase SQL Editor
+-- 3 users, 5 suppliers, 10 products,
+-- 8 customers, 5 POs, 50 sales, 20 stock reports
 -- ==============================================
 
--- Clear existing data (in reverse order of dependencies)
-DELETE FROM SaleItems;
-DELETE FROM Sales;
-DELETE FROM PurchaseOrderItems;
-DELETE FROM PurchaseOrders;
-DELETE FROM Forecasts;
-DELETE FROM ProductSupplierAvailability;
-DELETE FROM Customers;
-DELETE FROM Products;
-DELETE FROM Suppliers;
-DELETE FROM Users;
+-- ==============================================
+-- Clear all data and reset sequences
+-- ==============================================
+TRUNCATE TABLE dailystockreports, saleitems, sales, purchaseorderitems, purchaseorders, customers, products, suppliers, users RESTART IDENTITY CASCADE;
 
 -- ==============================================
--- USERS (password: password123 for all)
+-- 1. USERS (password: password123 for all)
 -- ==============================================
-INSERT INTO Users (username, email, password_hash, full_name, role, is_active, phone, location) VALUES
-('admin', 'admin@bevflow.com', '$2b$10$rICGcNJ8z9BGdhIjxO5Hv.mEgMbi0zTi5bBmPsrfAHfDvqLhlHpkS', 'System Administrator', 'admin', 1, '+855 23 456 789', 'Phnom Penh, Cambodia'),
-('manager', 'manager@bevflow.com', '$2b$10$rICGcNJ8z9BGdhIjxO5Hv.mEgMbi0zTi5bBmPsrfAHfDvqLhlHpkS', 'Store Manager', 'manager', 1, NULL, NULL),
-('staff', 'staff@bevflow.com', '$2b$10$rICGcNJ8z9BGdhIjxO5Hv.mEgMbi0zTi5bBmPsrfAHfDvqLhlHpkS', 'Staff User', 'user', 1, NULL, NULL);
+INSERT INTO users (username, email, password_hash, full_name, role, is_active, phone, location) VALUES
+('admin', 'admin@bevflow.com', '$2b$10$rICGcNJ8z9BGdhIjxO5Hv.mEgMbi0zTi5bBmPsrfAHfDvqLhlHpkS', 'System Administrator', 'admin', true, '+855 23 456 789', 'Phnom Penh, Cambodia'),
+('manager', 'manager@bevflow.com', '$2b$10$rICGcNJ8z9BGdhIjxO5Hv.mEgMbi0zTi5bBmPsrfAHfDvqLhlHpkS', 'Store Manager', 'manager', true, NULL, NULL),
+('staff', 'staff@bevflow.com', '$2b$10$rICGcNJ8z9BGdhIjxO5Hv.mEgMbi0zTi5bBmPsrfAHfDvqLhlHpkS', 'Staff User', 'user', true, NULL, NULL);
 
 -- ==============================================
--- SUPPLIERS (5 suppliers from Excel)
+-- 2. SUPPLIERS
 -- ==============================================
-INSERT INTO Suppliers (company_name, contact_person, sale_agent, phone, email, address, lead_time_days, payment_method, is_active) VALUES
-('Depo Bou Yong', 'Sopheak', 'Sopheak', '011 946 889', 'bouyongdepo@gmail.com', 'Mao Tse Toung, Phnom Penh', 2, 'Credit', 1),
-('Depo Mean Mean', 'Rotha', 'Rotha', '078 467 369', 'meanmeandepo9@gmail.com', 'Takhmao, Kandal', 1, 'Credit', 1),
-('Depo AMK', 'Socheat', 'Socheat', '012 967 039', 'depo-amk@gmail.com', 'Takdol, Kandal', 1, 'COD', 1),
-('Jae Ka Beer Depo', 'Nimol', 'Nimol', '096 057 417', 'kakabeer88@gmail.com', 'Daun Penh, Phnom Penh', 2, 'Credit', 1),
-('Mesa Saang Beer Depo', 'Bopha', 'Bopha', '090 245 966', 'saang-mesabeer@gmail.com', 'Saang, Kandal', 3, 'Prepaid', 1);
+INSERT INTO suppliers (company_name, contact_person, sale_agent, phone, email, address, lead_time_days, payment_method, is_active) VALUES
+('Depo Bou Yong', 'Sopheak', 'Sopheak', '011 946 889', 'bouyongdepo@gmail.com', 'Mao Tse Toung, Phnom Penh', 2, 'Credit', true),
+('Depo Mean Mean', 'Rotha', 'Rotha', '078 467 369', 'meanmeandepo9@gmail.com', 'Takhmao, Kandal', 1, 'Credit', true),
+('Depo AMK', 'Socheat', 'Socheat', '012 967 039', 'depo-amk@gmail.com', 'Takdol, Kandal', 1, 'COD', true),
+('Jae Ka Beer Depo', 'Nimol', 'Nimol', '096 057 417', 'kakabeer88@gmail.com', 'Daun Penh, Phnom Penh', 2, 'Credit', true),
+('Mesa Saang Beer Depo', 'Bopha', 'Bopha', '090 245 966', 'saang-mesabeer@gmail.com', 'Saang, Kandal', 3, 'Prepaid', true);
 
 -- ==============================================
--- PRODUCTS (10 products from Excel)
+-- 3. PRODUCTS (current_stock = Feb 2 closing)
 -- ==============================================
-INSERT INTO Products (sku, product_name, description, cost_price, selling_price, supplier_id, safety_stock, reorder_quantity, min_stock_level, current_stock, is_active) VALUES
-('A001', 'ABC Extra Stout', '330ml * 24c', 25.00, 85.00, 1, 14, 35, 34, 3, 1),
-('A002', 'Anchor Beer', '330ml * 24c', 12.00, 55.00, 2, 10, 35, 20, 0, 1),
-('A003', 'Anchor Smooth White Beer', '330ml * 24c', 14.00, 59.00, 2, 10, 36, 20, 0, 1),
-('A004', 'Anchor Beer (Bottle)', '325ml * 24B', 20.00, 59.00, 2, 10, 35, 21, 0, 1),
-('A005', 'Cambodia Lite Beer', '330ml * 24c', 15.00, 59.00, 3, 10, 35, 20, 10, 1),
-('A006', 'Tiger Lager Beer', '330ml * 24c', 18.00, 65.00, 4, 14, 35, 34, 0, 1),
-('A007', 'Tiger Crystal', '330ml * 24c', 22.00, 69.00, 4, 14, 34, 34, 2, 1),
-('A008', 'Tiger Lager Beer (Bottle)', '325ml * 24B', 24.00, 69.00, 4, 14, 35, 33, 0, 1),
-('A009', 'Tiger Crystal (Bottle)', '325ml * 24B', 26.00, 75.00, 4, 14, 35, 34, 10, 1),
-('A010', 'Heineken (Bottle)', '325ml * 24B', 28.00, 70.00, 5, 17, 35, 47, 6, 1);
+INSERT INTO products (sku, product_name, description, cost_price, selling_price, supplier_id, safety_stock, reorder_quantity, min_stock_level, current_stock, is_active) VALUES
+('A001', 'ABC Extra Stout', '330ml * 24c', 25.00, 85.00, 1, 14, 35, 34, 5, true),
+('A002', 'Anchor Beer', '330ml * 24c', 12.00, 55.00, 2, 10, 35, 20, 10, true),
+('A003', 'Anchor Smooth White Beer', '330ml * 24c', 14.00, 59.00, 2, 10, 36, 20, 6, true),
+('A004', 'Anchor Beer (Bottle)', '325ml * 24B', 20.00, 59.00, 2, 10, 35, 21, 6, true),
+('A005', 'Cambodia Lite Beer', '330ml * 24c', 15.00, 59.00, 3, 10, 35, 20, 9, true),
+('A006', 'Tiger Lager Beer', '330ml * 24c', 18.00, 65.00, 4, 14, 35, 34, 6, true),
+('A007', 'Tiger Crystal', '330ml * 24c', 22.00, 69.00, 4, 14, 34, 34, 8, true),
+('A008', 'Tiger Lager Beer (Bottle)', '325ml * 24B', 24.00, 69.00, 4, 14, 35, 33, 7, true),
+('A009', 'Tiger Crystal (Bottle)', '325ml * 24B', 26.00, 75.00, 4, 14, 35, 34, 5, true),
+('A010', 'Heineken (Bottle)', '325ml * 24B', 28.00, 70.00, 5, 17, 35, 47, 4, true);
 
 -- ==============================================
--- PRODUCT-SUPPLIER AVAILABILITY
+-- 4. CUSTOMERS
 -- ==============================================
-INSERT INTO ProductSupplierAvailability (product_id, supplier_id, is_available, supplier_price, lead_time_days) VALUES
-(1, 1, 1, 25.00, 2),
-(2, 2, 1, 12.00, 1),
-(3, 2, 1, 14.00, 1),
-(4, 2, 1, 20.00, 1),
-(5, 3, 1, 15.00, 1),
-(6, 4, 1, 18.00, 2),
-(7, 4, 1, 22.00, 2),
-(8, 4, 1, 24.00, 2),
-(9, 4, 1, 26.00, 2),
-(10, 5, 1, 28.00, 3);
+INSERT INTO customers (customer_name, contact_person, phone, email, address, is_active) VALUES
+('Walk-in Customer', NULL, NULL, NULL, 'General walk-in', true),
+('VIP 1', NULL, '012 111 111', 'vip1@customer.com', 'Phnom Penh', true),
+('VIP 2', NULL, '012 222 222', 'vip2@customer.com', 'Phnom Penh', true),
+('VIP 3', NULL, '012 333 333', 'vip3@customer.com', 'Phnom Penh', true),
+('VIP 4', NULL, '012 444 444', 'vip4@customer.com', 'Kandal', true),
+('VVIP 1', NULL, '012 555 555', 'vvip1@customer.com', 'Phnom Penh', true),
+('VVIP 2', NULL, '012 666 666', 'vvip2@customer.com', 'Phnom Penh', true),
+('Regular 1', NULL, '012 777 777', 'reg1@customer.com', 'Takeo', true);
 
 -- ==============================================
--- CUSTOMERS
+-- 5. PURCHASE ORDERS (January 2026)
 -- ==============================================
-INSERT INTO Customers (customer_name, contact_person, phone, email, address, is_active) VALUES
-('Walk-in Customer', NULL, NULL, NULL, 'General walk-in', 1),
-('VIP 1', NULL, '012 111 111', 'vip1@customer.com', 'Phnom Penh', 1),
-('VIP 2', NULL, '012 222 222', 'vip2@customer.com', 'Phnom Penh', 1),
-('VIP 3', NULL, '012 333 333', 'vip3@customer.com', 'Phnom Penh', 1),
-('VIP 4', NULL, '012 444 444', 'vip4@customer.com', 'Kandal', 1),
-('VVIP 1', NULL, '012 555 555', 'vvip1@customer.com', 'Phnom Penh', 1),
-('VVIP 2', NULL, '012 666 666', 'vvip2@customer.com', 'Phnom Penh', 1),
-('Regular 1', NULL, '012 777 777', 'reg1@customer.com', 'Takeo', 1);
-
--- ==============================================
--- PURCHASE ORDERS (January 2026 from Excel)
--- ==============================================
-INSERT INTO PurchaseOrders (po_number, supplier_id, order_date, eta_date, subtotal, total_amount, status, payment_method, payment_status) VALUES
+INSERT INTO purchaseorders (po_number, supplier_id, order_date, eta_date, subtotal, total_amount, status, payment_method, payment_status) VALUES
 ('PO-001-001', 1, '2026-01-13', '2026-01-15', 125.00, 125.00, 'Received', 'Credit', 'Unpaid'),
 ('PO-001-002', 4, '2026-01-14', '2026-01-16', 110.00, 110.00, 'Received', 'Credit', 'Unpaid'),
 ('PO-001-003', 3, '2026-01-15', '2026-01-16', 150.00, 150.00, 'Received', 'COD', 'Paid'),
@@ -88,9 +67,9 @@ INSERT INTO PurchaseOrders (po_number, supplier_id, order_date, eta_date, subtot
 ('PO-001-005', 5, '2026-01-18', '2026-01-21', 168.00, 168.00, 'Ordered', 'Prepaid', 'Paid');
 
 -- ==============================================
--- PURCHASE ORDER ITEMS
+-- 6. PURCHASE ORDER ITEMS
 -- ==============================================
-INSERT INTO PurchaseOrderItems (po_id, product_id, quantity, unit_cost, amount) VALUES
+INSERT INTO purchaseorderitems (po_id, product_id, quantity, unit_cost, amount) VALUES
 (1, 1, 5, 25.00, 125.00),
 (2, 7, 5, 22.00, 110.00),
 (3, 5, 10, 15.00, 150.00),
@@ -98,9 +77,9 @@ INSERT INTO PurchaseOrderItems (po_id, product_id, quantity, unit_cost, amount) 
 (5, 10, 6, 28.00, 168.00);
 
 -- ==============================================
--- SALES DATA (Daily sales from 1/1/2025 - Rows 1-50)
+-- 7. SALES (50 days: 1/1/2025 - 2/19/2025)
 -- ==============================================
-INSERT INTO Sales (sale_number, customer_id, sale_date, subtotal, total_amount, payment_method, status) VALUES
+INSERT INTO sales (sale_number, customer_id, sale_date, subtotal, total_amount, payment_method, status) VALUES
 ('SALE-2025-0001', 1, '2025-01-01', 0, 0, 'Cash', 'Completed'),
 ('SALE-2025-0002', 1, '2025-01-02', 0, 0, 'Cash', 'Completed'),
 ('SALE-2025-0003', 1, '2025-01-03', 0, 0, 'Cash', 'Completed'),
@@ -153,230 +132,251 @@ INSERT INTO Sales (sale_number, customer_id, sale_date, subtotal, total_amount, 
 ('SALE-2025-0050', 1, '2025-02-19', 0, 0, 'Cash', 'Completed');
 
 -- ==============================================
--- SALE ITEMS (Daily sales quantities for each product)
+-- 8. SALE ITEMS
 -- ==============================================
--- Row 1: 1/1/2025 - 3,19,8,17,14,7,19,11,2,12
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 1: 1/1/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (1, 1, 3, 85.00, 255.00), (1, 2, 19, 55.00, 1045.00), (1, 3, 8, 59.00, 472.00), (1, 4, 17, 59.00, 1003.00), (1, 5, 14, 59.00, 826.00), (1, 6, 7, 65.00, 455.00), (1, 7, 19, 69.00, 1311.00), (1, 8, 11, 69.00, 759.00), (1, 9, 2, 75.00, 150.00), (1, 10, 12, 70.00, 840.00);
 
--- Row 2: 1/2/2025 - 3,18,16,8,0,0,7,16,15,19
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 2: 1/2/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (2, 1, 3, 85.00, 255.00), (2, 2, 18, 55.00, 990.00), (2, 3, 16, 59.00, 944.00), (2, 4, 8, 59.00, 472.00), (2, 7, 7, 69.00, 483.00), (2, 8, 16, 69.00, 1104.00), (2, 9, 15, 75.00, 1125.00), (2, 10, 19, 70.00, 1330.00);
 
--- Row 3: 1/3/2025 - 7,11,17,10,11,13,4,15,17,15
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 3: 1/3/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (3, 1, 7, 85.00, 595.00), (3, 2, 11, 55.00, 605.00), (3, 3, 17, 59.00, 1003.00), (3, 4, 10, 59.00, 590.00), (3, 5, 11, 59.00, 649.00), (3, 6, 13, 65.00, 845.00), (3, 7, 4, 69.00, 276.00), (3, 8, 15, 69.00, 1035.00), (3, 9, 17, 75.00, 1275.00), (3, 10, 15, 70.00, 1050.00);
 
--- Row 4: 1/4/2025 - 9,6,15,17,9,11,17,9,14,11
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 4: 1/4/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (4, 1, 9, 85.00, 765.00), (4, 2, 6, 55.00, 330.00), (4, 3, 15, 59.00, 885.00), (4, 4, 17, 59.00, 1003.00), (4, 5, 9, 59.00, 531.00), (4, 6, 11, 65.00, 715.00), (4, 7, 17, 69.00, 1173.00), (4, 8, 9, 69.00, 621.00), (4, 9, 14, 75.00, 1050.00), (4, 10, 11, 70.00, 770.00);
 
--- Row 5: 1/5/2025 - 6,8,5,12,0,12,17,17,0,8
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 5: 1/5/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (5, 1, 6, 85.00, 510.00), (5, 2, 8, 55.00, 440.00), (5, 3, 5, 59.00, 295.00), (5, 4, 12, 59.00, 708.00), (5, 6, 12, 65.00, 780.00), (5, 7, 17, 69.00, 1173.00), (5, 8, 17, 69.00, 1173.00), (5, 10, 8, 70.00, 560.00);
 
--- Row 6: 1/6/2025 - 4,9,1,13,13,9,9,8,4,9
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 6: 1/6/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (6, 1, 4, 85.00, 340.00), (6, 2, 9, 55.00, 495.00), (6, 3, 1, 59.00, 59.00), (6, 4, 13, 59.00, 767.00), (6, 5, 13, 59.00, 767.00), (6, 6, 9, 65.00, 585.00), (6, 7, 9, 69.00, 621.00), (6, 8, 8, 69.00, 552.00), (6, 9, 4, 75.00, 300.00), (6, 10, 9, 70.00, 630.00);
 
--- Row 7: 1/7/2025 - 3,0,17,19,16,2,7,4,10,3
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 7: 1/7/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (7, 1, 3, 85.00, 255.00), (7, 3, 17, 59.00, 1003.00), (7, 4, 19, 59.00, 1121.00), (7, 5, 16, 59.00, 944.00), (7, 6, 2, 65.00, 130.00), (7, 7, 7, 69.00, 483.00), (7, 8, 4, 69.00, 276.00), (7, 9, 10, 75.00, 750.00), (7, 10, 3, 70.00, 210.00);
 
--- Row 8: 1/8/2025 - 20,5,2,12,11,19,1,13,14,15
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 8: 1/8/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (8, 1, 20, 85.00, 1700.00), (8, 2, 5, 55.00, 275.00), (8, 3, 2, 59.00, 118.00), (8, 4, 12, 59.00, 708.00), (8, 5, 11, 59.00, 649.00), (8, 6, 19, 65.00, 1235.00), (8, 7, 1, 69.00, 69.00), (8, 8, 13, 69.00, 897.00), (8, 9, 14, 75.00, 1050.00), (8, 10, 15, 70.00, 1050.00);
 
--- Row 9: 1/9/2025 - 19,12,0,12,4,6,12,13,20,10
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 9: 1/9/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (9, 1, 19, 85.00, 1615.00), (9, 2, 12, 55.00, 660.00), (9, 4, 12, 59.00, 708.00), (9, 5, 4, 59.00, 236.00), (9, 6, 6, 65.00, 390.00), (9, 7, 12, 69.00, 828.00), (9, 8, 13, 69.00, 897.00), (9, 9, 20, 75.00, 1500.00), (9, 10, 10, 70.00, 700.00);
 
--- Row 10: 1/10/2025 - 7,1,5,2,10,6,19,13,6,19
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 10: 1/10/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (10, 1, 7, 85.00, 595.00), (10, 2, 1, 55.00, 55.00), (10, 3, 5, 59.00, 295.00), (10, 4, 2, 59.00, 118.00), (10, 5, 10, 59.00, 590.00), (10, 6, 6, 65.00, 390.00), (10, 7, 19, 69.00, 1311.00), (10, 8, 13, 69.00, 897.00), (10, 9, 6, 75.00, 450.00), (10, 10, 19, 70.00, 1330.00);
 
--- Row 11: 1/11/2025 - 16,15,14,20,6,7,4,12,13,17
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 11: 1/11/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (11, 1, 16, 85.00, 1360.00), (11, 2, 15, 55.00, 825.00), (11, 3, 14, 59.00, 826.00), (11, 4, 20, 59.00, 1180.00), (11, 5, 6, 59.00, 354.00), (11, 6, 7, 65.00, 455.00), (11, 7, 4, 69.00, 276.00), (11, 8, 12, 69.00, 828.00), (11, 9, 13, 75.00, 975.00), (11, 10, 17, 70.00, 1190.00);
 
--- Row 12: 1/12/2025 - 6,19,15,18,14,9,19,0,9,12
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 12: 1/12/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (12, 1, 6, 85.00, 510.00), (12, 2, 19, 55.00, 1045.00), (12, 3, 15, 59.00, 885.00), (12, 4, 18, 59.00, 1062.00), (12, 5, 14, 59.00, 826.00), (12, 6, 9, 65.00, 585.00), (12, 7, 19, 69.00, 1311.00), (12, 9, 9, 75.00, 675.00), (12, 10, 12, 70.00, 840.00);
 
--- Row 13: 1/13/2025 - 11,4,12,11,0,18,1,20,9,12
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 13: 1/13/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (13, 1, 11, 85.00, 935.00), (13, 2, 4, 55.00, 220.00), (13, 3, 12, 59.00, 708.00), (13, 4, 11, 59.00, 649.00), (13, 6, 18, 65.00, 1170.00), (13, 7, 1, 69.00, 69.00), (13, 8, 20, 69.00, 1380.00), (13, 9, 9, 75.00, 675.00), (13, 10, 12, 70.00, 840.00);
 
--- Row 14: 1/14/2025 - 18,5,1,17,20,17,3,3,14,16
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 14: 1/14/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (14, 1, 18, 85.00, 1530.00), (14, 2, 5, 55.00, 275.00), (14, 3, 1, 59.00, 59.00), (14, 4, 17, 59.00, 1003.00), (14, 5, 20, 59.00, 1180.00), (14, 6, 17, 65.00, 1105.00), (14, 7, 3, 69.00, 207.00), (14, 8, 3, 69.00, 207.00), (14, 9, 14, 75.00, 1050.00), (14, 10, 16, 70.00, 1120.00);
 
--- Row 15: 1/15/2025 - 4,0,4,1,13,7,13,17,20,16
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 15: 1/15/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (15, 1, 4, 85.00, 340.00), (15, 3, 4, 59.00, 236.00), (15, 4, 1, 59.00, 59.00), (15, 5, 13, 59.00, 767.00), (15, 6, 7, 65.00, 455.00), (15, 7, 13, 69.00, 897.00), (15, 8, 17, 69.00, 1173.00), (15, 9, 20, 75.00, 1500.00), (15, 10, 16, 70.00, 1120.00);
 
--- Row 16: 1/16/2025 - 8,1,5,10,6,12,1,9,2,18
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 16: 1/16/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (16, 1, 8, 85.00, 680.00), (16, 2, 1, 55.00, 55.00), (16, 3, 5, 59.00, 295.00), (16, 4, 10, 59.00, 590.00), (16, 5, 6, 59.00, 354.00), (16, 6, 12, 65.00, 780.00), (16, 7, 1, 69.00, 69.00), (16, 8, 9, 69.00, 621.00), (16, 9, 2, 75.00, 150.00), (16, 10, 18, 70.00, 1260.00);
 
--- Row 17: 1/17/2025 - 11,20,5,12,9,8,3,14,9,5
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 17: 1/17/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (17, 1, 11, 85.00, 935.00), (17, 2, 20, 55.00, 1100.00), (17, 3, 5, 59.00, 295.00), (17, 4, 12, 59.00, 708.00), (17, 5, 9, 59.00, 531.00), (17, 6, 8, 65.00, 520.00), (17, 7, 3, 69.00, 207.00), (17, 8, 14, 69.00, 966.00), (17, 9, 9, 75.00, 675.00), (17, 10, 5, 70.00, 350.00);
 
--- Row 18: 1/18/2025 - 10,17,5,19,14,1,3,14,9,13
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 18: 1/18/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (18, 1, 10, 85.00, 850.00), (18, 2, 17, 55.00, 935.00), (18, 3, 5, 59.00, 295.00), (18, 4, 19, 59.00, 1121.00), (18, 5, 14, 59.00, 826.00), (18, 6, 1, 65.00, 65.00), (18, 7, 3, 69.00, 207.00), (18, 8, 14, 69.00, 966.00), (18, 9, 9, 75.00, 675.00), (18, 10, 13, 70.00, 910.00);
 
--- Row 19: 1/19/2025 - 0,0,15,12,3,12,2,2,6,12
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 19: 1/19/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (19, 3, 15, 59.00, 885.00), (19, 4, 12, 59.00, 708.00), (19, 5, 3, 59.00, 177.00), (19, 6, 12, 65.00, 780.00), (19, 7, 2, 69.00, 138.00), (19, 8, 2, 69.00, 138.00), (19, 9, 6, 75.00, 450.00), (19, 10, 12, 70.00, 840.00);
 
--- Row 20: 1/20/2025 - 17,2,14,10,9,14,20,2,15,0
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 20: 1/20/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (20, 1, 17, 85.00, 1445.00), (20, 2, 2, 55.00, 110.00), (20, 3, 14, 59.00, 826.00), (20, 4, 10, 59.00, 590.00), (20, 5, 9, 59.00, 531.00), (20, 6, 14, 65.00, 910.00), (20, 7, 20, 69.00, 1380.00), (20, 8, 2, 69.00, 138.00), (20, 9, 15, 75.00, 1125.00);
 
--- Row 21: 1/21/2025 - 18,8,11,5,3,3,9,13,15,13
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 21: 1/21/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (21, 1, 18, 85.00, 1530.00), (21, 2, 8, 55.00, 440.00), (21, 3, 11, 59.00, 649.00), (21, 4, 5, 59.00, 295.00), (21, 5, 3, 59.00, 177.00), (21, 6, 3, 65.00, 195.00), (21, 7, 9, 69.00, 621.00), (21, 8, 13, 69.00, 897.00), (21, 9, 15, 75.00, 1125.00), (21, 10, 13, 70.00, 910.00);
 
--- Row 22: 1/22/2025 - 2,14,14,12,10,9,9,1,17,13
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 22: 1/22/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (22, 1, 2, 85.00, 170.00), (22, 2, 14, 55.00, 770.00), (22, 3, 14, 59.00, 826.00), (22, 4, 12, 59.00, 708.00), (22, 5, 10, 59.00, 590.00), (22, 6, 9, 65.00, 585.00), (22, 7, 9, 69.00, 621.00), (22, 8, 1, 69.00, 69.00), (22, 9, 17, 75.00, 1275.00), (22, 10, 13, 70.00, 910.00);
 
--- Row 23: 1/23/2025 - 7,14,7,12,1,3,9,8,0,1
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 23: 1/23/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (23, 1, 7, 85.00, 595.00), (23, 2, 14, 55.00, 770.00), (23, 3, 7, 59.00, 413.00), (23, 4, 12, 59.00, 708.00), (23, 5, 1, 59.00, 59.00), (23, 6, 3, 65.00, 195.00), (23, 7, 9, 69.00, 621.00), (23, 8, 8, 69.00, 552.00), (23, 10, 1, 70.00, 70.00);
 
--- Row 24: 1/24/2025 - 14,16,20,2,15,19,16,9,11,12
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 24: 1/24/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (24, 1, 14, 85.00, 1190.00), (24, 2, 16, 55.00, 880.00), (24, 3, 20, 59.00, 1180.00), (24, 4, 2, 59.00, 118.00), (24, 5, 15, 59.00, 885.00), (24, 6, 19, 65.00, 1235.00), (24, 7, 16, 69.00, 1104.00), (24, 8, 9, 69.00, 621.00), (24, 9, 11, 75.00, 825.00), (24, 10, 12, 70.00, 840.00);
 
--- Row 25: 1/25/2025 - 1,4,11,3,1,13,12,7,13,6
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 25: 1/25/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (25, 1, 1, 85.00, 85.00), (25, 2, 4, 55.00, 220.00), (25, 3, 11, 59.00, 649.00), (25, 4, 3, 59.00, 177.00), (25, 5, 1, 59.00, 59.00), (25, 6, 13, 65.00, 845.00), (25, 7, 12, 69.00, 828.00), (25, 8, 7, 69.00, 483.00), (25, 9, 13, 75.00, 975.00), (25, 10, 6, 70.00, 420.00);
 
--- Row 26: 1/26/2025 - 7,18,16,7,12,20,3,13,2,0
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 26: 1/26/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (26, 1, 7, 85.00, 595.00), (26, 2, 18, 55.00, 990.00), (26, 3, 16, 59.00, 944.00), (26, 4, 7, 59.00, 413.00), (26, 5, 12, 59.00, 708.00), (26, 6, 20, 65.00, 1300.00), (26, 7, 3, 69.00, 207.00), (26, 8, 13, 69.00, 897.00), (26, 9, 2, 75.00, 150.00);
 
--- Row 27: 1/27/2025 - 18,7,5,4,7,18,8,6,13,19
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 27: 1/27/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (27, 1, 18, 85.00, 1530.00), (27, 2, 7, 55.00, 385.00), (27, 3, 5, 59.00, 295.00), (27, 4, 4, 59.00, 236.00), (27, 5, 7, 59.00, 413.00), (27, 6, 18, 65.00, 1170.00), (27, 7, 8, 69.00, 552.00), (27, 8, 6, 69.00, 414.00), (27, 9, 13, 75.00, 975.00), (27, 10, 19, 70.00, 1330.00);
 
--- Row 28: 1/28/2025 - 11,4,6,13,0,16,9,13,20,12
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 28: 1/28/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (28, 1, 11, 85.00, 935.00), (28, 2, 4, 55.00, 220.00), (28, 3, 6, 59.00, 354.00), (28, 4, 13, 59.00, 767.00), (28, 6, 16, 65.00, 1040.00), (28, 7, 9, 69.00, 621.00), (28, 8, 13, 69.00, 897.00), (28, 9, 20, 75.00, 1500.00), (28, 10, 12, 70.00, 840.00);
 
--- Row 29: 1/29/2025 - 7,14,1,17,15,7,1,19,9,0
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 29: 1/29/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (29, 1, 7, 85.00, 595.00), (29, 2, 14, 55.00, 770.00), (29, 3, 1, 59.00, 59.00), (29, 4, 17, 59.00, 1003.00), (29, 5, 15, 59.00, 885.00), (29, 6, 7, 65.00, 455.00), (29, 7, 1, 69.00, 69.00), (29, 8, 19, 69.00, 1311.00), (29, 9, 9, 75.00, 675.00);
 
--- Row 30: 1/30/2025 - 10,0,3,19,12,4,6,20,7,5
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 30: 1/30/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (30, 1, 10, 85.00, 850.00), (30, 3, 3, 59.00, 177.00), (30, 4, 19, 59.00, 1121.00), (30, 5, 12, 59.00, 708.00), (30, 6, 4, 65.00, 260.00), (30, 7, 6, 69.00, 414.00), (30, 8, 20, 69.00, 1380.00), (30, 9, 7, 75.00, 525.00), (30, 10, 5, 70.00, 350.00);
 
--- Row 31: 1/31/2025 - 12,20,5,2,14,6,7,5,6,14
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 31: 1/31/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (31, 1, 12, 85.00, 1020.00), (31, 2, 20, 55.00, 1100.00), (31, 3, 5, 59.00, 295.00), (31, 4, 2, 59.00, 118.00), (31, 5, 14, 59.00, 826.00), (31, 6, 6, 65.00, 390.00), (31, 7, 7, 69.00, 483.00), (31, 8, 5, 69.00, 345.00), (31, 9, 6, 75.00, 450.00), (31, 10, 14, 70.00, 980.00);
 
--- Row 32: 2/1/2025 - 0,12,11,6,5,18,5,19,11,20
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 32: 2/1/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (32, 2, 12, 55.00, 660.00), (32, 3, 11, 59.00, 649.00), (32, 4, 6, 59.00, 354.00), (32, 5, 5, 59.00, 295.00), (32, 6, 18, 65.00, 1170.00), (32, 7, 5, 69.00, 345.00), (32, 8, 19, 69.00, 1311.00), (32, 9, 11, 75.00, 825.00), (32, 10, 20, 70.00, 1400.00);
 
--- Row 33: 2/2/2025 - 6,2,13,20,0,13,20,5,18,20
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 33: 2/2/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (33, 1, 6, 85.00, 510.00), (33, 2, 2, 55.00, 110.00), (33, 3, 13, 59.00, 767.00), (33, 4, 20, 59.00, 1180.00), (33, 6, 13, 65.00, 845.00), (33, 7, 20, 69.00, 1380.00), (33, 8, 5, 69.00, 345.00), (33, 9, 18, 75.00, 1350.00), (33, 10, 20, 70.00, 1400.00);
 
--- Row 34: 2/3/2025 - 20,7,20,2,17,8,1,12,2,11
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 34: 2/3/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (34, 1, 20, 85.00, 1700.00), (34, 2, 7, 55.00, 385.00), (34, 3, 20, 59.00, 1180.00), (34, 4, 2, 59.00, 118.00), (34, 5, 17, 59.00, 1003.00), (34, 6, 8, 65.00, 520.00), (34, 7, 1, 69.00, 69.00), (34, 8, 12, 69.00, 828.00), (34, 9, 2, 75.00, 150.00), (34, 10, 11, 70.00, 770.00);
 
--- Row 35: 2/4/2025 - 5,1,15,0,1,20,20,17,11,15
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 35: 2/4/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (35, 1, 5, 85.00, 425.00), (35, 2, 1, 55.00, 55.00), (35, 3, 15, 59.00, 885.00), (35, 5, 1, 59.00, 59.00), (35, 6, 20, 65.00, 1300.00), (35, 7, 20, 69.00, 1380.00), (35, 8, 17, 69.00, 1173.00), (35, 9, 11, 75.00, 825.00), (35, 10, 15, 70.00, 1050.00);
 
--- Row 36: 2/5/2025 - 9,17,1,12,11,6,4,10,9,17
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 36: 2/5/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (36, 1, 9, 85.00, 765.00), (36, 2, 17, 55.00, 935.00), (36, 3, 1, 59.00, 59.00), (36, 4, 12, 59.00, 708.00), (36, 5, 11, 59.00, 649.00), (36, 6, 6, 65.00, 390.00), (36, 7, 4, 69.00, 276.00), (36, 8, 10, 69.00, 690.00), (36, 9, 9, 75.00, 675.00), (36, 10, 17, 70.00, 1190.00);
 
--- Row 37: 2/6/2025 - 13,15,2,3,12,8,5,16,9,4
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 37: 2/6/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (37, 1, 13, 85.00, 1105.00), (37, 2, 15, 55.00, 825.00), (37, 3, 2, 59.00, 118.00), (37, 4, 3, 59.00, 177.00), (37, 5, 12, 59.00, 708.00), (37, 6, 8, 65.00, 520.00), (37, 7, 5, 69.00, 345.00), (37, 8, 16, 69.00, 1104.00), (37, 9, 9, 75.00, 675.00), (37, 10, 4, 70.00, 280.00);
 
--- Row 38: 2/7/2025 - 12,10,16,3,4,20,13,10,0,0
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 38: 2/7/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (38, 1, 12, 85.00, 1020.00), (38, 2, 10, 55.00, 550.00), (38, 3, 16, 59.00, 944.00), (38, 4, 3, 59.00, 177.00), (38, 5, 4, 59.00, 236.00), (38, 6, 20, 65.00, 1300.00), (38, 7, 13, 69.00, 897.00), (38, 8, 10, 69.00, 690.00);
 
--- Row 39: 2/8/2025 - 16,7,9,0,8,4,9,13,2,18
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 39: 2/8/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (39, 1, 16, 85.00, 1360.00), (39, 2, 7, 55.00, 385.00), (39, 3, 9, 59.00, 531.00), (39, 5, 8, 59.00, 472.00), (39, 6, 4, 65.00, 260.00), (39, 7, 9, 69.00, 621.00), (39, 8, 13, 69.00, 897.00), (39, 9, 2, 75.00, 150.00), (39, 10, 18, 70.00, 1260.00);
 
--- Row 40: 2/9/2025 - 3,1,18,10,4,15,13,20,20,7
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 40: 2/9/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (40, 1, 3, 85.00, 255.00), (40, 2, 1, 55.00, 55.00), (40, 3, 18, 59.00, 1062.00), (40, 4, 10, 59.00, 590.00), (40, 5, 4, 59.00, 236.00), (40, 6, 15, 65.00, 975.00), (40, 7, 13, 69.00, 897.00), (40, 8, 20, 69.00, 1380.00), (40, 9, 20, 75.00, 1500.00), (40, 10, 7, 70.00, 490.00);
 
--- Row 41: 2/10/2025 - 1,6,9,18,2,3,6,12,15,20
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 41: 2/10/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (41, 1, 1, 85.00, 85.00), (41, 2, 6, 55.00, 330.00), (41, 3, 9, 59.00, 531.00), (41, 4, 18, 59.00, 1062.00), (41, 5, 2, 59.00, 118.00), (41, 6, 3, 65.00, 195.00), (41, 7, 6, 69.00, 414.00), (41, 8, 12, 69.00, 828.00), (41, 9, 15, 75.00, 1125.00), (41, 10, 20, 70.00, 1400.00);
 
--- Row 42: 2/11/2025 - 12,12,20,18,13,18,9,4,10,4
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 42: 2/11/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (42, 1, 12, 85.00, 1020.00), (42, 2, 12, 55.00, 660.00), (42, 3, 20, 59.00, 1180.00), (42, 4, 18, 59.00, 1062.00), (42, 5, 13, 59.00, 767.00), (42, 6, 18, 65.00, 1170.00), (42, 7, 9, 69.00, 621.00), (42, 8, 4, 69.00, 276.00), (42, 9, 10, 75.00, 750.00), (42, 10, 4, 70.00, 280.00);
 
--- Row 43: 2/12/2025 - 17,19,19,7,2,17,10,8,5,19
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 43: 2/12/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (43, 1, 17, 85.00, 1445.00), (43, 2, 19, 55.00, 1045.00), (43, 3, 19, 59.00, 1121.00), (43, 4, 7, 59.00, 413.00), (43, 5, 2, 59.00, 118.00), (43, 6, 17, 65.00, 1105.00), (43, 7, 10, 69.00, 690.00), (43, 8, 8, 69.00, 552.00), (43, 9, 5, 75.00, 375.00), (43, 10, 19, 70.00, 1330.00);
 
--- Row 44: 2/13/2025 - 18,0,5,2,10,11,16,15,3,19
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 44: 2/13/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (44, 1, 18, 85.00, 1530.00), (44, 3, 5, 59.00, 295.00), (44, 4, 2, 59.00, 118.00), (44, 5, 10, 59.00, 590.00), (44, 6, 11, 65.00, 715.00), (44, 7, 16, 69.00, 1104.00), (44, 8, 15, 69.00, 1035.00), (44, 9, 3, 75.00, 225.00), (44, 10, 19, 70.00, 1330.00);
 
--- Row 45: 2/14/2025 - 6,17,20,0,18,18,15,9,16,9
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 45: 2/14/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (45, 1, 6, 85.00, 510.00), (45, 2, 17, 55.00, 935.00), (45, 3, 20, 59.00, 1180.00), (45, 5, 18, 59.00, 1062.00), (45, 6, 18, 65.00, 1170.00), (45, 7, 15, 69.00, 1035.00), (45, 8, 9, 69.00, 621.00), (45, 9, 16, 75.00, 1200.00), (45, 10, 9, 70.00, 630.00);
 
--- Row 46: 2/15/2025 - 6,10,20,18,1,18,0,6,4,7
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 46: 2/15/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (46, 1, 6, 85.00, 510.00), (46, 2, 10, 55.00, 550.00), (46, 3, 20, 59.00, 1180.00), (46, 4, 18, 59.00, 1062.00), (46, 5, 1, 59.00, 59.00), (46, 6, 18, 65.00, 1170.00), (46, 8, 6, 69.00, 414.00), (46, 9, 4, 75.00, 300.00), (46, 10, 7, 70.00, 490.00);
 
--- Row 47: 2/16/2025 - 7,0,6,6,5,13,1,16,6,20
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 47: 2/16/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (47, 1, 7, 85.00, 595.00), (47, 3, 6, 59.00, 354.00), (47, 4, 6, 59.00, 354.00), (47, 5, 5, 59.00, 295.00), (47, 6, 13, 65.00, 845.00), (47, 7, 1, 69.00, 69.00), (47, 8, 16, 69.00, 1104.00), (47, 9, 6, 75.00, 450.00), (47, 10, 20, 70.00, 1400.00);
 
--- Row 48: 2/17/2025 - 19,7,7,15,10,16,4,3,0,6
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 48: 2/17/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (48, 1, 19, 85.00, 1615.00), (48, 2, 7, 55.00, 385.00), (48, 3, 7, 59.00, 413.00), (48, 4, 15, 59.00, 885.00), (48, 5, 10, 59.00, 590.00), (48, 6, 16, 65.00, 1040.00), (48, 7, 4, 69.00, 276.00), (48, 8, 3, 69.00, 207.00), (48, 10, 6, 70.00, 420.00);
 
--- Row 49: 2/18/2025 - 8,4,19,3,1,19,9,1,1,4
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 49: 2/18/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (49, 1, 8, 85.00, 680.00), (49, 2, 4, 55.00, 220.00), (49, 3, 19, 59.00, 1121.00), (49, 4, 3, 59.00, 177.00), (49, 5, 1, 59.00, 59.00), (49, 6, 19, 65.00, 1235.00), (49, 7, 9, 69.00, 621.00), (49, 8, 1, 69.00, 69.00), (49, 9, 1, 75.00, 75.00), (49, 10, 4, 70.00, 280.00);
 
--- Row 50: 2/19/2025 - 6,11,15,6,15,14,2,19,5,5
-INSERT INTO SaleItems (sale_id, product_id, quantity, unit_price, amount) VALUES
+-- Row 50: 2/19/2025
+INSERT INTO saleitems (sale_id, product_id, quantity, unit_price, amount) VALUES
 (50, 1, 6, 85.00, 510.00), (50, 2, 11, 55.00, 605.00), (50, 3, 15, 59.00, 885.00), (50, 4, 6, 59.00, 354.00), (50, 5, 15, 59.00, 885.00), (50, 6, 14, 65.00, 910.00), (50, 7, 2, 69.00, 138.00), (50, 8, 19, 69.00, 1311.00), (50, 9, 5, 75.00, 375.00), (50, 10, 5, 70.00, 350.00);
 
 -- ==============================================
--- UPDATE SALES TOTALS
+-- 9. UPDATE SALES TOTALS
 -- ==============================================
-UPDATE Sales SET 
-    subtotal = (SELECT COALESCE(SUM(amount), 0) FROM SaleItems WHERE SaleItems.sale_id = Sales.sale_id),
-    total_amount = (SELECT COALESCE(SUM(amount), 0) FROM SaleItems WHERE SaleItems.sale_id = Sales.sale_id);
+UPDATE sales SET
+    subtotal = (SELECT COALESCE(SUM(amount), 0) FROM saleitems WHERE saleitems.sale_id = sales.sale_id),
+    total_amount = (SELECT COALESCE(SUM(amount), 0) FROM saleitems WHERE saleitems.sale_id = sales.sale_id);
 
 -- ==============================================
--- FORECASTS
+-- 10. DAILY STOCK REPORTS (Feb 1-2, 2026)
 -- ==============================================
-INSERT INTO Forecasts (product_id, forecast_date, predicted_demand, confidence_score, recommended_order, notes) VALUES
-(1, '2026-01-15', 10, 0.78, 35, 'ABC Extra Stout - Annual demand: 3605, EOQ: 35'),
-(2, '2026-01-15', 10, 0.92, 35, 'Anchor Beer - Annual demand: 3635, EOQ: 35'),
-(3, '2026-01-15', 11, 0.81, 36, 'Anchor Smooth White Beer - Annual demand: 3854, EOQ: 36'),
-(4, '2026-01-15', 10, 0.75, 35, 'Anchor Beer (Bottle) - Annual demand: 3708, EOQ: 35'),
-(5, '2026-01-15', 10, 0.85, 35, 'Cambodia Lite Beer - Annual demand: 3648, EOQ: 35'),
-(6, '2026-01-15', 10, 0.88, 35, 'Tiger Lager Beer - Annual demand: 3736, EOQ: 35'),
-(7, '2026-01-15', 10, 0.86, 34, 'Tiger Crystal - Annual demand: 3538, EOQ: 34'),
-(8, '2026-01-15', 10, 0.79, 35, 'Tiger Lager Beer (Bottle) - Annual demand: 3557, EOQ: 35'),
-(9, '2026-01-15', 10, 0.77, 35, 'Tiger Crystal (Bottle) - Annual demand: 3683, EOQ: 35'),
-(10, '2026-01-15', 10, 0.73, 35, 'Heineken (Bottle) - Annual demand: 3662, EOQ: 35');
+INSERT INTO dailystockreports (product_id, report_date, opening_stock, purchased_qty, sold_qty, closing_stock) VALUES
+(1,  '2026-02-01',  0, 10, 1,  9),
+(2,  '2026-02-01',  5,  0, 0,  5),
+(3,  '2026-02-01',  5,  0, 2,  3),
+(4,  '2026-02-01',  9,  0, 0,  9),
+(5,  '2026-02-01', 10,  0, 0, 10),
+(6,  '2026-02-01',  2,  0, 0,  2),
+(7,  '2026-02-01',  3,  0, 0,  3),
+(8,  '2026-02-01',  0, 10, 3,  7),
+(9,  '2026-02-01',  6,  0, 0,  6),
+(10, '2026-02-01',  8,  0, 0,  8);
+
+INSERT INTO dailystockreports (product_id, report_date, opening_stock, purchased_qty, sold_qty, closing_stock) VALUES
+(1,  '2026-02-02',  9,  0, 4,  5),
+(2,  '2026-02-02',  5,  5, 0, 10),
+(3,  '2026-02-02',  3,  5, 2,  6),
+(4,  '2026-02-02',  9,  0, 3,  6),
+(5,  '2026-02-02', 10,  0, 1,  9),
+(6,  '2026-02-02',  2,  5, 1,  6),
+(7,  '2026-02-02',  3,  5, 0,  8),
+(8,  '2026-02-02',  7,  0, 0,  7),
+(9,  '2026-02-02',  6,  0, 1,  5),
+(10, '2026-02-02',  8,  0, 4,  4);
 
 -- ==============================================
--- DONE - 50 days of sales data loaded (1/1/2025 - 2/19/2025)
+-- VERIFY
 -- ==============================================
+SELECT 'Seed complete!' AS status,
+       (SELECT COUNT(*) FROM users) AS users,
+       (SELECT COUNT(*) FROM suppliers) AS suppliers,
+       (SELECT COUNT(*) FROM products) AS products,
+       (SELECT COUNT(*) FROM customers) AS customers,
+       (SELECT COUNT(*) FROM purchaseorders) AS purchase_orders,
+       (SELECT COUNT(*) FROM sales) AS sales,
+       (SELECT COUNT(*) FROM saleitems) AS sale_items,
+       (SELECT COUNT(*) FROM dailystockreports) AS stock_reports;

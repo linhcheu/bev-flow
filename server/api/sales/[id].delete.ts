@@ -1,5 +1,6 @@
 // API endpoint for deleting a sale
 import { execute, queryOne, queryAll, useDatabase, isProduction, getSupabase } from '~/server/utils/db';
+import { batchUpdateDailyStockReport } from '~/server/utils/stock-report-helper';
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
@@ -50,6 +51,17 @@ export default defineEventHandler(async (event) => {
       }
     }
     
+    // Reverse sold quantities in DailyStockReports
+    if (saleItems && saleItems.length > 0) {
+      // Get the sale date for the stock report update
+      const { data: saleData } = await supabase.from('sales').select('sale_date').eq('sale_id', id).single();
+      const saleDate = saleData?.sale_date || new Date().toISOString().split('T')[0];
+      await batchUpdateDailyStockReport(
+        saleItems.map((item: any) => ({ productId: item.product_id, soldDelta: -item.quantity, purchasedDelta: 0 })),
+        saleDate
+      );
+    }
+
     // Delete items first (cascade should handle, but explicit is safer)
     await supabase.from('saleitems').delete().eq('sale_id', id);
     
@@ -81,6 +93,15 @@ export default defineEventHandler(async (event) => {
   // Get all sale items to restore their stock
   const saleItems = queryAll<{ product_id: number; quantity: number }>('SELECT product_id, quantity FROM SaleItems WHERE sale_id = ?', [id]);
   
+  // Reverse sold quantities in DailyStockReports
+  const saleRecord = queryOne<{ sale_date: string }>('SELECT sale_date FROM Sales WHERE sale_id = ?', [id]);
+  const saleDate = saleRecord?.sale_date || new Date().toISOString().split('T')[0];
+  const stockItems = saleItems.length > 0 ? saleItems : [sale];
+  await batchUpdateDailyStockReport(
+    stockItems.map((item: any) => ({ productId: item.product_id, soldDelta: -item.quantity, purchasedDelta: 0 })),
+    saleDate
+  );
+
   const db = useDatabase();
   
   db.transaction(() => {

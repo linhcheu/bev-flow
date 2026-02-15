@@ -1,5 +1,6 @@
 // API endpoint for updating a sale with multi-item support
 import { execute, queryOne, queryAll, useDatabase, isProduction, getSupabase } from '~/server/utils/db';
+import { batchUpdateDailyStockReport } from '~/server/utils/stock-report-helper';
 import type { Sale, SaleItem, SaleItemFormData } from '~/types';
 
 interface SaleItemRow {
@@ -89,6 +90,13 @@ export default defineEventHandler(async (event) => {
       }
     }
     
+    // Reverse old sold quantities in DailyStockReports
+    const oldSaleDate = existing.sale_date || new Date().toISOString().split('T')[0];
+    await batchUpdateDailyStockReport(
+      (oldItems || []).map((oi: any) => ({ productId: oi.product_id, soldDelta: -oi.quantity, purchasedDelta: 0 })),
+      oldSaleDate
+    );
+
     // Delete old sale items
     await supabase.from('saleitems').delete().eq('sale_id', id);
     
@@ -139,6 +147,13 @@ export default defineEventHandler(async (event) => {
       }
     }
     
+    // Record new sold quantities in DailyStockReports
+    const newSaleDate = sale_date || existing.sale_date || new Date().toISOString().split('T')[0];
+    await batchUpdateDailyStockReport(
+      itemsArray.map((item: SaleItemFormData) => ({ productId: item.product_id, soldDelta: item.quantity, purchasedDelta: 0 })),
+      newSaleDate
+    );
+
     // Get updated items
     const { data: updatedItems } = await supabase
       .from('saleitems')
@@ -213,6 +228,13 @@ export default defineEventHandler(async (event) => {
     SELECT product_id, quantity FROM SaleItems WHERE sale_id = ?
   `, [id]);
   
+  // Reverse old sold quantities in DailyStockReports
+  const oldSaleDate = existing.sale_date || new Date().toISOString().split('T')[0];
+  await batchUpdateDailyStockReport(
+    oldItems.map(oi => ({ productId: oi.product_id, soldDelta: -oi.quantity, purchasedDelta: 0 })),
+    oldSaleDate
+  );
+
   // Restore old stock and apply new stock in a transaction
   db.transaction(() => {
     // Restore stock from old items
@@ -277,6 +299,13 @@ export default defineEventHandler(async (event) => {
     }
   })();
   
+  // Record new sold quantities in DailyStockReports
+  const newSaleDate = sale_date || existing.sale_date || new Date().toISOString().split('T')[0];
+  await batchUpdateDailyStockReport(
+    itemsArray.map((item: SaleItemFormData) => ({ productId: item.product_id, soldDelta: item.quantity, purchasedDelta: 0 })),
+    newSaleDate
+  );
+
   // Get updated items
   const updatedItems = queryAll<SaleItemRow>(`
     SELECT si.*, p.product_name, p.sku

@@ -1,6 +1,21 @@
 // Update current user profile
 import { execute, queryOne, isProduction, getSupabase } from '~/server/utils/db';
 
+// Ensure profile_image column exists (self-healing for existing dev DBs)
+let columnChecked = false;
+function ensureProfileImageColumn() {
+  if (columnChecked || isProduction()) return;
+  try {
+    queryOne<{ profile_image: string | null }>('SELECT profile_image FROM Users LIMIT 1', []);
+    columnChecked = true;
+  } catch {
+    try {
+      execute('ALTER TABLE Users ADD COLUMN profile_image TEXT', []);
+      columnChecked = true;
+    } catch { columnChecked = true; }
+  }
+}
+
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
@@ -43,7 +58,7 @@ export default defineEventHandler(async (event) => {
       
       const { data: updatedUser } = await supabase
         .from('users')
-        .select('user_id, username, email, full_name, role, phone, location')
+        .select('user_id, username, email, full_name, role, phone, location, profile_image')
         .eq('user_id', userId)
         .single();
       
@@ -57,6 +72,7 @@ export default defineEventHandler(async (event) => {
           role: role,
           phone: updatedUser?.phone || '+855 23 456 7890',
           location: updatedUser?.location || 'Phnom Penh, Cambodia',
+          profileImage: updatedUser?.profile_image || null,
         },
       };
     }
@@ -70,6 +86,9 @@ export default defineEventHandler(async (event) => {
       [name, phone || null, location || null, dbRole, userId]
     );
 
+    // Ensure column exists before selecting
+    if (!isProduction()) ensureProfileImageColumn();
+
     // Fetch updated profile
     const updatedUser = queryOne<{
       user_id: number;
@@ -79,8 +98,9 @@ export default defineEventHandler(async (event) => {
       role: string;
       phone: string | null;
       location: string | null;
+      profile_image: string | null;
     }>(
-      'SELECT user_id, username, email, full_name, role, phone, location FROM Users WHERE user_id = ?',
+      'SELECT user_id, username, email, full_name, role, phone, location, profile_image FROM Users WHERE user_id = ?',
       [userId]
     );
 
@@ -94,6 +114,7 @@ export default defineEventHandler(async (event) => {
         role: role,
         phone: updatedUser?.phone || '+855 23 456 7890',
         location: updatedUser?.location || 'Phnom Penh, Cambodia',
+        profileImage: updatedUser?.profile_image || null,
       },
     };
   } catch (error: any) {
