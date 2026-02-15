@@ -22,9 +22,9 @@
     <!-- Main Content -->
     <main 
       :class="[
-        'flex-1 min-h-screen bg-zinc-50',
+        'flex-1 min-h-screen min-w-0 bg-zinc-50 overflow-x-hidden',
         'transition-[margin] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]',
-        isExpanded ? 'lg:ml-64' : 'lg:ml-16 sm:lg:ml-20',
+        isExpanded ? 'lg:ml-64' : 'lg:ml-20',
         'ml-0'
       ]"
     >

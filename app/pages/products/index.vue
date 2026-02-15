@@ -1,11 +1,11 @@
 <template>
-  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white">
-    <div class="max-w-7xl mx-auto">
+  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white overflow-x-hidden">
+    <div class="max-w-7xl mx-auto w-full">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-package" class="w-5 h-5 text-zinc-600" />
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-package" class="w-4 h-4 sm:w-5 sm:h-5 text-zinc-600" />
           </div>
           <div>
             <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Products</h1>
@@ -91,7 +91,7 @@
         <template #filters>
           <select 
             v-model="stockFilter"
-            class="px-3 py-2 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+            class="px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
           >
             <option value="all">All Stock Levels</option>
             <option value="in-stock">In Stock (>10)</option>
@@ -100,7 +100,7 @@
           </select>
           <select 
             v-model="supplierFilter"
-            class="px-3 py-2 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+            class="px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
           >
             <option value="all">All Suppliers</option>
             <option v-for="supplier in uniqueSuppliers" :key="supplier" :value="supplier">
@@ -109,7 +109,7 @@
           </select>
           <select 
             v-model="sortBy"
-            class="px-3 py-2 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+            class="px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
           >
             <option value="name-asc">Name A-Z</option>
             <option value="name-desc">Name Z-A</option>
@@ -386,74 +386,74 @@
       <div v-if="viewModalOpen" class="fixed inset-0 z-50 overflow-y-auto">
         <div class="flex min-h-full items-center justify-center p-4">
           <div class="fixed inset-0 bg-black/50" @click="closeViewModal"></div>
-          <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-5 sm:p-6">
+          <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-4 sm:p-5 md:p-6">
             <!-- Header -->
-            <div class="flex items-start gap-4 mb-5">
-              <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                <UIcon name="i-lucide-package" class="w-6 h-6 text-amber-600" />
+            <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                <UIcon name="i-lucide-package" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
               </div>
               <div class="flex-1 min-w-0">
-                <h2 class="text-lg font-semibold text-zinc-900">{{ selectedProduct?.product_name }}</h2>
-                <p class="text-sm text-zinc-500">SKU: {{ selectedProduct?.sku || 'N/A' }}</p>
+                <h2 class="text-base sm:text-lg font-semibold text-zinc-900">{{ selectedProduct?.product_name }}</h2>
+                <p class="text-xs sm:text-sm text-zinc-500">SKU: {{ selectedProduct?.sku || 'N/A' }}</p>
               </div>
               <button 
                 @click="closeViewModal" 
                 class="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg"
               >
-                <UIcon name="i-lucide-x" class="w-5 h-5" />
+                <UIcon name="i-lucide-x" class="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
             
             <!-- Details -->
-            <div class="space-y-4 mb-5">
+            <div class="space-y-3 sm:space-y-4 mb-4 sm:mb-5">
               <!-- Product Image -->
               <div v-if="selectedProduct?.image_url" class="flex justify-center">
-                <div class="w-32 h-32 bg-zinc-100 rounded-xl overflow-hidden">
+                <div class="w-24 h-24 sm:w-32 sm:h-32 bg-zinc-100 rounded-xl overflow-hidden">
                   <img :src="selectedProduct.image_url" :alt="selectedProduct.product_name" class="w-full h-full object-contain" />
                 </div>
               </div>
               
-              <div class="grid grid-cols-2 gap-4">
-                <div class="bg-zinc-50 rounded-lg p-3">
-                  <p class="text-xs text-zinc-500 mb-1">Cost Price</p>
-                  <p class="text-lg font-semibold text-zinc-900">${{ Number(selectedProduct?.cost_price || 0).toFixed(2) }}</p>
+              <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                <div class="bg-zinc-50 rounded-lg p-2.5 sm:p-3">
+                  <p class="text-[10px] sm:text-xs text-zinc-500 mb-0.5 sm:mb-1">Cost Price</p>
+                  <p class="text-base sm:text-lg font-semibold text-zinc-900">${{ Number(selectedProduct?.cost_price || 0).toFixed(2) }}</p>
                 </div>
-                <div class="bg-zinc-50 rounded-lg p-3">
-                  <p class="text-xs text-zinc-500 mb-1">Selling Price</p>
-                  <p class="text-lg font-semibold text-zinc-900">${{ Number(selectedProduct?.selling_price || 0).toFixed(2) }}</p>
+                <div class="bg-zinc-50 rounded-lg p-2.5 sm:p-3">
+                  <p class="text-[10px] sm:text-xs text-zinc-500 mb-0.5 sm:mb-1">Selling Price</p>
+                  <p class="text-base sm:text-lg font-semibold text-zinc-900">${{ Number(selectedProduct?.selling_price || 0).toFixed(2) }}</p>
                 </div>
-                <div class="bg-zinc-50 rounded-lg p-3">
-                  <p class="text-xs text-zinc-500 mb-1">Current Stock</p>
-                  <p :class="['text-lg font-semibold', getStockColorClass(selectedProduct?.current_stock || 0)]">{{ selectedProduct?.current_stock || 0 }}</p>
+                <div class="bg-zinc-50 rounded-lg p-2.5 sm:p-3">
+                  <p class="text-[10px] sm:text-xs text-zinc-500 mb-0.5 sm:mb-1">Current Stock</p>
+                  <p :class="['text-base sm:text-lg font-semibold', getStockColorClass(selectedProduct?.current_stock || 0)]">{{ selectedProduct?.current_stock || 0 }}</p>
                 </div>
-                <div class="bg-zinc-50 rounded-lg p-3">
-                  <p class="text-xs text-zinc-500 mb-1">Profit Margin</p>
-                  <p :class="['text-lg font-semibold', getProfitColorClass(selectedProduct?.profit || 0)]">
+                <div class="bg-zinc-50 rounded-lg p-2.5 sm:p-3">
+                  <p class="text-[10px] sm:text-xs text-zinc-500 mb-0.5 sm:mb-1">Profit Margin</p>
+                  <p :class="['text-base sm:text-lg font-semibold', getProfitColorClass(selectedProduct?.profit || 0)]">
                     {{ (selectedProduct?.profit || 0) >= 0 ? '+' : '' }}${{ (selectedProduct?.profit || 0).toFixed(2) }}
                   </p>
                 </div>
               </div>
               
               <!-- Safety Stock & EOQ -->
-              <div class="grid grid-cols-2 gap-4">
-                <div class="bg-emerald-50 rounded-lg p-3">
-                  <p class="text-xs text-emerald-600 mb-1">Safety Stock</p>
-                  <p class="text-lg font-semibold text-emerald-700">{{ selectedProduct?.safety_stock || 0 }}</p>
+              <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                <div class="bg-emerald-50 rounded-lg p-2.5 sm:p-3">
+                  <p class="text-[10px] sm:text-xs text-emerald-600 mb-0.5 sm:mb-1">Safety Stock</p>
+                  <p class="text-base sm:text-lg font-semibold text-emerald-700">{{ selectedProduct?.safety_stock || 0 }}</p>
                 </div>
-                <div class="bg-emerald-50 rounded-lg p-3">
-                  <p class="text-xs text-emerald-600 mb-1">Re-order Qty (EOQ)</p>
-                  <p class="text-lg font-semibold text-emerald-700">{{ selectedProduct?.reorder_quantity || 0 }}</p>
+                <div class="bg-emerald-50 rounded-lg p-2.5 sm:p-3">
+                  <p class="text-[10px] sm:text-xs text-emerald-600 mb-0.5 sm:mb-1">Re-order Qty (EOQ)</p>
+                  <p class="text-base sm:text-lg font-semibold text-emerald-700">{{ selectedProduct?.reorder_quantity || 0 }}</p>
                 </div>
               </div>
               
-              <div class="bg-zinc-50 rounded-lg p-3">
-                <p class="text-xs text-zinc-500 mb-1">Supplier</p>
-                <p class="text-sm font-medium text-zinc-900">{{ selectedProduct?.supplier?.company_name || 'No supplier assigned' }}</p>
+              <div class="bg-zinc-50 rounded-lg p-2.5 sm:p-3">
+                <p class="text-[10px] sm:text-xs text-zinc-500 mb-0.5 sm:mb-1">Supplier</p>
+                <p class="text-xs sm:text-sm font-medium text-zinc-900">{{ selectedProduct?.supplier?.company_name || 'No supplier assigned' }}</p>
               </div>
               
-              <div v-if="selectedProduct?.description" class="bg-zinc-50 rounded-lg p-3">
-                <p class="text-xs text-zinc-500 mb-1">Description</p>
-                <p class="text-sm text-zinc-700">{{ selectedProduct.description }}</p>
+              <div v-if="selectedProduct?.description" class="bg-zinc-50 rounded-lg p-2.5 sm:p-3">
+                <p class="text-[10px] sm:text-xs text-zinc-500 mb-0.5 sm:mb-1">Description</p>
+                <p class="text-xs sm:text-sm text-zinc-700">{{ selectedProduct.description }}</p>
               </div>
             </div>
             
@@ -461,16 +461,16 @@
             <div class="flex gap-2">
               <button 
                 @click="exportProductPDF(selectedProduct!)"
-                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100"
+                class="flex-1 inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-red-50 text-red-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-red-100"
               >
-                <UIcon name="i-lucide-file-text" class="w-4 h-4" />
+                <UIcon name="i-lucide-file-text" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Export PDF
               </button>
               <NuxtLink 
                 :to="`/products/${selectedProduct?.product_id}/edit`"
-                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
+                class="flex-1 inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-600 no-underline"
               >
-                <UIcon name="i-lucide-pencil" class="w-4 h-4" />
+                <UIcon name="i-lucide-pencil" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Edit
               </NuxtLink>
             </div>

@@ -29,21 +29,22 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* Touch-friendly styling for mobile */
+/* Touch-friendly styling for mobile - only min-height for tap targets, no min-width to avoid breaking grid layouts */
 @media (pointer: coarse) {
   button, 
   a, 
-  input[type="checkbox"],
-  input[type="radio"],
   select {
     min-height: 44px;
-    min-width: 44px;
   }
   
-  input[type="checkbox"],
-  input[type="radio"] {
+  /* Reset for inline/icon buttons that shouldn't enforce height */
+  button.p-1,
+  button.p-1\.5,
+  button.p-2,
+  a.p-1,
+  a.p-1\.5,
+  a.p-2 {
     min-height: auto;
-    min-width: auto;
   }
 }
 

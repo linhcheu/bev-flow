@@ -1,11 +1,11 @@
 <template>
-  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white">
-    <div class="max-w-7xl mx-auto">
+  <div class="p-3 sm:p-4 md:p-6 lg:p-8 min-h-screen bg-white overflow-x-hidden">
+    <div class="max-w-7xl mx-auto w-full">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-8">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-layout-dashboard" class="w-5 h-5 text-zinc-600" />
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-layout-dashboard" class="w-4 h-4 sm:w-5 sm:h-5 text-zinc-600" />
           </div>
           <div>
             <h1 class="text-lg sm:text-xl md:text-2xl font-semibold text-zinc-900">Dashboard</h1>
@@ -106,18 +106,18 @@
       <!-- Sales Trend Chart -->
       <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 lg:mb-8 border border-zinc-200">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-line-chart" class="w-4 h-4 text-emerald-600" />
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-line-chart" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
             </div>
             <div>
-              <h3 class="text-sm sm:text-base font-medium text-zinc-900">Today's Hourly Sales</h3>
-              <p class="text-xs text-zinc-500">Sales activity throughout today</p>
+              <h3 class="text-xs sm:text-sm md:text-base font-medium text-zinc-900">Today's Hourly Sales</h3>
+              <p class="text-[10px] sm:text-xs text-zinc-500">Sales activity throughout today</p>
             </div>
           </div>
-          <div class="flex gap-4 text-xs">
+          <div class="flex gap-4 text-[10px] sm:text-xs">
             <span class="flex items-center gap-1.5">
-              <span class="w-3 h-3 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"></span>
+              <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"></span>
               Hourly Revenue
             </span>
           </div>
@@ -189,13 +189,13 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 lg:mb-8">
         <!-- Sales by Category Chart -->
         <div class="lg:col-span-2 bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
-          <div class="flex items-center gap-3 mb-3 sm:mb-4 md:mb-6">
-            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-pie-chart" class="w-4 h-4 text-purple-600" />
+          <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-pie-chart" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
             </div>
             <div>
-              <h3 class="text-sm font-medium text-zinc-900">Today's Sales by Product</h3>
-              <p class="text-xs text-zinc-500">Revenue distribution</p>
+              <h3 class="text-xs sm:text-sm font-medium text-zinc-900">Today's Sales by Product</h3>
+              <p class="text-[10px] sm:text-xs text-zinc-500">Revenue distribution</p>
             </div>
           </div>
           
@@ -256,13 +256,13 @@
         <div class="space-y-3 sm:space-y-4 md:space-y-6">
           <!-- Top Products -->
           <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-3 sm:mb-4">
-              <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-trophy" class="w-4 h-4 text-amber-600" />
+            <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-trophy" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
               </div>
               <div>
-                <h3 class="text-sm font-medium text-zinc-900">Top Selling Today</h3>
-                <p class="text-xs text-zinc-500">Best performers</p>
+                <h3 class="text-xs sm:text-sm font-medium text-zinc-900">Top Selling Today</h3>
+                <p class="text-[10px] sm:text-xs text-zinc-500">Best performers</p>
               </div>
             </div>
             
@@ -285,13 +285,13 @@
 
           <!-- Low Stock Alerts -->
           <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
-            <div class="flex items-center gap-3 mb-3 sm:mb-4">
-              <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
-                <UIcon name="i-lucide-alert-triangle" class="w-4 h-4 text-red-600" />
+            <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div class="w-7 h-7 sm:w-8 sm:h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                <UIcon name="i-lucide-alert-triangle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
               </div>
               <div>
-                <h3 class="text-sm font-medium text-zinc-900">Low Stock Alerts</h3>
-                <p class="text-xs text-zinc-500">Needs attention</p>
+                <h3 class="text-xs sm:text-sm font-medium text-zinc-900">Low Stock Alerts</h3>
+                <p class="text-[10px] sm:text-xs text-zinc-500">Needs attention</p>
               </div>
             </div>
             
@@ -318,49 +318,49 @@
       <!-- Balance on Hand (BoH) Section -->
       <div class="bg-white rounded-xl p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 lg:mb-8 border border-zinc-200">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-              <UIcon name="i-lucide-warehouse" class="w-5 h-5 text-amber-600" />
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-50 rounded-lg flex items-center justify-center">
+              <UIcon name="i-lucide-warehouse" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
             </div>
             <div>
-              <h3 class="text-sm sm:text-base font-semibold text-zinc-900">Balance on Hand (BoH)</h3>
-              <p class="text-xs text-zinc-500">Current stock levels &amp; reorder status</p>
+              <h3 class="text-xs sm:text-sm md:text-base font-semibold text-zinc-900">Balance on Hand (BoH)</h3>
+              <p class="text-[10px] sm:text-xs text-zinc-500">Current stock levels &amp; reorder status</p>
             </div>
           </div>
-          <div class="flex items-center gap-3">
-            <div v-if="bohSummary" class="flex items-center gap-2">
-              <span class="text-xs text-zinc-500">Need Reorder:</span>
-              <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', bohSummary.needsReorderCount > 0 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700']">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div v-if="bohSummary" class="flex items-center gap-1.5 sm:gap-2">
+              <span class="text-[10px] sm:text-xs text-zinc-500">Need Reorder:</span>
+              <span :class="['text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full', bohSummary.needsReorderCount > 0 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700']">
                 {{ bohSummary.needsReorderCount }} / {{ bohSummary.totalProducts }}
               </span>
             </div>
-            <NuxtLink to="/stock-reports" class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 no-underline">
-              View Reports <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5" />
+            <NuxtLink to="/stock-reports" class="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-medium text-amber-600 hover:text-amber-700 no-underline">
+              View Reports <UIcon name="i-lucide-arrow-right" class="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </NuxtLink>
           </div>
         </div>
 
         <!-- BoH Summary Cards -->
-        <div v-if="bohSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4">
-          <div class="bg-blue-50 rounded-lg p-3">
-            <p class="text-xs text-blue-600 mb-1">Total Stock</p>
-            <p class="text-lg font-bold text-blue-700">{{ bohSummary.totalStock }}</p>
-            <p class="text-[10px] text-blue-500">units on hand</p>
+        <div v-if="bohSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div class="bg-blue-50 rounded-lg p-2.5 sm:p-3">
+            <p class="text-[10px] sm:text-xs text-blue-600 mb-0.5 sm:mb-1">Total Stock</p>
+            <p class="text-base sm:text-lg font-bold text-blue-700">{{ bohSummary.totalStock }}</p>
+            <p class="text-[9px] sm:text-[10px] text-blue-500">units on hand</p>
           </div>
-          <div class="bg-emerald-50 rounded-lg p-3">
-            <p class="text-xs text-emerald-600 mb-1">Inventory Value</p>
-            <p class="text-lg font-bold text-emerald-700">${{ (bohSummary.totalValue || 0).toLocaleString() }}</p>
-            <p class="text-[10px] text-emerald-500">at cost price</p>
+          <div class="bg-emerald-50 rounded-lg p-2.5 sm:p-3">
+            <p class="text-[10px] sm:text-xs text-emerald-600 mb-0.5 sm:mb-1">Inventory Value</p>
+            <p class="text-base sm:text-lg font-bold text-emerald-700">${{ (bohSummary.totalValue || 0).toLocaleString() }}</p>
+            <p class="text-[9px] sm:text-[10px] text-emerald-500">at cost price</p>
           </div>
-          <div class="bg-amber-50 rounded-lg p-3">
-            <p class="text-xs text-amber-600 mb-1">Healthy</p>
-            <p class="text-lg font-bold text-amber-700">{{ bohSummary.healthyCount }}</p>
-            <p class="text-[10px] text-amber-500">products OK</p>
+          <div class="bg-amber-50 rounded-lg p-2.5 sm:p-3">
+            <p class="text-[10px] sm:text-xs text-amber-600 mb-0.5 sm:mb-1">Healthy</p>
+            <p class="text-base sm:text-lg font-bold text-amber-700">{{ bohSummary.healthyCount }}</p>
+            <p class="text-[9px] sm:text-[10px] text-amber-500">products OK</p>
           </div>
-          <div :class="['rounded-lg p-3', bohSummary.needsReorderCount > 0 ? 'bg-red-50' : 'bg-emerald-50']">
-            <p :class="['text-xs mb-1', bohSummary.needsReorderCount > 0 ? 'text-red-600' : 'text-emerald-600']">Needs Reorder</p>
-            <p :class="['text-lg font-bold', bohSummary.needsReorderCount > 0 ? 'text-red-700' : 'text-emerald-700']">{{ bohSummary.needsReorderCount }}</p>
-            <p :class="['text-[10px]', bohSummary.needsReorderCount > 0 ? 'text-red-500' : 'text-emerald-500']">products below ROP</p>
+          <div :class="['rounded-lg p-2.5 sm:p-3', bohSummary.needsReorderCount > 0 ? 'bg-red-50' : 'bg-emerald-50']">
+            <p :class="['text-[10px] sm:text-xs mb-0.5 sm:mb-1', bohSummary.needsReorderCount > 0 ? 'text-red-600' : 'text-emerald-600']">Needs Reorder</p>
+            <p :class="['text-base sm:text-lg font-bold', bohSummary.needsReorderCount > 0 ? 'text-red-700' : 'text-emerald-700']">{{ bohSummary.needsReorderCount }}</p>
+            <p :class="['text-[9px] sm:text-[10px]', bohSummary.needsReorderCount > 0 ? 'text-red-500' : 'text-emerald-500']">products below ROP</p>
           </div>
         </div>
 
@@ -442,13 +442,13 @@
 
       <!-- Quick Actions -->
       <div class="bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-zinc-200">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
-            <UIcon name="i-lucide-zap" class="w-4 h-4 text-indigo-600" />
+        <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+            <UIcon name="i-lucide-zap" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
           </div>
           <div>
-            <h3 class="text-sm font-medium text-zinc-900">Quick Actions</h3>
-            <p class="text-xs text-zinc-500">Common operations</p>
+            <h3 class="text-xs sm:text-sm font-medium text-zinc-900">Quick Actions</h3>
+            <p class="text-[10px] sm:text-xs text-zinc-500">Common operations</p>
           </div>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
@@ -509,9 +509,9 @@
       v-if="isLoading && !isInitialized"
       class="fixed inset-0 bg-white/80 backdrop-blur-sm z-40 flex items-center justify-center"
     >
-      <div class="flex flex-col items-center gap-3">
-        <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-amber-500 animate-spin" />
-        <p class="text-sm text-zinc-600">Loading dashboard...</p>
+      <div class="flex flex-col items-center gap-2 sm:gap-3">
+        <UIcon name="i-lucide-loader-2" class="w-6 h-6 sm:w-8 sm:h-8 text-amber-500 animate-spin" />
+        <p class="text-xs sm:text-sm text-zinc-600">Loading dashboard...</p>
       </div>
     </div>
   </div>
