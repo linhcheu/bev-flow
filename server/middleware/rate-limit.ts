@@ -13,6 +13,7 @@ const RATE_LIMITS: Record<string, { maxRequests: number; windowMs: number }> = {
   '/api/forecasts': { maxRequests: 30, windowMs: 60 * 1000 },          // 30 req/min (heavier)
   '/api/stock-reports/seed': { maxRequests: 3, windowMs: 60 * 60 * 1000 }, // 3 per hour
   '/api/dashboard': { maxRequests: 120, windowMs: 60 * 1000 },         // 120 req/min (read-heavy)
+  '/api/settings/delete-account': { maxRequests: 3, windowMs: 60 * 60 * 1000 }, // 3 per hour (critical)
 };
 
 // Cleanup stale entries every 5 minutes

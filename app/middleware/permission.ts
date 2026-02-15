@@ -64,7 +64,6 @@ function getPermissionsByRole(role: DbRole): UserPermissions {
 // Route permission mapping
 const routePermissions: Record<string, keyof UserPermissions> = {
   '/forecasts': 'canForecast',
-  '/backup': 'canBackupRestore',
   '/users': 'canManageUsers',
 };
 

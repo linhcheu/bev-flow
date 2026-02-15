@@ -184,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { AUTH_CONFIG } from '../utils/auth-config';
+import { AUTH_CONFIG, getSessionExpiry } from '../utils/auth-config';
 
 definePageMeta({
   layout: 'auth'
@@ -255,8 +255,8 @@ const handleLogin = async () => {
       localStorage.setItem('userName', response.user.full_name || response.user.username);
       localStorage.setItem('userRole', response.user.role);
       
-      // Set token expiry time
-      const expiryTime = Date.now() + AUTH_CONFIG.TOKEN_EXPIRY_MS;
+      // Set token expiry time - expires at midnight before next Monday
+      const expiryTime = getSessionExpiry();
       localStorage.setItem('tokenExpiry', expiryTime.toString());
       
       // Also set cookies for SSR

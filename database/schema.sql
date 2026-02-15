@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS Users (
     role VARCHAR(20) DEFAULT 'user' CHECK(role IN ('admin', 'manager', 'user')),
     phone VARCHAR(30),
     location VARCHAR(100),
+    profile_image TEXT,
     is_active INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -240,3 +241,16 @@ CREATE INDEX IF NOT EXISTS idx_psa_supplier ON ProductSupplierAvailability(suppl
 CREATE INDEX IF NOT EXISTS idx_dsr_product ON DailyStockReports(product_id);
 CREATE INDEX IF NOT EXISTS idx_dsr_date ON DailyStockReports(report_date);
 CREATE INDEX IF NOT EXISTS idx_dsr_product_date ON DailyStockReports(product_id, report_date);
+
+-- ==============================================
+-- USER SETTINGS TABLE (minimal - for account management)
+-- ==============================================
+CREATE TABLE IF NOT EXISTS UserSettings (
+    setting_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_settings_user_id ON UserSettings(user_id);

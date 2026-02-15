@@ -121,6 +121,25 @@ const initializeSchema = () => {
         console.log('✅ Database schema initialized');
       }
     }
+  } else {
+    // Run lightweight migrations for existing databases
+    runMigrations();
+  }
+};
+
+// Add missing columns to existing databases
+const runMigrations = () => {
+  if (!db) return;
+  try {
+    const cols = db.prepare("PRAGMA table_info(Users)").all() as { name: string }[];
+    const colNames = cols.map((c: { name: string }) => c.name);
+
+    if (!colNames.includes('profile_image')) {
+      db.exec('ALTER TABLE Users ADD COLUMN profile_image TEXT');
+      console.log('✅ Added profile_image column to Users');
+    }
+  } catch (err) {
+    // Ignore migration errors for resilience
   }
 };
 

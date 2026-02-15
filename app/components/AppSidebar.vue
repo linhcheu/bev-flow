@@ -169,7 +169,6 @@ const mainMenuItems: MenuItem[] = [
   { path: '/sales', label: 'Sales', icon: 'i-lucide-receipt' },
   { path: '/forecasts', label: 'Forecasts', icon: 'i-lucide-trending-up', requiresPermission: 'canForecast' },
   { path: '/users', label: 'Users', icon: 'i-lucide-users', requiresPermission: 'canManageUsers' },
-  { path: '/backup', label: 'Backup', icon: 'i-lucide-database', requiresPermission: 'canBackupRestore' },
   { path: '/profile', label: 'Profile', icon: 'i-lucide-user-circle' },
 ];
 

@@ -36,8 +36,9 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Get user_id from session/token (for now, use admin user)
-    const userId = 1;
+    // Get user_id from cookie
+    const userIdCookie = getCookie(event, 'userId');
+    const userId = userIdCookie ? parseInt(userIdCookie) : 1;
 
     // Production: Use Supabase
     if (isProduction()) {

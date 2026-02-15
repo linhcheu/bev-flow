@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
       
       const { data: user, error } = await supabase
         .from('users')
-        .select('user_id, username, email, full_name, role, phone, location, is_active, created_at, updated_at')
+        .select('user_id, username, email, full_name, role, phone, location, profile_image, is_active, created_at, updated_at')
         .eq('user_id', userId)
         .single();
       
@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
         role: user.role === 'admin' ? 'System Administrator' : user.role === 'manager' ? 'Manager' : 'Staff',
         phone: user.phone || '+855 23 456 7890',
         location: user.location || 'Phnom Penh, Cambodia',
+        profileImage: user.profile_image || null,
         joinDate: formatDate(user.created_at),
         lastLogin: 'Today at ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         isActive: user.is_active === true,
@@ -47,11 +48,12 @@ export default defineEventHandler(async (event) => {
       role: string;
       phone: string | null;
       location: string | null;
+      profile_image: string | null;
       is_active: number;
       created_at: string;
       updated_at: string;
     }>(
-      `SELECT user_id, username, email, full_name, role, phone, location, is_active, created_at, updated_at 
+      `SELECT user_id, username, email, full_name, role, phone, location, profile_image, is_active, created_at, updated_at 
        FROM Users WHERE user_id = ?`,
       [userId]
     );
@@ -72,6 +74,7 @@ export default defineEventHandler(async (event) => {
       role: user.role === 'admin' ? 'System Administrator' : user.role === 'manager' ? 'Manager' : 'Staff',
       phone: user.phone || '+855 23 456 7890',
       location: user.location || 'Phnom Penh, Cambodia',
+      profileImage: user.profile_image || null,
       joinDate: formatDate(user.created_at),
       lastLogin: 'Today at ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       isActive: user.is_active === 1,

@@ -372,3 +372,20 @@ export interface PaginatedResponse<T> {
   limit: number;
   totalPages: number;
 }
+
+// User Settings types
+export interface UserSettings {
+  setting_id?: number;
+  user_id: number;
+  email_notifications?: boolean;
+  low_stock_alerts?: boolean;
+  order_updates?: boolean;
+  language?: string;
+  currency?: string;
+  date_format?: string;
+  items_per_page?: number;
+  session_timeout?: number;
+  login_notifications?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
