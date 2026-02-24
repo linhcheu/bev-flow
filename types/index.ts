@@ -223,6 +223,17 @@ export interface DailyStockReport {
   sku?: string;
   description?: string;
   report_date: string;
+  // Big Stock Inventory (Warehouse)
+  big_opening: number;
+  big_purchase_in: number;
+  big_move_out: number;
+  big_remaining: number;
+  // Small Stock Inventory (Retail/Fridge)
+  small_opening: number;
+  small_move_in: number;
+  small_sell_out: number;
+  small_closing: number;
+  // Legacy aggregate fields
   opening_stock: number;
   purchased_qty: number;
   sold_qty: number;

@@ -16,7 +16,12 @@ export const useSupabase = () => {
     throw new Error('Missing SUPABASE_URL or SUPABASE_KEY environment variables');
   }
 
-  supabase = createClient(supabaseUrl, supabaseKey);
+  supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
   return supabase;
 };
 

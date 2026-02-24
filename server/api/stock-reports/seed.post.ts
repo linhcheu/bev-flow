@@ -1,45 +1,119 @@
-// Seed Daily Stock Reports — Feb 1-2, 2026
+// Seed Daily Stock Reports — Feb 19-20, 2026 (Big Stock / Small Stock model)
 import { execute, queryAll, isProduction, getSupabase } from '~/server/utils/db';
 
-// Opening stock for each product on Feb 1 (product_id → qty)
-const feb1Opening: Record<number, number> = {
-  1: 0, 2: 5, 3: 5, 4: 9, 5: 10, 6: 2, 7: 3, 8: 0, 9: 6, 10: 8,
-};
+// Each product's seed data for a given day
+// Keyed by SKU instead of hardcoded product_id
+interface SeedRow {
+  sku: string;
+  big_opening: number;
+  big_purchase_in: number;
+  big_move_out: number;
+  small_opening: number;
+  small_sell_out: number;
+}
 
-// Purchases: 'day-productId' → quantity purchased
-const purchases: Record<string, number> = {
-  // Feb 1 — Restock products that are out of stock
-  '1-1': 10,   // ABC Extra Stout (was 0)
-  '1-8': 10,   // Tiger Lager Beer Bottle (was 0)
-  // Feb 2 — Scheduled delivery
-  '2-2': 5,    // Anchor Beer
-  '2-3': 5,    // Anchor Smooth White Beer
-  '2-6': 5,    // Tiger Lager Beer
-  '2-7': 5,    // Tiger Crystal
-};
-
-// Daily sales per product index (rows = days, cols = products in DB order)
-const dailySales: number[][] = [
-  //  P1  P2  P3  P4  P5  P6  P7  P8  P9  P10
-  [   1,  0,  2,  0,  0,  0,  0,  3,  0,   0 ],  // Feb 1 (Sunday — quiet day)
-  [   4,  0,  2,  3,  1,  1,  0,  0,  1,   4 ],  // Feb 2 (Monday — busier day)
+// Data matching the report image dated 20/02/2026
+const feb20Data: SeedRow[] = [
+  { sku: 'A001', big_opening: 10, big_purchase_in: 5,  big_move_out: 8,  small_opening: 3, small_sell_out: 6  }, // ABC Extra Stout
+  { sku: 'A002', big_opening: 15, big_purchase_in: 0,  big_move_out: 10, small_opening: 5, small_sell_out: 12 }, // Anchor Beer
+  { sku: 'A003', big_opening: 8,  big_purchase_in: 10, big_move_out: 6,  small_opening: 4, small_sell_out: 7  }, // Anchor Smooth White Beer
+  { sku: 'A005', big_opening: 20, big_purchase_in: 0,  big_move_out: 8,  small_opening: 6, small_sell_out: 10 }, // Cambodia Lite Beer
+  { sku: 'A006', big_opening: 14, big_purchase_in: 10, big_move_out: 12, small_opening: 3, small_sell_out: 8  }, // Tiger Lager Beer
+  { sku: 'A007', big_opening: 18, big_purchase_in: 0,  big_move_out: 10, small_opening: 5, small_sell_out: 9  }, // Tiger Crystal
+  { sku: 'A008', big_opening: 16, big_purchase_in: 5,  big_move_out: 8,  small_opening: 4, small_sell_out: 7  }, // Tiger Lager Beer (Bottle)
+  { sku: 'A009', big_opening: 10, big_purchase_in: 0,  big_move_out: 6,  small_opening: 3, small_sell_out: 5  }, // Tiger Crystal (Bottle)
+  { sku: 'A010', big_opening: 8,  big_purchase_in: 10, big_move_out: 5,  small_opening: 2, small_sell_out: 4  }, // Heineken (Bottle)
+  { sku: 'A011', big_opening: 6,  big_purchase_in: 0,  big_move_out: 4,  small_opening: 3, small_sell_out: 5  }, // ABC Singapore
+  { sku: 'A012', big_opening: 12, big_purchase_in: 5,  big_move_out: 8,  small_opening: 4, small_sell_out: 6  }, // Hanuman White
+  { sku: 'A013', big_opening: 9,  big_purchase_in: 0,  big_move_out: 5,  small_opening: 2, small_sell_out: 3  }, // Hanuman Black
+  { sku: 'A014', big_opening: 15, big_purchase_in: 10, big_move_out: 10, small_opening: 5, small_sell_out: 8  }, // Vattanac Premier Light
+  { sku: 'A015', big_opening: 7,  big_purchase_in: 0,  big_move_out: 4,  small_opening: 3, small_sell_out: 5  }, // ABC (Bottle)
+  { sku: 'A016', big_opening: 11, big_purchase_in: 5,  big_move_out: 7,  small_opening: 3, small_sell_out: 6  }, // Ganzberg Snow White
+  { sku: 'A004', big_opening: 12, big_purchase_in: 0,  big_move_out: 5,  small_opening: 2, small_sell_out: 4  }, // Anchor Beer (325ml)
 ];
 
-const DAYS_TO_SEED = 2;
+// Feb 19 data (previous day — establishes opening stocks for Feb 20)
+const feb19Data: SeedRow[] = [
+  { sku: 'A001', big_opening: 12, big_purchase_in: 0,  big_move_out: 5,  small_opening: 4, small_sell_out: 4  },
+  { sku: 'A002', big_opening: 18, big_purchase_in: 0,  big_move_out: 8,  small_opening: 5, small_sell_out: 8  },
+  { sku: 'A003', big_opening: 10, big_purchase_in: 5,  big_move_out: 7,  small_opening: 3, small_sell_out: 6  },
+  { sku: 'A005', big_opening: 22, big_purchase_in: 5,  big_move_out: 7,  small_opening: 4, small_sell_out: 6  },
+  { sku: 'A006', big_opening: 16, big_purchase_in: 5,  big_move_out: 7,  small_opening: 4, small_sell_out: 4  },
+  { sku: 'A007', big_opening: 20, big_purchase_in: 5,  big_move_out: 7,  small_opening: 5, small_sell_out: 7  },
+  { sku: 'A008', big_opening: 18, big_purchase_in: 5,  big_move_out: 7,  small_opening: 3, small_sell_out: 6  },
+  { sku: 'A009', big_opening: 14, big_purchase_in: 0,  big_move_out: 7,  small_opening: 4, small_sell_out: 7  },
+  { sku: 'A010', big_opening: 10, big_purchase_in: 5,  big_move_out: 7,  small_opening: 3, small_sell_out: 6  },
+  { sku: 'A011', big_opening: 8,  big_purchase_in: 0,  big_move_out: 5,  small_opening: 4, small_sell_out: 4  },
+  { sku: 'A012', big_opening: 14, big_purchase_in: 5,  big_move_out: 7,  small_opening: 3, small_sell_out: 6  },
+  { sku: 'A013', big_opening: 11, big_purchase_in: 0,  big_move_out: 5,  small_opening: 3, small_sell_out: 6  },
+  { sku: 'A014', big_opening: 17, big_purchase_in: 5,  big_move_out: 7,  small_opening: 4, small_sell_out: 6  },
+  { sku: 'A015', big_opening: 9,  big_purchase_in: 0,  big_move_out: 5,  small_opening: 4, small_sell_out: 4  },
+  { sku: 'A016', big_opening: 13, big_purchase_in: 5,  big_move_out: 7,  small_opening: 4, small_sell_out: 5  },
+  { sku: 'A004', big_opening: 14, big_purchase_in: 0,  big_move_out: 5,  small_opening: 3, small_sell_out: 6  },
+];
+
+function computeRow(row: SeedRow, dateStr: string, productId: number) {
+  const big_remaining = row.big_opening + row.big_purchase_in - row.big_move_out;
+  const small_move_in = row.big_move_out; // transfer from big to small
+  const small_closing = row.small_opening + small_move_in - row.small_sell_out;
+  // Legacy fields
+  const opening_stock = row.big_opening + row.small_opening;
+  const purchased_qty = row.big_purchase_in;
+  const sold_qty = row.small_sell_out;
+  const closing_stock = big_remaining + small_closing;
+
+  return {
+    product_id: productId,
+    report_date: dateStr,
+    big_opening: row.big_opening,
+    big_purchase_in: row.big_purchase_in,
+    big_move_out: row.big_move_out,
+    big_remaining: Math.max(0, big_remaining),
+    small_opening: row.small_opening,
+    small_move_in: small_move_in,
+    small_sell_out: row.small_sell_out,
+    small_closing: Math.max(0, small_closing),
+    opening_stock,
+    purchased_qty,
+    sold_qty,
+    closing_stock: Math.max(0, closing_stock),
+  };
+}
 
 export default defineEventHandler(async () => {
   // === PRODUCTION: Supabase ===
   if (isProduction()) {
     const supabase = getSupabase();
 
-    const { data: products } = await supabase
+    // Look up actual product_ids by SKU
+    const { data: products, error: pErr } = await supabase
       .from('products')
-      .select('product_id, product_name, safety_stock, current_stock')
-      .eq('is_active', true)
-      .order('product_id', { ascending: true });
+      .select('product_id, sku')
+      .eq('is_active', true);
 
-    if (!products || products.length === 0) {
-      return { success: false, message: 'No products found' };
+    if (pErr || !products || products.length === 0) {
+      return { success: false, message: 'No products found. Ensure the 16 products exist.' };
+    }
+
+    // Build SKU → product_id map
+    const skuMap = new Map<string, number>();
+    for (const p of products) {
+      skuMap.set(p.sku, p.product_id);
+    }
+
+    // Build rows resolving SKU → actual product_id
+    const rows: any[] = [];
+    for (const r of feb19Data) {
+      const pid = skuMap.get(r.sku);
+      if (pid) rows.push(computeRow(r, '2026-02-19', pid));
+    }
+    for (const r of feb20Data) {
+      const pid = skuMap.get(r.sku);
+      if (pid) rows.push(computeRow(r, '2026-02-20', pid));
+    }
+
+    if (rows.length === 0) {
+      return { success: false, message: `No matching SKUs found. Expected A001-A016, got: ${products.map(p => p.sku).join(', ')}` };
     }
 
     // Delete existing Feb 2026 data
@@ -49,58 +123,20 @@ export default defineEventHandler(async () => {
       .gte('report_date', '2026-02-01')
       .lte('report_date', '2026-02-28');
 
-    const currentStock: Record<number, number> = {};
-    products.forEach(p => {
-      currentStock[p.product_id] = feb1Opening[p.product_id] ?? p.current_stock ?? 0;
-    });
-
-    let insertedCount = 0;
-    const batchRows: any[] = [];
-
-    for (let day = 1; day <= DAYS_TO_SEED; day++) {
-      const dateStr = `2026-02-${String(day).padStart(2, '0')}`;
-      const dayIndex = day - 1;
-
-      products.forEach((product, idx) => {
-        const pid = product.product_id;
-        const opening = currentStock[pid] || 0;
-        const purchased = purchases[`${day}-${pid}`] || 0;
-        const maxSellable = opening + purchased;
-        const sold = Math.min(dailySales[dayIndex]?.[idx] || 0, maxSellable);
-        const closing = opening + purchased - sold;
-
-        batchRows.push({
-          product_id: pid,
-          report_date: dateStr,
-          opening_stock: opening,
-          purchased_qty: purchased,
-          sold_qty: sold,
-          closing_stock: closing,
-        });
-
-        currentStock[pid] = closing;
-        insertedCount++;
-      });
-    }
-
-    // Insert
-    for (let i = 0; i < batchRows.length; i += 100) {
-      const batch = batchRows.slice(i, i + 100);
-      const { error } = await supabase.from('dailystockreports').upsert(batch, { onConflict: 'product_id,report_date' });
+    // Insert in batches
+    for (let i = 0; i < rows.length; i += 50) {
+      const batch = rows.slice(i, i + 50);
+      const { error } = await supabase
+        .from('dailystockreports')
+        .upsert(batch, { onConflict: 'product_id,report_date' });
       if (error) throw createError({ statusCode: 500, message: `Seed error: ${error.message}` });
-    }
-
-    // Update products with final closing stock
-    for (const product of products) {
-      const finalStock = currentStock[product.product_id] || 0;
-      await supabase.from('products').update({ current_stock: finalStock }).eq('product_id', product.product_id);
     }
 
     return {
       success: true,
-      message: `Seeded ${insertedCount} daily stock report records for Feb 1-${DAYS_TO_SEED}, 2026 (Supabase)`,
-      daysGenerated: DAYS_TO_SEED,
-      productsCount: products.length,
+      message: `Seeded ${rows.length} daily stock report records for Feb 19-20, 2026 (Supabase)`,
+      daysGenerated: 2,
+      productsCount: feb20Data.length,
     };
   }
 
@@ -114,63 +150,57 @@ export default defineEventHandler(async () => {
       purchased_qty INTEGER DEFAULT 0,
       sold_qty INTEGER DEFAULT 0,
       closing_stock INTEGER DEFAULT 0,
+      big_opening INTEGER DEFAULT 0,
+      big_purchase_in INTEGER DEFAULT 0,
+      big_move_out INTEGER DEFAULT 0,
+      big_remaining INTEGER DEFAULT 0,
+      small_opening INTEGER DEFAULT 0,
+      small_move_in INTEGER DEFAULT 0,
+      small_sell_out INTEGER DEFAULT 0,
+      small_closing INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
       UNIQUE(product_id, report_date)
     )
   `);
 
-  // Clear existing Feb 2026 data
+  // Look up actual product_ids by SKU
+  const localProducts = queryAll(`SELECT product_id, sku FROM Products WHERE is_active = 1`);
+  const skuMap = new Map<string, number>();
+  for (const p of localProducts) {
+    skuMap.set((p as any).sku, (p as any).product_id);
+  }
+
+  const rows: any[] = [];
+  for (const r of feb19Data) {
+    const pid = skuMap.get(r.sku);
+    if (pid) rows.push(computeRow(r, '2026-02-19', pid));
+  }
+  for (const r of feb20Data) {
+    const pid = skuMap.get(r.sku);
+    if (pid) rows.push(computeRow(r, '2026-02-20', pid));
+  }
+
   execute(`DELETE FROM DailyStockReports WHERE report_date BETWEEN '2026-02-01' AND '2026-02-28'`);
 
-  const products = queryAll<{ product_id: number; product_name: string; safety_stock: number; current_stock: number }>(
-    `SELECT product_id, product_name, safety_stock, current_stock FROM Products WHERE is_active = 1 ORDER BY product_id`
-  );
-
-  if (products.length === 0) {
-    return { success: false, message: 'No products found' };
+  for (const row of rows) {
+    execute(
+      `INSERT OR REPLACE INTO DailyStockReports
+       (product_id, report_date, big_opening, big_purchase_in, big_move_out, big_remaining,
+        small_opening, small_move_in, small_sell_out, small_closing,
+        opening_stock, purchased_qty, sold_qty, closing_stock)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [row.product_id, row.report_date,
+       row.big_opening, row.big_purchase_in, row.big_move_out, row.big_remaining,
+       row.small_opening, row.small_move_in, row.small_sell_out, row.small_closing,
+       row.opening_stock, row.purchased_qty, row.sold_qty, row.closing_stock]
+    );
   }
-
-  const currentStock: Record<number, number> = {};
-  products.forEach(p => {
-    currentStock[p.product_id] = feb1Opening[p.product_id] ?? p.current_stock ?? 0;
-  });
-
-  let insertedCount = 0;
-
-  for (let day = 1; day <= DAYS_TO_SEED; day++) {
-    const dateStr = `2026-02-${String(day).padStart(2, '0')}`;
-    const dayIndex = day - 1;
-
-    products.forEach((product, idx) => {
-      const pid = product.product_id;
-      const opening = currentStock[pid] || 0;
-      const purchased = purchases[`${day}-${pid}`] || 0;
-      const maxSellable = opening + purchased;
-      const sold = Math.min(dailySales[dayIndex]?.[idx] || 0, maxSellable);
-      const closing = opening + purchased - sold;
-
-      execute(
-        `INSERT OR REPLACE INTO DailyStockReports (product_id, report_date, opening_stock, purchased_qty, sold_qty, closing_stock)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [pid, dateStr, opening, purchased, sold, closing]
-      );
-
-      currentStock[pid] = closing;
-      insertedCount++;
-    });
-  }
-
-  // Update Products table with final closing stock
-  products.forEach(product => {
-    const finalStock = currentStock[product.product_id] || 0;
-    execute(`UPDATE Products SET current_stock = ? WHERE product_id = ?`, [finalStock, product.product_id]);
-  });
 
   return {
     success: true,
-    message: `Seeded ${insertedCount} daily stock report records for Feb 1-${DAYS_TO_SEED}, 2026`,
-    daysGenerated: DAYS_TO_SEED,
-    productsCount: products.length,
+    message: `Seeded ${rows.length} daily stock report records for Feb 19-20, 2026`,
+    daysGenerated: 2,
+    productsCount: feb20Data.length,
   };
 });

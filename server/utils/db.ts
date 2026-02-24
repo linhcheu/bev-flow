@@ -26,8 +26,13 @@ export const getSupabase = (): SupabaseClient => {
     throw new Error('Missing SUPABASE_URL or SUPABASE_KEY environment variables');
   }
 
-  supabase = createClient(supabaseUrl, supabaseKey);
-  console.log('✅ Supabase client initialized');
+  supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+  console.log('✅ Supabase client initialized (server-side)');
   return supabase;
 };
 

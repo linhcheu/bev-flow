@@ -35,25 +35,36 @@ export default defineEventHandler(async () => {
     const todaySalesTotal = todaySalesData?.reduce((sum, s) => sum + Number(s.total_amount), 0) || 0;
     
     // Get TODAY's sales with product info for profit calculation
-    const { data: salesWithProducts } = await supabase
+    // Sales items are in the 'saleitems' table, not in 'sales' directly
+    const { data: todaySaleIds } = await supabase
       .from('sales')
-      .select(`
-        quantity,
-        products (
-          selling_price,
-          cost_price
-        )
-      `)
+      .select('sale_id')
       .gte('sale_date', today)
       .lt('sale_date', new Date(Date.now() + 86400000).toISOString().split('T')[0]);
     
-    const todayProfitTotal = salesWithProducts?.reduce((sum, s) => {
-      const product = s.products as any;
-      if (product) {
-        return sum + ((Number(product.selling_price) - Number(product.cost_price)) * s.quantity);
-      }
-      return sum;
-    }, 0) || 0;
+    let todayProfitTotal = 0;
+    if (todaySaleIds && todaySaleIds.length > 0) {
+      const saleIds = todaySaleIds.map(s => s.sale_id);
+      const { data: saleItemsWithProducts } = await supabase
+        .from('saleitems')
+        .select(`
+          quantity,
+          unit_price,
+          products (
+            selling_price,
+            cost_price
+          )
+        `)
+        .in('sale_id', saleIds);
+      
+      todayProfitTotal = saleItemsWithProducts?.reduce((sum, item) => {
+        const product = item.products as any;
+        if (product) {
+          return sum + ((Number(product.selling_price) - Number(product.cost_price)) * item.quantity);
+        }
+        return sum;
+      }, 0) || 0;
+    }
     
     // Get TODAY's orders count
     const { count: todayOrdersCount } = await supabase
@@ -70,29 +81,48 @@ export default defineEventHandler(async () => {
       .order('current_stock', { ascending: true })
       .limit(10);
     
-    // Get recent sales
+    // Get recent sales with items info
     const { data: recentSales } = await supabase
       .from('sales')
       .select(`
         sale_id,
-        quantity,
+        sale_number,
         total_amount,
-        sale_date,
-        products (
-          product_name
-        )
+        sale_date
       `)
       .gte('sale_date', today)
       .order('sale_date', { ascending: false })
       .limit(5);
     
-    const formattedRecentSales = recentSales?.map(s => ({
-      sale_id: s.sale_id,
-      product_name: (s.products as any)?.product_name || 'Unknown',
-      quantity: s.quantity,
-      total_amount: s.total_amount,
-      sale_date: s.sale_date
-    })) || [];
+    // Get sale items for recent sales to get product names
+    const recentSaleIds = recentSales?.map(s => s.sale_id) || [];
+    let recentSaleItems: any[] = [];
+    if (recentSaleIds.length > 0) {
+      const { data: items } = await supabase
+        .from('saleitems')
+        .select(`
+          sale_id,
+          quantity,
+          products (
+            product_name
+          )
+        `)
+        .in('sale_id', recentSaleIds);
+      recentSaleItems = items || [];
+    }
+    
+    const formattedRecentSales = recentSales?.map(s => {
+      const items = recentSaleItems.filter(i => i.sale_id === s.sale_id);
+      const totalQty = items.reduce((sum: number, i: any) => sum + (i.quantity || 0), 0);
+      const productName = items.length > 0 ? ((items[0].products as any)?.product_name || 'Unknown') : 'Unknown';
+      return {
+        sale_id: s.sale_id,
+        product_name: productName + (items.length > 1 ? ` +${items.length - 1} more` : ''),
+        quantity: totalQty,
+        total_amount: s.total_amount,
+        sale_date: s.sale_date
+      };
+    }) || [];
     
     return {
       totalProducts: productCount || 0,

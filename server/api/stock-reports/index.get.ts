@@ -7,6 +7,30 @@ export default defineEventHandler(async (event) => {
   const month = query.month as string; // e.g., '2026-02'
   const productId = query.product_id as string;
 
+  const mapReport = (r: any) => ({
+    report_id: r.report_id,
+    product_id: r.product_id,
+    product_name: r.products?.product_name ?? r.product_name,
+    sku: r.products?.sku ?? r.sku,
+    description: r.products?.description ?? r.description,
+    report_date: r.report_date,
+    // Big Stock
+    big_opening: r.big_opening ?? 0,
+    big_purchase_in: r.big_purchase_in ?? 0,
+    big_move_out: r.big_move_out ?? 0,
+    big_remaining: r.big_remaining ?? 0,
+    // Small Stock
+    small_opening: r.small_opening ?? 0,
+    small_move_in: r.small_move_in ?? 0,
+    small_sell_out: r.small_sell_out ?? 0,
+    small_closing: r.small_closing ?? 0,
+    // Legacy
+    opening_stock: r.opening_stock ?? 0,
+    purchased_qty: r.purchased_qty ?? 0,
+    sold_qty: r.sold_qty ?? 0,
+    closing_stock: r.closing_stock ?? 0,
+  });
+
   // === PRODUCTION: Supabase ===
   if (isProduction()) {
     const supabase = getSupabase();
@@ -28,19 +52,7 @@ export default defineEventHandler(async (event) => {
       const { data, error } = await q;
       if (error) throw createError({ statusCode: 500, message: error.message });
 
-      const reports = (data || []).map((r: any) => ({
-        report_id: r.report_id,
-        product_id: r.product_id,
-        product_name: r.products?.product_name,
-        sku: r.products?.sku,
-        description: r.products?.description,
-        report_date: r.report_date,
-        opening_stock: r.opening_stock,
-        purchased_qty: r.purchased_qty,
-        sold_qty: r.sold_qty,
-        closing_stock: r.closing_stock,
-      }));
-
+      const reports = (data || []).map(mapReport);
       return { data: reports, date: null, month };
     }
 
@@ -56,30 +68,25 @@ export default defineEventHandler(async (event) => {
     const { data, error } = await q;
     if (error) throw createError({ statusCode: 500, message: error.message });
 
-    const reports = (data || []).map((r: any) => ({
-      report_id: r.report_id,
-      product_id: r.product_id,
-      product_name: r.products?.product_name,
-      sku: r.products?.sku,
-      description: r.products?.description,
-      report_date: r.report_date,
-      opening_stock: r.opening_stock,
-      purchased_qty: r.purchased_qty,
-      sold_qty: r.sold_qty,
-      closing_stock: r.closing_stock,
-    }));
+    const reports = (data || []).map(mapReport);
 
-    const totalOpening = reports.reduce((s: number, r: any) => s + (r.opening_stock || 0), 0);
-    const totalPurchased = reports.reduce((s: number, r: any) => s + (r.purchased_qty || 0), 0);
-    const totalSold = reports.reduce((s: number, r: any) => s + (r.sold_qty || 0), 0);
-    const totalClosing = reports.reduce((s: number, r: any) => s + (r.closing_stock || 0), 0);
-
-    return {
-      data: reports,
-      date,
-      month: null,
-      summary: { totalOpening, totalPurchased, totalSold, totalClosing },
+    const summary = {
+      totalBigOpening: reports.reduce((s, r) => s + r.big_opening, 0),
+      totalBigPurchaseIn: reports.reduce((s, r) => s + r.big_purchase_in, 0),
+      totalBigMoveOut: reports.reduce((s, r) => s + r.big_move_out, 0),
+      totalBigRemaining: reports.reduce((s, r) => s + r.big_remaining, 0),
+      totalSmallOpening: reports.reduce((s, r) => s + r.small_opening, 0),
+      totalSmallMoveIn: reports.reduce((s, r) => s + r.small_move_in, 0),
+      totalSmallSellOut: reports.reduce((s, r) => s + r.small_sell_out, 0),
+      totalSmallClosing: reports.reduce((s, r) => s + r.small_closing, 0),
+      // Legacy
+      totalOpening: reports.reduce((s, r) => s + r.opening_stock, 0),
+      totalPurchased: reports.reduce((s, r) => s + r.purchased_qty, 0),
+      totalSold: reports.reduce((s, r) => s + r.sold_qty, 0),
+      totalClosing: reports.reduce((s, r) => s + r.closing_stock, 0),
     };
+
+    return { data: reports, date, month: null, summary };
   }
 
   // === DEVELOPMENT: SQLite ===
@@ -88,8 +95,7 @@ export default defineEventHandler(async (event) => {
     const endDate = `${month}-31`;
 
     let sql = `
-      SELECT d.report_id, d.product_id, p.product_name, p.sku, p.description,
-             d.report_date, d.opening_stock, d.purchased_qty, d.sold_qty, d.closing_stock
+      SELECT d.*, p.product_name, p.sku, p.description
       FROM DailyStockReports d
       JOIN Products p ON d.product_id = p.product_id
       WHERE d.report_date BETWEEN ? AND ?
@@ -103,13 +109,12 @@ export default defineEventHandler(async (event) => {
 
     sql += ` ORDER BY d.report_date ASC, d.product_id ASC`;
 
-    const reports = queryAll(sql, params);
+    const reports = queryAll(sql, params).map(mapReport);
     return { data: reports, date: null, month };
   }
 
   let sql = `
-    SELECT d.report_id, d.product_id, p.product_name, p.sku, p.description,
-           d.report_date, d.opening_stock, d.purchased_qty, d.sold_qty, d.closing_stock
+    SELECT d.*, p.product_name, p.sku, p.description
     FROM DailyStockReports d
     JOIN Products p ON d.product_id = p.product_id
     WHERE d.report_date = ?
@@ -123,27 +128,22 @@ export default defineEventHandler(async (event) => {
 
   sql += ` ORDER BY d.product_id ASC`;
 
-  const reports = queryAll(sql, params);
+  const reports = queryAll(sql, params).map(mapReport);
 
-  const summary = queryOne<{ total_opening: number; total_purchased: number; total_sold: number; total_closing: number }>(`
-    SELECT 
-      COALESCE(SUM(opening_stock), 0) as total_opening,
-      COALESCE(SUM(purchased_qty), 0) as total_purchased,
-      COALESCE(SUM(sold_qty), 0) as total_sold,
-      COALESCE(SUM(closing_stock), 0) as total_closing
-    FROM DailyStockReports
-    WHERE report_date = ?
-  `, [date]);
-
-  return {
-    data: reports,
-    date,
-    month: null,
-    summary: {
-      totalOpening: summary?.total_opening || 0,
-      totalPurchased: summary?.total_purchased || 0,
-      totalSold: summary?.total_sold || 0,
-      totalClosing: summary?.total_closing || 0,
-    }
+  const summary = {
+    totalBigOpening: reports.reduce((s: number, r: any) => s + r.big_opening, 0),
+    totalBigPurchaseIn: reports.reduce((s: number, r: any) => s + r.big_purchase_in, 0),
+    totalBigMoveOut: reports.reduce((s: number, r: any) => s + r.big_move_out, 0),
+    totalBigRemaining: reports.reduce((s: number, r: any) => s + r.big_remaining, 0),
+    totalSmallOpening: reports.reduce((s: number, r: any) => s + r.small_opening, 0),
+    totalSmallMoveIn: reports.reduce((s: number, r: any) => s + r.small_move_in, 0),
+    totalSmallSellOut: reports.reduce((s: number, r: any) => s + r.small_sell_out, 0),
+    totalSmallClosing: reports.reduce((s: number, r: any) => s + r.small_closing, 0),
+    totalOpening: reports.reduce((s: number, r: any) => s + r.opening_stock, 0),
+    totalPurchased: reports.reduce((s: number, r: any) => s + r.purchased_qty, 0),
+    totalSold: reports.reduce((s: number, r: any) => s + r.sold_qty, 0),
+    totalClosing: reports.reduce((s: number, r: any) => s + r.closing_stock, 0),
   };
+
+  return { data: reports, date, month: null, summary };
 });

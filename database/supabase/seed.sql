@@ -1,8 +1,8 @@
 -- ==============================================
 -- BEV Flow - Supabase Seed Data
 -- Run AFTER schema.sql in Supabase SQL Editor
--- 3 users, 5 suppliers, 10 products,
--- 8 customers, 5 POs, 50 sales, 20 stock reports
+-- 3 users, 5 suppliers, 16 products,
+-- 8 customers, 5 POs, 50 sales, stock reports
 -- ==============================================
 
 -- ==============================================
@@ -29,19 +29,25 @@ INSERT INTO suppliers (company_name, contact_person, sale_agent, phone, email, a
 ('Mesa Saang Beer Depo', 'Bopha', 'Bopha', '090 245 966', 'saang-mesabeer@gmail.com', 'Saang, Kandal', 3, 'Prepaid', true);
 
 -- ==============================================
--- 3. PRODUCTS (current_stock = Feb 2 closing)
+-- 3. PRODUCTS (16 products matching Beer Stock report)
 -- ==============================================
 INSERT INTO products (sku, product_name, description, cost_price, selling_price, supplier_id, safety_stock, reorder_quantity, min_stock_level, current_stock, is_active) VALUES
 ('A001', 'ABC Extra Stout', '330ml * 24c', 25.00, 85.00, 1, 14, 35, 34, 5, true),
 ('A002', 'Anchor Beer', '330ml * 24c', 12.00, 55.00, 2, 10, 35, 20, 10, true),
 ('A003', 'Anchor Smooth White Beer', '330ml * 24c', 14.00, 59.00, 2, 10, 36, 20, 6, true),
-('A004', 'Anchor Beer (Bottle)', '325ml * 24B', 20.00, 59.00, 2, 10, 35, 21, 6, true),
+('A004', 'Anchor Beer (325ml)', '325ml * 24B', 20.00, 59.00, 2, 10, 35, 21, 6, true),
 ('A005', 'Cambodia Lite Beer', '330ml * 24c', 15.00, 59.00, 3, 10, 35, 20, 9, true),
 ('A006', 'Tiger Lager Beer', '330ml * 24c', 18.00, 65.00, 4, 14, 35, 34, 6, true),
 ('A007', 'Tiger Crystal', '330ml * 24c', 22.00, 69.00, 4, 14, 34, 34, 8, true),
 ('A008', 'Tiger Lager Beer (Bottle)', '325ml * 24B', 24.00, 69.00, 4, 14, 35, 33, 7, true),
 ('A009', 'Tiger Crystal (Bottle)', '325ml * 24B', 26.00, 75.00, 4, 14, 35, 34, 5, true),
-('A010', 'Heineken (Bottle)', '325ml * 24B', 28.00, 70.00, 5, 17, 35, 47, 4, true);
+('A010', 'Heineken (Bottle)', '325ml * 24B', 28.00, 70.00, 5, 17, 35, 47, 4, true),
+('A011', 'ABC Singapore', '330ml * 24c', 16.00, 60.00, 1, 10, 30, 20, 5, true),
+('A012', 'Hanuman White', '330ml * 24c', 13.00, 55.00, 3, 10, 30, 20, 8, true),
+('A013', 'Hanuman Black', '330ml * 24c', 14.00, 58.00, 3, 10, 30, 20, 6, true),
+('A014', 'Vattanac Premier Light', '330ml * 24c', 17.00, 62.00, 5, 12, 30, 25, 10, true),
+('A015', 'ABC (Bottle)', '325ml * 24B', 22.00, 65.00, 1, 10, 30, 20, 5, true),
+('A016', 'Ganzberg Snow White', '330ml * 24c', 15.00, 58.00, 2, 10, 30, 20, 7, true);
 
 -- ==============================================
 -- 4. CUSTOMERS
@@ -342,31 +348,45 @@ UPDATE sales SET
     total_amount = (SELECT COALESCE(SUM(amount), 0) FROM saleitems WHERE saleitems.sale_id = sales.sale_id);
 
 -- ==============================================
--- 10. DAILY STOCK REPORTS (Feb 1-2, 2026)
+-- 10. DAILY STOCK REPORTS (Feb 19-20, 2026 — Big/Small Stock model)
 -- ==============================================
-INSERT INTO dailystockreports (product_id, report_date, opening_stock, purchased_qty, sold_qty, closing_stock) VALUES
-(1,  '2026-02-01',  0, 10, 1,  9),
-(2,  '2026-02-01',  5,  0, 0,  5),
-(3,  '2026-02-01',  5,  0, 2,  3),
-(4,  '2026-02-01',  9,  0, 0,  9),
-(5,  '2026-02-01', 10,  0, 0, 10),
-(6,  '2026-02-01',  2,  0, 0,  2),
-(7,  '2026-02-01',  3,  0, 0,  3),
-(8,  '2026-02-01',  0, 10, 3,  7),
-(9,  '2026-02-01',  6,  0, 0,  6),
-(10, '2026-02-01',  8,  0, 0,  8);
+INSERT INTO dailystockreports (product_id, report_date, big_opening, big_purchase_in, big_move_out, big_remaining, small_opening, small_move_in, small_sell_out, small_closing, opening_stock, purchased_qty, sold_qty, closing_stock) VALUES
+-- Feb 19 (previous day)
+(1,  '2026-02-19', 12, 0,  5, 7,  4, 5,  4, 5,  16, 0,  4, 12),
+(2,  '2026-02-19', 18, 0,  8, 10, 5, 8,  8, 5,  23, 0,  8, 15),
+(3,  '2026-02-19', 10, 5,  7, 8,  3, 7,  6, 4,  13, 5,  6, 12),
+(4,  '2026-02-19', 14, 0,  5, 9,  3, 5,  6, 2,  17, 0,  6, 11),
+(5,  '2026-02-19', 22, 5,  7, 20, 4, 7,  5, 6,  26, 5,  5, 26),
+(6,  '2026-02-19', 16, 5,  7, 14, 4, 7,  8, 3,  20, 5,  8, 17),
+(7,  '2026-02-19', 20, 5,  7, 18, 5, 7,  7, 5,  25, 5,  7, 23),
+(8,  '2026-02-19', 18, 5,  7, 16, 3, 7,  6, 4,  21, 5,  6, 20),
+(9,  '2026-02-19', 14, 0,  7, 7,  4, 7,  8, 3,  18, 0,  8, 10),
+(10, '2026-02-19', 10, 5,  7, 8,  3, 7,  8, 2,  13, 5,  8, 10),
+(11, '2026-02-19', 8,  0,  5, 3,  4, 5,  6, 3,  12, 0,  6, 6),
+(12, '2026-02-19', 14, 5,  7, 12, 3, 7,  6, 4,  17, 5,  6, 16),
+(13, '2026-02-19', 11, 0,  5, 6,  3, 5,  6, 2,  14, 0,  6, 8),
+(14, '2026-02-19', 17, 5,  7, 15, 4, 7,  6, 5,  21, 5,  6, 20),
+(15, '2026-02-19', 9,  0,  5, 4,  4, 5,  6, 3,  13, 0,  6, 7),
+(16, '2026-02-19', 13, 5,  7, 11, 4, 7,  8, 3,  17, 5,  8, 14);
 
-INSERT INTO dailystockreports (product_id, report_date, opening_stock, purchased_qty, sold_qty, closing_stock) VALUES
-(1,  '2026-02-02',  9,  0, 4,  5),
-(2,  '2026-02-02',  5,  5, 0, 10),
-(3,  '2026-02-02',  3,  5, 2,  6),
-(4,  '2026-02-02',  9,  0, 3,  6),
-(5,  '2026-02-02', 10,  0, 1,  9),
-(6,  '2026-02-02',  2,  5, 1,  6),
-(7,  '2026-02-02',  3,  5, 0,  8),
-(8,  '2026-02-02',  7,  0, 0,  7),
-(9,  '2026-02-02',  6,  0, 1,  5),
-(10, '2026-02-02',  8,  0, 4,  4);
+INSERT INTO dailystockreports (product_id, report_date, big_opening, big_purchase_in, big_move_out, big_remaining, small_opening, small_move_in, small_sell_out, small_closing, opening_stock, purchased_qty, sold_qty, closing_stock) VALUES
+-- Feb 20 (main report day matching image)
+(1,  '2026-02-20', 10, 5,  8, 7,  3, 8,  6,  5,  13, 5,  6,  12),
+(2,  '2026-02-20', 15, 0,  10, 5, 5, 10, 12, 3,  20, 0,  12, 8),
+(3,  '2026-02-20', 8,  10, 6, 12, 4, 6,  7,  3,  12, 10, 7,  15),
+(4,  '2026-02-20', 12, 0,  5, 7,  2, 5,  4,  3,  14, 0,  4,  10),
+(5,  '2026-02-20', 20, 0,  8, 12, 6, 8,  10, 4,  26, 0,  10, 16),
+(6,  '2026-02-20', 14, 10, 12, 12, 3, 12, 8, 7,  17, 10, 8,  19),
+(7,  '2026-02-20', 18, 0,  10, 8, 5, 10, 9,  6,  23, 0,  9,  14),
+(8,  '2026-02-20', 16, 5,  8, 13, 4, 8,  7,  5,  20, 5,  7,  18),
+(9,  '2026-02-20', 10, 0,  6, 4,  3, 6,  5,  4,  13, 0,  5,  8),
+(10, '2026-02-20', 8,  10, 5, 13, 2, 5,  4,  3,  10, 10, 4,  16),
+(11, '2026-02-20', 6,  0,  4, 2,  3, 4,  5,  2,  9,  0,  5,  4),
+(12, '2026-02-20', 12, 5,  8, 9,  4, 8,  6,  6,  16, 5,  6,  15),
+(13, '2026-02-20', 9,  0,  5, 4,  2, 5,  3,  4,  11, 0,  3,  8),
+(14, '2026-02-20', 15, 10, 10, 15, 5, 10, 8, 7,  20, 10, 8,  22),
+(15, '2026-02-20', 7,  0,  4, 3,  3, 4,  5,  2,  10, 0,  5,  5),
+(16, '2026-02-20', 11, 5,  7, 9,  3, 7,  6,  4,  14, 5,  6,  13);
 
 -- ==============================================
 -- VERIFY

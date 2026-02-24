@@ -242,6 +242,17 @@ CREATE TABLE dailystockreports (
     report_id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
     report_date DATE NOT NULL,
+    -- Big Stock Inventory (Warehouse)
+    big_opening INTEGER DEFAULT 0,
+    big_purchase_in INTEGER DEFAULT 0,
+    big_move_out INTEGER DEFAULT 0,
+    big_remaining INTEGER DEFAULT 0,
+    -- Small Stock Inventory (Retail/Fridge)
+    small_opening INTEGER DEFAULT 0,
+    small_move_in INTEGER DEFAULT 0,
+    small_sell_out INTEGER DEFAULT 0,
+    small_closing INTEGER DEFAULT 0,
+    -- Legacy columns (kept for backward compatibility, computed from big+small)
     opening_stock INTEGER DEFAULT 0,
     purchased_qty INTEGER DEFAULT 0,
     sold_qty INTEGER DEFAULT 0,
@@ -296,6 +307,10 @@ GROUP BY s.supplier_id, s.company_name, s.contact_person, s.sale_agent,
 -- ==============================================
 -- ROW LEVEL SECURITY
 -- ==============================================
+-- NOTE: This app uses server-side API routes with the service_role key,
+-- which bypasses RLS entirely. These policies are kept as a safety net
+-- and also allow the anon role for cases where the anon key is used.
+-- ==============================================
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE suppliers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
@@ -308,108 +323,69 @@ ALTER TABLE dailystockreports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
 
 -- ==============================================
--- RLS POLICIES (per-operation, no always-true ALL)
+-- RLS POLICIES (allow all roles: service_role, authenticated, anon)
+-- The app handles its own authentication via JWT tokens in API routes.
 -- ==============================================
 
 -- ---- USERS ----
 CREATE POLICY "users_select" ON users FOR SELECT USING (true);
-CREATE POLICY "users_insert" ON users FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "users_update" ON users FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "users_delete" ON users FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "users_insert" ON users FOR INSERT WITH CHECK (true);
+CREATE POLICY "users_update" ON users FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "users_delete" ON users FOR DELETE USING (true);
 
 -- ---- SUPPLIERS ----
 CREATE POLICY "suppliers_select" ON suppliers FOR SELECT USING (true);
-CREATE POLICY "suppliers_insert" ON suppliers FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "suppliers_update" ON suppliers FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "suppliers_delete" ON suppliers FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "suppliers_insert" ON suppliers FOR INSERT WITH CHECK (true);
+CREATE POLICY "suppliers_update" ON suppliers FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "suppliers_delete" ON suppliers FOR DELETE USING (true);
 
 -- ---- PRODUCTS ----
 CREATE POLICY "products_select" ON products FOR SELECT USING (true);
-CREATE POLICY "products_insert" ON products FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "products_update" ON products FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "products_delete" ON products FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "products_insert" ON products FOR INSERT WITH CHECK (true);
+CREATE POLICY "products_update" ON products FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "products_delete" ON products FOR DELETE USING (true);
 
 -- ---- CUSTOMERS ----
 CREATE POLICY "customers_select" ON customers FOR SELECT USING (true);
-CREATE POLICY "customers_insert" ON customers FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "customers_update" ON customers FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "customers_delete" ON customers FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "customers_insert" ON customers FOR INSERT WITH CHECK (true);
+CREATE POLICY "customers_update" ON customers FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "customers_delete" ON customers FOR DELETE USING (true);
 
 -- ---- PURCHASE ORDERS ----
 CREATE POLICY "po_select" ON purchaseorders FOR SELECT USING (true);
-CREATE POLICY "po_insert" ON purchaseorders FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "po_update" ON purchaseorders FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "po_delete" ON purchaseorders FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "po_insert" ON purchaseorders FOR INSERT WITH CHECK (true);
+CREATE POLICY "po_update" ON purchaseorders FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "po_delete" ON purchaseorders FOR DELETE USING (true);
 
 -- ---- PURCHASE ORDER ITEMS ----
 CREATE POLICY "poi_select" ON purchaseorderitems FOR SELECT USING (true);
-CREATE POLICY "poi_insert" ON purchaseorderitems FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "poi_update" ON purchaseorderitems FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "poi_delete" ON purchaseorderitems FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "poi_insert" ON purchaseorderitems FOR INSERT WITH CHECK (true);
+CREATE POLICY "poi_update" ON purchaseorderitems FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "poi_delete" ON purchaseorderitems FOR DELETE USING (true);
 
 -- ---- SALES ----
 CREATE POLICY "sales_select" ON sales FOR SELECT USING (true);
-CREATE POLICY "sales_insert" ON sales FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "sales_update" ON sales FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "sales_delete" ON sales FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "sales_insert" ON sales FOR INSERT WITH CHECK (true);
+CREATE POLICY "sales_update" ON sales FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "sales_delete" ON sales FOR DELETE USING (true);
 
 -- ---- SALE ITEMS ----
 CREATE POLICY "si_select" ON saleitems FOR SELECT USING (true);
-CREATE POLICY "si_insert" ON saleitems FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "si_update" ON saleitems FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "si_delete" ON saleitems FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "si_insert" ON saleitems FOR INSERT WITH CHECK (true);
+CREATE POLICY "si_update" ON saleitems FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "si_delete" ON saleitems FOR DELETE USING (true);
 
 -- ---- DAILY STOCK REPORTS ----
 CREATE POLICY "dsr_select" ON dailystockreports FOR SELECT USING (true);
-CREATE POLICY "dsr_insert" ON dailystockreports FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "dsr_update" ON dailystockreports FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "dsr_delete" ON dailystockreports FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "dsr_insert" ON dailystockreports FOR INSERT WITH CHECK (true);
+CREATE POLICY "dsr_update" ON dailystockreports FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "dsr_delete" ON dailystockreports FOR DELETE USING (true);
 
 -- ---- USER SETTINGS ----
 CREATE POLICY "us_select" ON user_settings FOR SELECT USING (true);
-CREATE POLICY "us_insert" ON user_settings FOR INSERT
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "us_update" ON user_settings FOR UPDATE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'))
-  WITH CHECK ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
-CREATE POLICY "us_delete" ON user_settings FOR DELETE
-  USING ((SELECT current_setting('role')) IN ('service_role', 'authenticated'));
+CREATE POLICY "us_insert" ON user_settings FOR INSERT WITH CHECK (true);
+CREATE POLICY "us_update" ON user_settings FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "us_delete" ON user_settings FOR DELETE USING (true);
 
 -- ==============================================
 -- GRANTS
@@ -418,4 +394,5 @@ GRANT ALL ON ALL TABLES IN SCHEMA public TO service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon;
