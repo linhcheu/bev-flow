@@ -56,20 +56,6 @@
               </p>
             </div>
             
-            <!-- Background Removal Toggle -->
-            <div class="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <input 
-                id="remove_bg"
-                v-model="removeBackground"
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 border-zinc-300 rounded focus:ring-blue-500"
-              />
-              <label for="remove_bg" class="text-xs sm:text-sm text-blue-700">
-                <span class="font-medium">Remove background</span>
-                <span class="block text-[10px] text-blue-600">Automatically remove image background before saving</span>
-              </label>
-            </div>
-            
             <!-- Or enter URL -->
             <div>
               <label class="block text-xs text-zinc-500 mb-1">Or enter image URL</label>
@@ -326,7 +312,6 @@ const { suppliers, fetchSuppliers } = useSuppliers();
 // Image handling
 const imagePreview = ref<string | null>(null);
 const selectedFileName = ref<string>('');
-const removeBackground = ref(true);
 
 const form = ref<Product>({
   sku: props.product?.sku || '',
@@ -364,16 +349,7 @@ const handleImageUpload = async (event: Event) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     imagePreview.value = e.target?.result as string;
-    
-    // If remove background is enabled, we would call an API here
-    // For now, just use the original image
-    if (removeBackground.value) {
-      // TODO: Integrate with background removal API (e.g., remove.bg)
-      // For now, just use the uploaded image
-      form.value.image_url = imagePreview.value;
-    } else {
-      form.value.image_url = imagePreview.value;
-    }
+    form.value.image_url = imagePreview.value;
   };
   reader.readAsDataURL(file);
 };
