@@ -156,7 +156,7 @@
         </form>
         
         <!-- Demo Credentials -->
-        <div class="mt-6 sm:mt-8 p-3 sm:p-4 bg-zinc-50 border border-zinc-100 rounded-lg">
+        <!-- <div class="mt-6 sm:mt-8 p-3 sm:p-4 bg-zinc-50 border border-zinc-100 rounded-lg">
           <p class="text-[10px] sm:text-xs text-zinc-400 mb-2 sm:mb-3 uppercase tracking-wide font-medium">Demo Accounts</p>
           <div class="space-y-2 text-xs sm:text-sm">
             <div class="flex items-center justify-between text-zinc-600">
@@ -172,7 +172,7 @@
               <span>staff@bevflow.com / staff123</span>
             </div>
           </div>
-        </div>
+        </div> -->
         
         <!-- Footer (Mobile/Tablet) -->
         <p class="lg:hidden mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-zinc-400">
