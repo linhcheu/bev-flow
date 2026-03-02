@@ -38,9 +38,9 @@
         </button>
         <div class="flex items-center gap-2">
           <div class="w-7 h-7 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-50">
-            <img src="/images/logo-1.png" alt="BEV Flow" class="w-full h-full object-cover" />
+            <img src="/images/logo-1.png" alt="H2O" class="w-full h-full object-cover" />
           </div>
-          <span class="font-semibold text-zinc-900 text-sm sm:text-base">BEV Flow</span>
+          <span class="font-semibold text-zinc-900 text-sm sm:text-base">H2O</span>
         </div>
         <div class="w-9"></div>
       </header>

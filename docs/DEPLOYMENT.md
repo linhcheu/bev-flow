@@ -1,8 +1,8 @@
-# BEV Flow - Supabase + Vercel Deployment Guide
+# H2O - Supabase + Vercel Deployment Guide
 
 ## 📋 Overview
 
-This guide will help you deploy BEV Flow to **Vercel** with **Supabase** as the database.
+This guide will help you deploy H2O to **Vercel** with **Supabase** as the database.
 
 ---
 
@@ -81,7 +81,7 @@ npm install @supabase/supabase-js
 # If not already a git repo
 git init
 git add .
-git commit -m "Initial commit - BEV Flow"
+git commit -m "Initial commit - H2O"
 
 # Create repo on GitHub, then:
 git remote add origin https://github.com/YOUR_USERNAME/bev-flow.git

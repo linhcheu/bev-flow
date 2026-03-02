@@ -1,5 +1,5 @@
 -- ==============================================
--- BEV Flow - Supabase Seed Data
+-- H2O - Supabase Seed Data
 -- Run AFTER schema.sql in Supabase SQL Editor
 -- 3 users, 5 suppliers, 16 products,
 -- 8 customers, 5 POs, 50 sales, stock reports

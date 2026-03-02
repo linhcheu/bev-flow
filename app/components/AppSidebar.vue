@@ -11,10 +11,10 @@
     <div class="px-4 py-5 border-b border-zinc-100 flex items-center justify-between">
       <NuxtLink to="/" class="flex items-center gap-3 no-underline" @click="closeMobileSidebar">
         <div class="w-9 h-9 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-50 shrink-0">
-          <img src="/images/logo-1.png" alt="BEV Flow Logo" class="w-full h-full object-cover" />
+          <img src="/images/logo-1.png" alt="H2O Logo" class="w-full h-full object-cover" />
         </div>
         <div v-if="isExpanded" class="overflow-hidden">
-          <h2 class="text-sm font-semibold text-zinc-900 whitespace-nowrap">BEV Flow</h2>
+          <h2 class="text-sm font-semibold text-zinc-900 whitespace-nowrap">H2O</h2>
           <p class="text-[10px] text-zinc-500 tracking-wide">Inventory System</p>
         </div>
       </NuxtLink>

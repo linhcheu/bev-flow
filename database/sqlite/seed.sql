@@ -1,5 +1,5 @@
 -- ==============================================
--- BEV Flow - SQLite Seed Data
+-- H2O - SQLite Seed Data
 -- Run AFTER schema.sql
 -- 3 users, 5 suppliers, 10 products, 10 PSA,
 -- 8 customers, 5 POs, 50 sales, 20 stock reports

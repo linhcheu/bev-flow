@@ -1,6 +1,6 @@
-# BEV Flow - Documentation Index
+# H2O - Documentation Index
 
-Welcome to the BEV Flow Inventory Management System documentation!
+Welcome to the H2O Inventory Management System documentation!
 
 ## 📚 Documentation Guide
 

@@ -1,4 +1,4 @@
-# BEV Flow - File Structure Reference
+# H2O - File Structure Reference
 
 ## Complete Project Structure
 

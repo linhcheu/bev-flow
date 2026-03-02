@@ -10,9 +10,9 @@
         <!-- Logo -->
         <div class="mb-8 xl:mb-12">
           <div class="w-16 h-16 xl:w-20 xl:h-20 rounded-2xl overflow-hidden border border-zinc-200 shadow-sm mb-6">
-            <img src="/images/logo-1.png" alt="BEV Flow Logo" class="w-full h-full object-cover" />
+            <img src="/images/logo-1.png" alt="H2O Logo" class="w-full h-full object-cover" />
           </div>
-          <h1 class="text-3xl xl:text-4xl 2xl:text-5xl font-semibold text-zinc-900 mb-3 tracking-tight">BEV Flow</h1>
+          <h1 class="text-3xl xl:text-4xl 2xl:text-5xl font-semibold text-zinc-900 mb-3 tracking-tight">H2O</h1>
           <p class="text-base xl:text-lg text-zinc-500 font-normal">Beverage Inventory Management System</p>
         </div>
                                     
@@ -51,7 +51,7 @@
         
         <!-- Footer on branding side -->
         <div class="mt-auto pt-8 xl:pt-12">
-          <p class="text-xs text-zinc-400">© 2026 BEV Flow. All rights reserved.</p>
+          <p class="text-xs text-zinc-400">© 2026 H2O. All rights reserved.</p>
         </div>
       </div>
     </div>
@@ -62,9 +62,9 @@
         <!-- Logo (visible on mobile/tablet only) -->
         <div class="login-mobile-header">
           <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border border-zinc-200 shadow-sm mx-auto mb-3">
-            <img src="/images/logo-1.png" alt="BEV Flow Logo" class="w-full h-full object-cover" />
+            <img src="/images/logo-1.png" alt="H2O Logo" class="w-full h-full object-cover" />
           </div>
-          <h1 class="text-xl sm:text-2xl font-semibold text-zinc-900">BEV Flow</h1>
+          <h1 class="text-xl sm:text-2xl font-semibold text-zinc-900">H2O</h1>
           <p class="text-xs sm:text-sm text-zinc-500 mt-1">Inventory Management</p>
         </div>
         
@@ -176,7 +176,7 @@
         
         <!-- Footer (Mobile/Tablet) -->
         <p class="lg:hidden mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-zinc-400">
-          © 2026 BEV Flow. All rights reserved.
+          © 2026 H2O. All rights reserved.
         </p>
       </div>
     </div>

@@ -151,7 +151,7 @@ const drawFooter = (doc: jsPDF, pageWidth: number, pageHeight: number, margin: n
   
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.muted);
-  doc.text('BEV Flow - Inventory Management System', margin, footerY);
+  doc.text('H2O - Inventory Management System', margin, footerY);
   doc.text(`Page ${currentPage} of ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
   doc.text(`Generated: ${new Date().toLocaleString('en-US')}`, pageWidth / 2, footerY, { align: 'center' });
 };
@@ -171,7 +171,7 @@ export const useExport = () => {
     
     // Create header rows with branding
     const headerRows: any[][] = [
-      ['BEV FLOW'],
+      ['H2O'],
       ['Karaoke Inventory Management System'],
       [''],
       [title],
@@ -768,7 +768,7 @@ export const useReceiptExport = () => {
     const generatedDate = new Date().toLocaleString('en-US');
     
     const headerData = [
-      ['BEV FLOW'],
+      ['H2O'],
       ['Karaoke Inventory Management System'],
       [''],
       ['═══════════════════════════════════════════'],
@@ -1704,7 +1704,7 @@ export const useReceiptExport = () => {
     const isLowStock = (product.current_stock || 0) <= (product.min_stock_level || 0);
     
     const data = [
-      ['BEV FLOW'],
+      ['H2O'],
       ['Karaoke Inventory Management System'],
       [''],
       ['═══════════════════════════════════════════'],
@@ -1753,7 +1753,7 @@ export const useReceiptExport = () => {
     const generatedDate = new Date().toLocaleString('en-US');
     
     const data = [
-      ['BEV FLOW'],
+      ['H2O'],
       ['Karaoke Inventory Management System'],
       [''],
       ['═══════════════════════════════════════════'],
@@ -1801,7 +1801,7 @@ export const useReceiptExport = () => {
     const generatedDate = new Date().toLocaleString('en-US');
     
     const headerData: any[][] = [
-      ['BEV FLOW'],
+      ['H2O'],
       ['Karaoke Inventory Management System'],
       [''],
       ['═══════════════════════════════════════════════════════'],
@@ -1881,7 +1881,7 @@ export const useReceiptExport = () => {
     const needsReorder = predicted > currentStock;
     
     const data = [
-      ['BEV FLOW'],
+      ['H2O'],
       ['Karaoke Inventory Management System'],
       [''],
       ['═══════════════════════════════════════════'],

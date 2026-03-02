@@ -1,5 +1,5 @@
 -- ==============================================
--- BEV Flow - SQLite Database Schema
+-- H2O - SQLite Database Schema
 -- Compatible with better-sqlite3
 -- Version: 2.0 (No Forecasts)
 -- ==============================================

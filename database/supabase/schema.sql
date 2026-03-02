@@ -1,5 +1,5 @@
 -- ==============================================
--- BEV Flow - Supabase PostgreSQL Schema
+-- H2O - Supabase PostgreSQL Schema
 -- Version: 2.0 (Production-Ready, No Forecasts)
 -- Includes: RLS, triggers, indexes, grants
 -- Run in Supabase SQL Editor

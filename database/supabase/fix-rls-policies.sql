@@ -1,5 +1,5 @@
 -- ==============================================
--- BEV Flow - FIX RLS POLICIES
+-- H2O - FIX RLS POLICIES
 -- Run this in Supabase SQL Editor to fix write operations
 -- ==============================================
 -- Problem: The old RLS policies only allowed 'service_role' and 'authenticated'

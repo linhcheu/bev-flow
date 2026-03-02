@@ -1,4 +1,4 @@
-# BEV Flow - Beverage Inventory Management System
+# H2O - Beverage Inventory Management System
 
 A modern, full-featured inventory management system designed for beverage distributors, retailers, and karaoke businesses.
 
@@ -114,7 +114,7 @@ Every data page includes comprehensive export options:
 | Analytics | ✅ | ✅ | - |
 
 **Export Features:**
-- Professional PDF layouts with BEV Flow logo/branding header
+- Professional PDF layouts with H2O logo/branding header
 - Multi-item invoice support for sales exports
 - Excel exports with formatted cells and proper column widths
 - One-click export from list views and detail modals

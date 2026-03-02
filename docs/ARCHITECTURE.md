@@ -1,4 +1,4 @@
-# BEV Flow - Visual Architecture
+# H2O - Visual Architecture
 
 ## 🏗️ Application Architecture
 
@@ -153,7 +153,7 @@ DATABASE
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│  BEV Flow                                    [User Menu]    │ Header
+│  H2O                                    [User Menu]    │ Header
 ├──────────┬─────────────────────────────────────────────────┤
 │          │                                                  │
 │  📊 Dash │  ┌────────────────────────────────────────┐    │

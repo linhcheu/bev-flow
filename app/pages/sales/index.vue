@@ -346,7 +346,7 @@
           <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6">
             <!-- Receipt Header -->
             <div class="text-center border-b border-dashed border-zinc-300 pb-4 mb-4">
-              <h2 class="text-lg font-bold text-zinc-900">BEV FLOW</h2>
+              <h2 class="text-lg font-bold text-zinc-900">H2O</h2>
               <p class="text-xs text-zinc-500">Karaoke Inventory System</p>
             </div>
             
